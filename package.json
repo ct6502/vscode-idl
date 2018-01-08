@@ -1,0 +1,32 @@
+{
+    "name": "idl",
+    "displayName": "IDL Interactive Data Language",
+    "description": "IDL syntax highlighting",
+    "version": "1.0.0",
+    "publisher": "CT6502",
+    "engines": {
+        "vscode": "^1.19.0"
+    },
+    "categories": [
+        "Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "idl",
+            "aliases": ["IDL", "idl"],
+            "extensions": [".pro"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "idl",
+            "scopeName": "source.idl",
+            "path": "./syntaxes/idl.tmLanguage"
+        }],
+        "snippets": [
+            {
+                "language": "idl",
+                "path": "./snippets/snippets.json"
+            }
+        ]
+    }
+}

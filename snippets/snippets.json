@@ -1,0 +1,116 @@
+{
+	"kw": {
+		"prefix": "kw",
+		"body": "typedef struct {\n  IDL_KW_RESULT_FIRST_FIELD;\n  IDL_VPTR ${1};\n  int ${1}_present;\n} KW_RESULT;\n\nstatic IDL_KW_PAR kw_pars[] = {\n  { \"${1/./\\u$0/g}\", IDL_TYP_LONG, 1, IDL_KW_OUT,\n    IDL_KW_OFFSETOF(${1}_present), IDL_KW_OFFSETOF(${1}) },\n  { NULL }\n};\n\nnargs = IDL_KWProcessByOffset(argc, argv, argk, kw_pars, (IDL_VPTR *) NULL, 1, &kw);\n\nIDL_KW_FREE;",
+		"description": "C keywords",
+		"scope": "source.c"
+	},
+	"pro": {
+		"prefix": "pro",
+		"body": "static void $1(int argc, IDL_VPTR *argv, char *argk) {\n  $0\n}\n",
+		"description": "C procedure",
+		"scope": "source.c"
+	},
+	"function": {
+		"prefix": "function",
+		"body": "static IDL_VPTR $1(int argc, IDL_VPTR *argv, char *argk) {\n  $0\n}",
+		"description": "C function",
+		"scope": "source.c"
+	},
+	"init": {
+		"prefix": "init",
+		"body": "int IDL_Load(void) {\n  static IDL_SYSFUN_DEF2 function_addr[] = {\n    { ${1}, \"${2}\", ${3|0}, ${4|0}, ${5|IDL_SYSFUN_DEF_F_KEYWORDS,0|}, 0 },\n  };\n\n  static IDL_SYSFUN_DEF2 procedure_addr[] = {\n    { (IDL_SYSRTN_GENERIC) ${6}, \"${7}\", ${8|0}, ${9|0}, ${10|IDL_SYSFUN_DEF_F_KEYWORDS,0|}, 0 },\n  };\n\n  return IDL_SysRtnAdd(procedure_addr, FALSE, IDL_CARRAY_ELTS(procedure_addr))\n         && IDL_SysRtnAdd(function_addr, TRUE, IDL_CARRAY_ELTS(function_addr));\n}",
+		"description": "C IDL_Load",
+		"scope": "source.c"
+	},
+	"case": {
+		"prefix": "case",
+		"body": "case $1 of\n  $2: ${3|; TODO implement|}\n  else:\nendcase\n$0\n",
+		"description": "case statement",
+		"scope": "source.idl"
+	},
+	"class": {
+		"prefix": "class",
+		"body": "; docformat = 'rst'\n\n;+\n; Definition of ${1} class.\n;\n; :Properties:\n;\n; :Author:\n;   $TM_FULLNAME\n;-\n\n\n;= Property access\n\n;+\n; Set properties.\n;-\npro ${1/./\\l$0/g}::setProperty\n  compile_opt strictarr\n\nend\n\n\n;+\n; Get properties.\n;-\npro ${1/./\\l$0/g}::getProperty\n  compile_opt strictarr\n\nend\n\n\n;= Lifecycle methods\n\n;+\n; Free resources.\n;-\npro${1/./\\l$0/g}::cleanup\n  compile_opt strictarr\n\nend\n\n\n;+\n; Instantiate ${1/./\\l$0/g} object.\n;\n; :Returns:\n;    1 for success, 0 for failure\n;-\nfunction ${1/./\\l$0/g}::init\n  compile_opt strictarr\n\n  return, 1\nend\n\n\n;+\n; Define instance variables.\n;\n; :Fields:\n;   $2\n;-\npro ${1/./\\l$0/g}__define\n  compile_opt strictarr\n\n  define = { ${1}, $2$0 }\nend",
+		"description": "class",
+		"scope": "source.idl"
+	},
+	"co": {
+		"prefix": "co",
+		"body": "compile_opt ${1|strictarr|}\n\n$0",
+		"description": "compile_opt",
+		"scope": "source.idl"
+	},
+	"def": {
+		"prefix": "def",
+		"body": "_$1 = n_elements($1) eq 0L ? $2 : $1\n$0\n",
+		"description": "default",
+		"scope": "source.idl"
+	},
+	"doc": {
+		"prefix": "doc",
+		"body": "; docformat = '${1|rst|}'\n\n$0",
+		"description": "docformat",
+		"scope": "source.idl"
+	},
+	"else": {
+		"prefix": "else",
+		"body": "else begin\n  ${1|; TODO: implement|}\nendelse\n$0\n",
+		"description": "else clause",
+		"scope": "source.idl"
+	},
+	"else if": {
+		"prefix": "else if",
+		"body": "else if ($1) then begin\n  ${2|; TODO: implement|}\nendif$0\n",
+		"description": "else if clause",
+		"scope": "source.idl"
+	},
+	"for": {
+		"prefix": "for",
+		"body": "for $1 = $2, $3 do begin\n  ${4|; TODO: implement|}\nendfor\n$0",
+		"description": "for loop",
+		"scope": "source.idl"
+	},
+	"foreach": {
+		"prefix": "foreach",
+		"body": "foreach $1, $2, $3 do begin\n  ${4|; TODO: implement|}\nendforeach\n$0",
+		"description": "foreach loop",
+		"scope": "source.idl"
+	},
+	"function1": {
+		"prefix": "function",
+		"body": ";+\n; $1\n;\n; :Returns:\n;    $2\n;-\nfunction $3\n  compile_opt strictarr\n\n  ${0|; TODO: implement|}\nend",
+		"description": "function",
+		"scope": "source.idl"
+	},
+	"if": {
+		"prefix": "if",
+		"body": "if ($1) then begin\n  ${2|; TODO: implement|}\nendif$0\n",
+		"description": "if statement",
+		"scope": "source.idl"
+	},
+	"pro1": {
+		"prefix": "pro",
+		"body": ";+\n; $1\n;-\npro $2\n  compile_opt strictarr\n\n  ${0|; TODO: implement|}\nend\n",
+		"description": "procedure",
+		"scope": "source.idl"
+	},
+	"subclass": {
+		"prefix": "subclass",
+		"body": "; docformat = 'rst'\n\n;+\n; Definition of ${1} class.\n;\n; :Properties:\n;   _extra\n;     properties from $2\n;\n; :Author:\n;   $TM_FULLNAME\n;-\n\n\n;= Property access\n\n;+\n; Set properties.\n;-\npro ${1/./\\l$0/g}::setProperty, _extra=e\n  compile_opt strictarr\n\n  if (n_elements(e) gt 0L) then self->$2::setProperty, _extra=e\nend\n\n\n;+\n; Get properties.\n;-\npro ${1/./\\l$0/g}::getProperty, _ref_extra=e\n  compile_opt strictarr\n\n  if (n_elements(e) gt 0L) then self->$2::getProperty, _extra=e\nend\n\n\n;= Lifecycle methods\n\n;+\n; Free resources.\n;-\npro ${1/./\\l$0/g}::cleanup\n  compile_opt strictarr\n\n  self->$2::cleanup\nend\n\n\n;+\n; Instantiate ${1/./\\l$0/g} object.\n;\n; :Returns:\n;    1 for success, 0 for failure\n;-\nfunction ${1/./\\l$0/g}::init, _extra=e\n  compile_opt strictarr\n\n  if (~self->$2::init(_extra=e)) then return, 0\n\n  return, 1\nend\n\n\n;+\n; Define instance variables.\n;-\npro ${1/./\\l$0/g}__define\n  compile_opt strictarr\n\n  define = { ${1}, inherits $2$0 }\nend",
+		"description": "subclass",
+		"scope": "source.idl"
+	},
+	"switch": {
+		"prefix": "switch",
+		"body": "switch ($1) of\n  $2: ${3|; TODO: implement|}\n  else: \nendswitch\n$0\n",
+		"description": "switch statement",
+		"scope": "source.idl"
+	},
+	"while": {
+		"prefix": "while",
+		"body": "while ($1) do begin\n  ${2|; TODO: implement|}\nendwhile\n$0",
+		"description": "while loop",
+		"scope": "source.idl"
+	}
+}
