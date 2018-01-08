@@ -1,9 +1,14 @@
 {
     "name": "idl",
     "displayName": "IDL Interactive Data Language",
-    "description": "IDL syntax highlighting",
+    "description": "IDL syntax highlighting and code snippets",
     "version": "1.0.0",
     "publisher": "CT6502",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/chris-torrence/vscode-idl"
+    },
+    "license": "SEE LICENSE IN LICENSE",
     "engines": {
         "vscode": "^1.19.0"
     },
