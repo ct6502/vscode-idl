@@ -15,6 +15,7 @@
     "categories": [
         "Languages"
     ],
+    "icon": "images/idlicon.png",
     "contributes": {
         "languages": [{
             "id": "idl",
