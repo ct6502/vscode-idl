@@ -13,4 +13,4 @@ None.
 
 ## Release Notes
 
-See CHANGELOG.md.
+See [CHANGELOG](CHANGELOG.md).
