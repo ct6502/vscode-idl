@@ -400,9 +400,9 @@
 			<key>comment</key>
 			<string>IDL Code Continuation Blocks</string>
 			<key>begin</key>
-			<string>(?i)(?<![a-z0-9_])\$</string>
+			<string>(?i)(?<![a-z0-9_])\$.*\n</string>
 			<key>end</key>
-			<string>^(?!(^[\s]*$)).*</string>
+			<string>^((?!((?<![a-z0-9_])\$.*\n)).)*$</string>
 			<key>patterns</key>
 			<array>
 				<dict>
