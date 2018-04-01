@@ -15,6 +15,17 @@
 	<key>patterns</key>
 	<array>
 		<dict>
+			<key>match</key>
+			<string>(?ix)
+			(?=(function|pro)\b) # borrowed from ruby bundle
+			(?&lt;=^|\s)(function|pro)\s+ # the function keyword
+			(?&gt;\[(.*)\])? # match various different combination of output arguments
+			((?&gt;[a-z_][a-z_$0-9]*))?
+			(?&gt;\s*=\s*)?
+			((?&gt;[a-z_][a-z_$0-9]*(::[a-z_][a-z_$0-9]*)?(?&gt;[?!]|=(?!&gt;))? )) # the function name
+			</string>
+			<key>name</key>
+			<string>meta.function.idl</string>
 			<key>captures</key>
 			<dict>
 				<key>1</key>
@@ -43,17 +54,6 @@
 					<string>entity.name.function.idl</string>
 				</dict>
 			</dict>
-			<key>match</key>
-			<string>(?ix)
-(?=(function|pro)\b) # borrowed from ruby bundle
-(?&lt;=^|\s)(function|pro)\s+ # the function keyword
-(?&gt;\[(.*)\])? # match various different combination of output arguments
-((?&gt;[a-zA-Z_][a-zA-Z_$0-9]*))?
-(?&gt;\s*=\s*)?
-((?&gt;[a-zA-Z_][a-zA-Z_$0-9]*(::[a-zA-Z_][a-zA-Z_$0-9]*)?(?&gt;[?!]|=(?!&gt;))? )) # the function name
-</string>
-			<key>name</key>
-			<string>meta.function.idl</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -90,6 +90,10 @@
 		<dict>
 			<key>include</key>
 			<string>#all_idl_procedure_keywords</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#idl_structures</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -168,14 +172,6 @@
 			<array>
 				<dict>
 					<key>include</key>
-					<string>#idl_keyword_control</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_keyword_operator</string>
-				</dict>
-				<dict>
-					<key>include</key>
 					<string>#idl_operator</string>
 				</dict>
 				<dict>
@@ -197,6 +193,14 @@
 				<dict>
 					<key>include</key>
 					<string>#idl_line_continuation_blocks</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#idl_keyword_control</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#idl_keyword_operator</string>
 				</dict>
 			</array>
 		</dict>
@@ -227,6 +231,10 @@
 				<dict>
 					<key>include</key>
 					<string>#all_idl_procedure_keywords</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#idl_structures</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -360,21 +368,6 @@
 			<key>name</key>
 			<string>support.function.idl</string>
 		</dict>
-		<key>idl_general_procedure_methods</key>
-		<dict>
-			<key>comment</key>
-			<string>IDL General Procedure Methods</string>
-			<key>match</key>
-			<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*(?=\,))</string>
-			<key>captures</key>
-			<dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>support.function.idl</string>
-				</dict>
-			</dict>
-		</dict>
 		<key>idl_general_functions</key>
 		<dict>
 			<key>comment</key>
@@ -395,7 +388,7 @@
 			<key>name</key>
 			<string>meta.variable.other.valid.idl</string>
 		</dict> -->
-		<key>idl_line_continuation_blocks</key>
+		<!-- <key>idl_line_continuation_blocks</key>
 		<dict>
 			<key>comment</key>
 			<string>IDL Code Continuation Blocks</string>
@@ -407,42 +400,168 @@
 			<array>
 				<dict>
 					<key>include</key>
-					<string>#idl_keyword_control</string>
+					<string>#allofem</string>
+				</dict>
+			</array>
+		</dict> -->
+		<key>idl_general_procedure_methods</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>IDL General Procedure Methods</string>
+					<key>match</key>
+					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*(?=\,))</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
 				</dict>
 				<dict>
-					<key>include</key>
-					<string>#idl_keyword_operator</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_operator</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_storage_type</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_sysvar</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_general_function_methods</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_general_functions</string>
+					<key>comment</key>
+					<string>IDL General Procedure Methods</string>
+					<key>match</key>
+					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)(\s*)$</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
 				</dict>
 			</array>
 		</dict>
 		<key>idl_general_procedures</key>
 		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedures with args/keywords</string>
+					<key>match</key>
+					<string>(?i)^\s*[a-z_][a-z0-9_$]*(?=\,)</string>
+					<key>name</key>
+					<string>support.function.idl</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedures with no arguments or keywords</string>
+					<key>match</key>
+					<string>(?i)^(\s*)(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)([a-z_][a-z_$]*)(\s*)$</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
+		<key>idl_structures</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>Structure names</string>
+					<key>match</key>
+					<string>(?i)({\s*)([a-z_][a-z0-9_$]*\s*(?=,|}))</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.type</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Structure/object inheritance</string>
+					<key>match</key>
+					<string>(?i)(\s*inherits\s+)([a-z_][a-z0-9_$]*\s*(?=,|}|\n))</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.control.idl</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.type</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Structure tags</string>
+					<key>match</key>
+					<string>(?i)([a-z_][a-z0-9_$]*\s*(?=:))</string>
+					<key>name</key>
+					<string>entity.name.tag</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Accessing properties (structures or objects)</string>
+					<key>match</key>
+					<string>(?i)([~=\*/(\-+,]\s*|mod\s*)([a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
+					<key>captures</key>
+					<dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Accessing properties (structures or objects) with mod operator before</string>
+					<key>match</key>
+					<string>(?i)(mod\s+)([a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.control.idl</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Accessing properties of properties or indexing properties</string>
+					<key>match</key>
+					<string>(?i)(?<=\.)[a-z_][a-z0-9_$]*(?=[\.\[])</string>
+					<key>name</key>
+					<string>entity.name.tag</string>
+				</dict>
+			</array>
+		</dict>
+		<key>idl_routine_keywords</key>
+		<dict>
 			<key>comment</key>
-			<string>IDL General Procedures</string>
+			<string>IDL routine keywords</string>
 			<key>match</key>
-			<string>^\s*(?!goto)[a-z_][a-z0-9_$]*(?=\,)</string>
+			<string>(?i)(?<![a-z0-9.])((?<=\(|\s|,)\/\s*[a-z_][a-z0-9_$]*)</string>
 			<key>name</key>
-			<string>support.function.idl</string>
+			<string>entity.name.tag</string>
 		</dict>
 		<key>idl_sysvar</key>
 		<dict>
