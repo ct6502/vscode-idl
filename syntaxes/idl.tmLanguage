@@ -347,15 +347,15 @@
 				</dict>
 			</array>
 		</dict>
-		<key>idl_operator</key>
+		<!-- <key>idl_operator</key>
 		<dict>
 			<key>comment</key>
-			<string>Operator symbols</string>
+			<string>Operator symbols - BREAKS PROPERTIES, DO NOT UNCOMMENT</string>
 			<key>match</key>
 			<string>(?i)(&gt;|&lt;|&amp;&amp;|\?|:|\||\|\||\+|-|\*|\.\*|/|\./|\\|\.\\|\^|\.\^)</string>
 			<key>name</key>
 			<string>keyword.operator.symbols.idl</string>
-		</dict>
+		</dict> -->
 		<key>idl_storage_type</key>
 		<dict>
 			<key>comment</key>
@@ -377,11 +377,22 @@
 		<key>idl_sysvar</key>
 		<dict>
 			<key>comment</key>
-			<string>IDL system variables</string>
+			<string>IDL system variables and optional variable access - will fail if system variable is object with methods</string>
 			<key>match</key>
-			<string>(?i)\![a-z_][a-z0-9_$]*\b</string>
-			<key>name</key>
-			<string>constant.language.idl</string>
+			<string>(?i)(\![a-z_][a-z0-9_$]*)(\.|\b)([a-z_][a-z0-9_$]*|\b)</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>constant.language.idl</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.tag</string>
+				</dict>
+			</dict>
 		</dict>
 		<!-- <key>idl_line_continuation_blocks</key>
 		<dict>
@@ -529,7 +540,7 @@
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>Structure/object inheritances</string>
+					<string>Inheritance in structure declaration</string>
 					<key>match</key>
 					<string>(?i)(\s*inherits\s+)([a-z_][a-z0-9_$]*\s*(?=,|}|\n))</string>
 					<key>captures</key>
@@ -551,28 +562,28 @@
 						</dict>
 					</dict>
 				</dict>
-				<dict>
+				<!-- <dict>
 					<key>comment</key>
-					<string>Structure tag/property name declarations</string>
+					<string>Structure tag/property name declarations - false positives in array indexing</string>
 					<key>match</key>
 					<string>(?i)(\s*|{\s*)([a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
 					<key>name</key>
 					<string>entity.name.tag</string>
-				</dict>
+				</dict> -->
 				<dict>
 					<key>comment</key>
-					<string>Accessing properties (structures or objects) does not work if within structure definition tag</string>
+					<string>Extracting properties</string>
 					<key>match</key>
-					<string>(?i)([:~=\*/(\-+,]\s*)([!a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
+					<string>(?i)(&&|\|\||\*|\/|\+|mod|\-|\(|\:|=|,|\^)\s*([a-z_][a-z0-9_$]*\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
-						<key>2</key>
+						<key>1</key>
 						<dict>
 							<key>patterns</key>
 							<array>
 								<dict>
 									<key>include</key>
-									<string>#idl_sysvar</string>
+									<string>#idl_control_statements</string>
 								</dict>
 							</array>
 						</dict>
@@ -585,26 +596,7 @@
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>Accessing properties with mod operator before</string>
-					<key>match</key>
-					<string>(?i)(mod\s+)([a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
-					<key>captures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>name</key>
-							<string>keyword.control.idl</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.tag</string>
-						</dict>
-					</dict>
-				</dict>
-				<dict>
-					<key>comment</key>
-					<string>Accessing properties of properties or indexing properties</string>
+					<string>Get property of property</string>
 					<key>match</key>
 					<string>(?i)(?<=\.)[a-z_][a-z0-9_$]*(?=[\.\[])</string>
 					<key>name</key>
