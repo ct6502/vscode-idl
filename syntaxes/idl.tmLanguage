@@ -424,7 +424,7 @@
 			<array>
 				<dict>
 					<key>comment</key>
-					<string>IDL General Procedure Methods</string>
+					<string>IDL Procedure Methods with args/keywords</string>
 					<key>match</key>
 					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*(?=\,))</string>
 					<key>captures</key>
@@ -438,9 +438,23 @@
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>IDL General Procedure Methods</string>
+					<string>IDL Procedure Methods with nothing on the line</string>
 					<key>match</key>
 					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)(\s*)$</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedure Methods with comment after</string>
+					<key>match</key>
+					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)(?=\s*;.*)</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
@@ -463,6 +477,20 @@
 					<string>IDL Procedures with no arguments or keywords</string>
 					<key>match</key>
 					<string>(?i)^(\s*)(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)([a-z_][a-z_$]*)(\s*)$</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedures with no arguments or keywords and comment</string>
+					<key>match</key>
+					<string>(?i)^(\s*)(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)([a-z_][a-z_$]*)(?=\s*;.*)</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
