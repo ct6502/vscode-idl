@@ -505,9 +505,9 @@
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>Structure tags</string>
+					<string>Structure tag/property names</string>
 					<key>match</key>
-					<string>(?i)([a-z_][a-z0-9_$]*\s*(?=:))</string>
+					<string>(?i)(\s*|{\s*)([a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
 					<key>name</key>
 					<string>entity.name.tag</string>
 				</dict>
@@ -515,7 +515,7 @@
 					<key>comment</key>
 					<string>Accessing properties (structures or objects)</string>
 					<key>match</key>
-					<string>(?i)([~=\*/(\-+,]\s*|mod\s*)([a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
+					<string>(?i)([~=\*/(\-+,]\s*)([a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>3</key>
@@ -525,6 +525,20 @@
 						</dict>
 					</dict>
 				</dict>
+				<!-- <dict>
+					<key>comment</key>
+					<string>Accessing properties on system variable</string>
+					<key>match</key>
+					<string>(?i)(![a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag</string>
+						</dict>
+					</dict>
+				</dict> -->
 				<dict>
 					<key>comment</key>
 					<string>Accessing properties (structures or objects) with mod operator before</string>
