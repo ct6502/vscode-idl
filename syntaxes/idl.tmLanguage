@@ -93,10 +93,6 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#idl_structures</string>
-		</dict>
-		<dict>
-			<key>include</key>
 			<string>#all_idl_comments</string>
 		</dict>
 	</array>
@@ -124,11 +120,11 @@
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#idl_line_continuation_blocks</string>
+					<string>#idl_control_statements</string>
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#idl_control_statements</string>
+					<string>#idl_structures</string>
 				</dict>
 			</array>
 		</dict>
@@ -369,6 +365,24 @@
 			<key>name</key>
 			<string>storage.type.idl</string>
 		</dict>
+		<key>idl_routine_keywords</key>
+		<dict>
+			<key>comment</key>
+			<string>IDL routine keywords with boolean values</string>
+			<key>match</key>
+			<string>(?i)(?<![a-z0-9.])((?<=\(|\s|,)\/\s*[a-z_][a-z0-9_$]*)</string>
+			<key>name</key>
+			<string>entity.name.tag</string>
+		</dict>
+		<key>idl_sysvar</key>
+		<dict>
+			<key>comment</key>
+			<string>IDL system variables</string>
+			<key>match</key>
+			<string>(?i)\![a-z_][a-z0-9_$]*\b</string>
+			<key>name</key>
+			<string>constant.language.idl</string>
+		</dict>
 		<!-- <key>idl_line_continuation_blocks</key>
 		<dict>
 			<key>comment</key>
@@ -376,7 +390,8 @@
 			<key>begin</key>
 			<string>(?i)(?<![a-z0-9_])\$</string>
 			<key>end</key>
-			<string>^((?!\$).)*$</string>
+			<string>^((?!\$).)*$</string> or the one on the next line
+			<string>^((?!((?<![a-z0-9_])\$.*\n)).)*$</string>
 			<key>name</key>
 			<string>meta.variable.other.valid.idl</string>
 		</dict> -->
@@ -387,12 +402,12 @@
 			<key>begin</key>
 			<string>(?i)(?<![a-z0-9_])\$.*\n</string>
 			<key>end</key>
-			<string>^((?!((?<![a-z0-9_])\$.*\n)).)*$</string>
+			<string>(?i)^((?!((?<![a-z0-9_])\$.*\n)).)*$</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>include</key>
-					<string>#allofem</string>
+					<string>#all_idl_keywords_except_procedures</string>
 				</dict>
 			</array>
 		</dict> -->
@@ -529,8 +544,13 @@
 					<dict>
 						<key>1</key>
 						<dict>
-							<key>name</key>
-							<string>keyword.control.idl</string>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_control_statements</string>
+								</dict>
+							</array>
 						</dict>
 						<key>2</key>
 						<dict>
@@ -551,23 +571,19 @@
 					<key>comment</key>
 					<string>Accessing properties (structures or objects) does not work if within structure definition tag</string>
 					<key>match</key>
-					<string>(?i)([:~=\*/(\-+,]\s*)([a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
+					<string>(?i)([:~=\*/(\-+,]\s*)([!a-z_][a-z0-9_$]*\.)(?![a-z_][a-z0-9_$]*(?=\())([a-z_][a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
-						<key>3</key>
+						<key>2</key>
 						<dict>
-							<key>name</key>
-							<string>entity.name.tag</string>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_sysvar</string>
+								</dict>
+							</array>
 						</dict>
-					</dict>
-				</dict>
-				<dict>
-					<key>comment</key>
-					<string>Accessing properties on system variables</string>
-					<key>match</key>
-					<string>(?i)(![a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)</string>
-					<key>captures</key>
-					<dict>
 						<key>3</key>
 						<dict>
 							<key>name</key>
@@ -606,9 +622,19 @@
 					<key>comment</key>
 					<string>Setting properties</string>
 					<key>match</key>
-					<string>(?i)(\s*)([a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)(?=\s*=)</string>
+					<string>(?i)(\s*)([!a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)(?=\s*=)</string>
 					<key>captures</key>
 					<dict>
+						<key>2</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_sysvar</string>
+								</dict>
+							</array>
+						</dict>
 						<key>3</key>
 						<dict>
 							<key>name</key>
@@ -617,24 +643,6 @@
 					</dict>
 				</dict>
 			</array>
-		</dict>
-		<key>idl_routine_keywords</key>
-		<dict>
-			<key>comment</key>
-			<string>IDL routine keywords with boolean values</string>
-			<key>match</key>
-			<string>(?i)(?<![a-z0-9.])((?<=\(|\s|,)\/\s*[a-z_][a-z0-9_$]*)</string>
-			<key>name</key>
-			<string>entity.name.tag</string>
-		</dict>
-		<key>idl_sysvar</key>
-		<dict>
-			<key>comment</key>
-			<string>IDL system variables</string>
-			<key>match</key>
-			<string>(?i)\![a-z_][a-z0-9_$]*\b</string>
-			<key>name</key>
-			<string>constant.language.idl</string>
 		</dict>
 		<key>integer</key>
 		<dict>
