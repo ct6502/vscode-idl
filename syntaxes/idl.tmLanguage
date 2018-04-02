@@ -182,11 +182,7 @@
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#idl_keyword_control</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_keyword_operator</string>
+					<string>#idl_control_statements</string>
 				</dict>
 			</array>
 		</dict>
@@ -212,15 +208,15 @@
 				</dict>
 				<dict>
 					<key>include</key>
+					<string>#idl_structures</string>
+				</dict>
+				<dict>
+					<key>include</key>
 					<string>#all_idl_keywords_except_procedures</string>
 				</dict>
 				<dict>
 					<key>include</key>
 					<string>#idl_procedures</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_structures</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -308,24 +304,56 @@
 			<key>name</key>
 			<string>constant.numeric.idl</string>
 		</dict>
-		<key>idl_keyword_control</key>
+		<key>idl_control_statements</key>
 		<dict>
-			<key>comment</key>
-			<string>Control keywords</string>
-			<key>match</key>
-			<string>(?i)(?&lt;!\.)\b(begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)\b</string>
-			<key>name</key>
-			<string>keyword.control.idl</string>
-		</dict>
-		<key>idl_keyword_operator</key>
-		<dict>
-			<key>comment</key>
-			<string>Operator keywords</string>
-			<key>match</key>
-			<string>(?i)(?&lt;!\.)\b(and|eq|ge|gt|le|lt|mod|ne|not|or|xor)\b</string>
-			<key>name</key>
-			<!-- shoul say keyword.operator.idl, but there is no highlighting if we do that -->
-			<string>keyword.control.idl</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>Control keywords</string>
+					<key>match</key>
+					<string>(?i)(?&lt;!\.)\b(begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)\b</string>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Operator keywords</string>
+					<key>match</key>
+					<string>(?i)(?&lt;!\.)\b(and|eq|ge|gt|le|lt|mod|ne|not|or|xor)\b</string>
+					<key>name</key>
+					<!-- shoul say keyword.operator.idl, but there is no highlighting if we do that -->
+					<string>keyword.control.idl</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>goto jump statement with comment</string>
+					<key>match</key>
+					<string>(?i)^\s*([a-z_][a-z0-9_$\s]*)(?=:\s*;.*$)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.type</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>goto jump statement without comment</string>
+					<key>match</key>
+					<string>(?i)^\s*([a-z_][a-z0-9_$\s]*):\s*$</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.type</string>
+						</dict>
+					</dict>
+				</dict>
+			</array>
 		</dict>
 		<key>idl_operator</key>
 		<dict>
