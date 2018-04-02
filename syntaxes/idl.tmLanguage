@@ -15,8 +15,86 @@
 	<key>patterns</key>
 	<array>
 		<dict>
-			<key>include</key>
-			<string>#idl_routine_definitions</string>
+			<key>match</key>
+			<string>(?ix)
+			(?=(function)\b) # borrowed from ruby bundle
+			(?&lt;=^|\s)(function|pro)\s+ # the function keyword
+			(?&gt;\[(.*)\])? # match various different combination of output arguments
+			((?&gt;[a-z_][a-z_$0-9]*))?
+			(?&gt;\s*=\s*)?
+			((?&gt;[a-z_][a-z_$0-9]*(::[a-z_][a-z_$0-9]*)?(?&gt;[?!]|=(?!&gt;))? )) # the function name
+			</string>
+			<key>name</key>
+			<string>meta.function.idl</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>storage.type.idl</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>storage.type.idl</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>variable.parameter.output.function.idl</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>variable.parameter.output.function.idl</string>
+				</dict>
+				<key>5</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.idl</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>(?ix)
+			(?=(pro)\b) # borrowed from ruby bundle
+			(?&lt;=^|\s)(function|pro)\s+ # the function keyword
+			(?&gt;\[(.*)\])? # match various different combination of output arguments
+			((?&gt;[a-z_][a-z_$0-9]*))?
+			(?&gt;\s*=\s*)?
+			((?&gt;[a-z_][a-z_$0-9]*(::[a-z_][a-z_$0-9]*)?(?&gt;[?!]|=(?!&gt;))? )) # the function name
+			</string>
+			<key>name</key>
+			<string>support.function.idl</string>
+			<key>captures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>storage.type.idl</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>storage.type.idl</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>variable.parameter.output.function.idl</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>variable.parameter.output.function.idl</string>
+				</dict>
+				<key>5</key>
+				<dict>
+					<key>name</key>
+					<string>support.function.idl</string>
+				</dict>
+			</dict>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -250,63 +328,6 @@
 				</dict>
 			</array>
 		</dict>
-		<key>idl_routine_definitions</key>
-		<dict>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>comment</key>
-					<string>Storage types</string>
-					<key>match</key>
-					<string>(?i)(?&lt;!\.)\b(function|pro)\s</string>
-					<key>name</key>
-					<string>storage.type.idl</string>
-				</dict>
-				<dict>
-					<key>comment</key>
-					<string>Names of IDL routines</string>
-					<key>match</key>
-					<string>(?ix)
-					(?=(function|pro)\b) # borrowed from ruby bundle
-					(?&lt;=^|\s)(function|pro)\s+ # the function keyword
-					(?&gt;\[(.*)\])? # match various different combination of output arguments
-					((?&gt;[a-z_][a-z_$0-9]*))?
-					(?&gt;\s*=\s*)?
-					((?&gt;[a-z_][a-z_$0-9]*(::[a-z_][a-z_$0-9]*)?(?&gt;[?!]|=(?!&gt;))? )) # the function name
-					</string>
-					<key>name</key>
-					<string>meta.function.idl</string>
-					<key>captures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>name</key>
-							<string>storage.type.idl</string>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>storage.type.idl</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>name</key>
-							<string>variable.parameter.output.function.idl</string>
-						</dict>
-						<key>4</key>
-						<dict>
-							<key>name</key>
-							<string>variable.parameter.output.function.idl</string>
-						</dict>
-						<key>5</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.function.idl</string>
-						</dict>
-					</dict>
-				</dict>
-			</array>
-		</dict>
 		<key>float</key>
 		<dict>
 			<key>comment</key>
@@ -376,6 +397,15 @@
 			<key>name</key>
 			<string>keyword.operator.symbols.idl</string>
 		</dict> -->
+		<key>idl_storage_type</key>
+		<dict>
+			<key>comment</key>
+			<string>Storage types</string>
+			<key>match</key>
+			<string>(?i)(?&lt;!\.)\b(function|pro)\s</string>
+			<key>name</key>
+			<string>storage.type.idl</string>
+		</dict>
 		<key>idl_routine_keywords</key>
 		<dict>
 			<key>comment</key>
@@ -443,7 +473,7 @@
 					<key>match</key>
 					<string>(?i)(?<=\.)[a-z_][a-z0-9_$]*(?=\()</string>
 					<key>name</key>
-					<string>support.function.idl</string>
+					<string>entity.name.function.idl</string>
 				</dict>
 				<dict>
 					<key>comment</key>
@@ -451,7 +481,7 @@
 					<key>match</key>
 					<string>(?i)\b[a-z_][a-z0-9_$]*(?=\()</string>
 					<key>name</key>
-					<string>support.function.idl</string>
+					<string>entity.name.function.idl</string>
 				</dict>
 			</array>
 		</dict>
@@ -501,7 +531,7 @@
 					<key>comment</key>
 					<string>IDL Procedures with args/keywords</string>
 					<key>match</key>
-					<string>(?i)^\s*(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)[a-z_][a-z0-9_$]*(?=\,)\b</string>
+					<string>(?i)^\s*(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|function|goto|if|inherits|of|on_ioerror|pro|repeat|switch|then|until|while)[a-z_][a-z0-9_$]*(?=\,)\b</string>
 					<key>name</key>
 					<string>support.function.idl</string>
 				</dict>
@@ -509,7 +539,7 @@
 					<key>comment</key>
 					<string>IDL Procedures with no arguments or keywords</string>
 					<key>match</key>
-					<string>(?i)^(\s*)(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)([a-z_][a-z_$]*)(\s*;.*|\s*)$</string>
+					<string>(?i)^(\s*)(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|function|goto|if|inherits|of|on_ioerror|pro|repeat|switch|then|until|while)([a-z_][a-z_$]*)(\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
