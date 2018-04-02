@@ -89,7 +89,7 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#all_idl_procedure_keywords</string>
+			<string>#idl_procedures</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -149,20 +149,6 @@
 					<string>\n</string>
 					<key>name</key>
 					<string>comment.line.semicolon.idl</string>
-				</dict>
-			</array>
-		</dict>
-		<key>all_idl_procedure_keywords</key>
-		<dict>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#idl_general_procedure_methods</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_general_procedures</string>
 				</dict>
 			</array>
 		</dict>
@@ -230,7 +216,7 @@
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#all_idl_procedure_keywords</string>
+					<string>#idl_procedures</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -404,7 +390,7 @@
 				</dict>
 			</array>
 		</dict> -->
-		<key>idl_general_procedure_methods</key>
+		<key>idl_procedures</key>
 		<dict>
 			<key>patterns</key>
 			<array>
@@ -436,17 +422,11 @@
 						</dict>
 					</dict>
 				</dict>
-			</array>
-		</dict>
-		<key>idl_general_procedures</key>
-		<dict>
-			<key>patterns</key>
-			<array>
 				<dict>
 					<key>comment</key>
 					<string>IDL Procedures with args/keywords</string>
 					<key>match</key>
-					<string>(?i)^\s*[a-z_][a-z0-9_$]*(?=\,)</string>
+					<string>(?i)^\s*(?!and|eq|ge|gt|le|lt|mod|ne|not|or|xor|begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|goto|if|inherits|of|on_ioerror|repeat|switch|then|until|while)[a-z_][a-z0-9_$]*(?=\,)</string>
 					<key>name</key>
 					<string>support.function.idl</string>
 				</dict>
