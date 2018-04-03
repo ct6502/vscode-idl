@@ -12,7 +12,7 @@ The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbu
 
 * Code snippets for common code blocks
 
-**Note:** The actual code that gets highlighted is strnongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
+**Note:** The actual code that gets highlighted is strongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
 
 ## Known Issues
 
