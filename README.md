@@ -12,6 +12,8 @@ The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbu
 
 * Code snippets for common code blocks
 
+**Note:** The actual code that gets highlighted is strnongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
+
 ## Known Issues
 
 When you have code blocks from line continuations(the `$`), sometimes the first argument of the next line of the form `name` or `name,` will become highlighted as a procedure.
