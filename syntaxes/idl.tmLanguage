@@ -282,7 +282,7 @@
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.type</string>
+							<string>entity.name.type.idl</string>
 						</dict>
 					</dict>
 				</dict>
@@ -296,7 +296,7 @@
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.type</string>
+							<string>entity.name.type.idl</string>
 						</dict>
 					</dict>
 				</dict>
@@ -433,7 +433,7 @@
 				<key>3</key>
 				<dict>
 					<key>name</key>
-					<string>entity.name.tag</string>
+					<string>entity.name.tag.idl</string>
 				</dict>
 			</dict>
 		</dict>
@@ -577,7 +577,7 @@
 						<key>2</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.type</string>
+							<string>entity.name.type.idl</string>
 						</dict>
 					</dict>
 				</dict>
@@ -601,7 +601,7 @@
 						<key>2</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.type</string>
+							<string>entity.name.type.idl</string>
 						</dict>
 					</dict>
 				</dict>
@@ -633,7 +633,7 @@
 						<key>3</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.tag</string>
+							<string>entity.name.tag.idl</string>
 						</dict>
 					</dict>
 				</dict>
@@ -643,7 +643,7 @@
 					<key>match</key>
 					<string>(?i)(?<=\.)[a-z_][a-z0-9_$]*(?=[\.\[])</string>
 					<key>name</key>
-					<string>entity.name.tag</string>
+					<string>entity.name.tag.idl</string>
 				</dict>
 				<dict>
 					<key>comment</key>
@@ -665,7 +665,7 @@
 						<key>3</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.tag</string>
+							<string>entity.name.tag.idl</string>
 						</dict>
 					</dict>
 				</dict>

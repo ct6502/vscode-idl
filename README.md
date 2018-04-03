@@ -4,6 +4,8 @@ This extension adds syntax highlighting and code snippets for the Interactive Da
 
 The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbundle](https://github.com/mgalloy/idl.tmbundle).
 
+The JSON syntax rules for the `.task` files are from [VSCode](https://github.com/Microsoft/vscode-JSON.tmLanguage) and are included so that you don't have to edit file associations for them to look correct.
+
 ## Features
 
 * Support for VSCode's auto-comment (Ctrl+/ or command+/)
@@ -13,6 +15,8 @@ The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbu
 * Code snippets for common code blocks
 
 **Note:** The actual code that gets highlighted is strongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
+
+* Colorization of ENVI and IDL task files.
 
 ## Known Issues
 
