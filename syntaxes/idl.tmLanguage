@@ -48,6 +48,10 @@
 		</dict>
 		<dict>
 			<key>include</key>
+			<string>#idl_structure_tag_names</string>
+		</dict>
+		<dict>
+			<key>include</key>
 			<string>#all_idl_comments</string>
 		</dict>
 	</array>
@@ -75,11 +79,11 @@
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#idl_control_statements</string>
+					<string>#idl_structures</string>
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#idl_structures</string>
+					<string>#idl_control_statements</string>
 				</dict>
 			</array>
 		</dict>
@@ -102,10 +106,6 @@
 				<dict>
 					<key>include</key>
 					<string>#string</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_structures</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -209,6 +209,10 @@
 			</dict>
 			<key>patterns</key>
 			<array>
+				<dict>
+					<key>include</key>
+					<string>#idl_properties_in_brackets</string>
+				</dict>
 				<dict>
 					<key>include</key>
 					<string>#allofem</string>
@@ -507,9 +511,67 @@
 				</dict>
 				<dict>
 					<key>comment</key>
+					<string>IDL Procedure Methods from (variables) args/keywords</string>
+					<key>match</key>
+					<string>(?i)(^\s*\(.*\)\.)([a-z_][a-z0-9_$]*(?=\,))</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#allofem</string>
+								</dict>
+							</array>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedure Methods from (variables) with no arguments or keywords</string>
+					<key>match</key>
+					<string>(?i)(^\s*\(.*\)\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#allofem</string>
+								</dict>
+							</array>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#all_idl_comments</string>
+								</dict>
+							</array>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
 					<string>IDL Procedure Methods with no arguments or keywords</string>
 					<key>match</key>
-					<string>(?i)^(\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*\(*[a-z_][a-z0-9_$]*\)*\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
@@ -563,6 +625,64 @@
 				</dict>
 			</array>
 		</dict>
+		<key>idl_structure_tag_names</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>Structure tag/property name declarations - false positives in array indexing</string>
+					<key>match</key>
+					<string>(?i)(\s*|{\s*)([a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
+					<key>name</key>
+					<string>entity.name.tag</string>
+				</dict>
+			</array>
+		</dict>
+		<key>idl_properties_in_brackets</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>Getting properties at bracket</string>
+					<key>match</key>
+					<string>(?i)\s*([a-z_][a-z0-9_$]*\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Getting properties from (variables)</string>
+					<key>match</key>
+					<string>(?i)\s*(\(.*\)\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#allofem</string>
+								</dict>
+							</array>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.idl</string>
+						</dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
 		<key>idl_structures</key>
 		<dict>
 			<key>patterns</key>
@@ -605,19 +725,11 @@
 						</dict>
 					</dict>
 				</dict>
-				<!-- <dict>
-					<key>comment</key>
-					<string>Structure tag/property name declarations - false positives in array indexing</string>
-					<key>match</key>
-					<string>(?i)(\s*|{\s*)([a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
-					<key>name</key>
-					<string>entity.name.tag</string>
-				</dict> -->
 				<dict>
 					<key>comment</key>
-					<string>Extracting properties</string>
+					<string>Getting properties</string>
 					<key>match</key>
-					<string>(?i)(&&|\|\||\*|\/|\+|mod|\-|\(|\:|=|,|\^)\s*([a-z_][a-z0-9_$]*\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
+					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[)\s*([a-z_][a-z0-9_$]*\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -627,6 +739,40 @@
 								<dict>
 									<key>include</key>
 									<string>#idl_control_statements</string>
+								</dict>
+							</array>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Getting properties from (variables)</string>
+					<key>match</key>
+					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[)\s*(\(.*\)\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_control_statements</string>
+								</dict>
+							</array>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#allofem</string>
 								</dict>
 							</array>
 						</dict>
