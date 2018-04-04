@@ -1,17 +1,26 @@
 # VS Code IDL (Interactive Data Language) Extension
 
-This extension adds syntax highlighting and code snippets for the Interactive Data Language (IDL) from Harris Geospatial (formerly Research Systems, Inc.).
+This extension adds syntax highlighting and code snippets for the Interactive Data Language (IDL) from Harris Geospatial Solutions (formerly Research Systems, Inc.).
 
 The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbundle](https://github.com/mgalloy/idl.tmbundle).
 
+The JSON syntax rules for the `.task` files are from [VSCode](https://github.com/Microsoft/vscode-JSON.tmLanguage) and are included so that you don't have to edit file associations for them to look correct.
+
 ## Features
 
+* Support for VSCode's auto-comment (Ctrl+/ or command+/)
+
 * Syntax highlighting and coloring
+
 * Code snippets for common code blocks
+
+**Note:** The actual code that gets highlighted is strongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
+
+* Colorization of ENVI and IDL task files.
 
 ## Known Issues
 
-None.
+When you have code blocks from line continuations(the `$`), sometimes the first argument of the next line of the form `name` or `name,` will become highlighted as a procedure.
 
 ## Release Notes
 

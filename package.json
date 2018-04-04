@@ -22,11 +22,19 @@
             "aliases": ["IDL", "idl"],
             "extensions": [".pro"],
             "configuration": "./language-configuration.json"
+        },{
+            "id": "task",
+            "aliases": ["Task", "task"],
+            "extensions": [".task"]
         }],
         "grammars": [{
             "language": "idl",
             "scopeName": "source.idl",
             "path": "./syntaxes/idl.tmLanguage"
+        },{
+            "language": "task",
+            "scopeName": "source.json",
+            "path": "./syntaxes/json-task/JSON.tmLanguage"
         }],
         "snippets": [
             {
