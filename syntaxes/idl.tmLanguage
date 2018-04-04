@@ -54,6 +54,10 @@
 			<key>include</key>
 			<string>#all_idl_comments</string>
 		</dict>
+		<dict>
+			<key>include</key>
+			<string>#idl_executive_commands</string>
+		</dict>
 	</array>
 	<key>repository</key>
 	<dict>
@@ -809,6 +813,26 @@
 							</array>
 						</dict>
 						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.idl</string>
+						</dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
+		<key>idl_executive_commands</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>Executive commands</string>
+					<key>match</key>
+					<string>(?i)(^\s*)(\.[a-z_][a-z0-9_$]*\b)</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
 						<dict>
 							<key>name</key>
 							<string>entity.name.tag.idl</string>

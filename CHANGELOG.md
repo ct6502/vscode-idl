@@ -17,6 +17,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Structure names and `inherits` keys have their own styling.
 
+- Structure tag names have their own styling
+
+- Executive commands are styled
+
 - All system variables now highlight correctly.
 
 - There is code for colorizing structure tag names, but it has too many false positives when accessing arrays with syntax like `arr[start:finish]` so it has been commented out.
