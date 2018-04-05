@@ -637,7 +637,7 @@
 					<key>comment</key>
 					<string>Structure tag/property name declarations - false positives in array indexing</string>
 					<key>match</key>
-					<string>(?i)(\s*|{\s*)([a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
+					<string>(?i)(\s*|{\s*)((?!else)[a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
 					<key>name</key>
 					<string>entity.name.tag</string>
 				</dict>
