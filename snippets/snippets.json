@@ -1,4 +1,4 @@
-{
+{	
 	"for-loop": {
 		"prefix": "for",
 		"body": "for $1 = $2, $3 do begin\n  $4\nendfor\n$0",
@@ -25,31 +25,31 @@
 	},
 	"if-then-begin": {
 		"prefix": "if",
-		"body": "if ($1) then begin\n  $2\nendif$0\n",
+		"body": "if ($1) then begin\n  $2\nendif\n$0",
 		"description": "If then begin",
 		"scope": "source.idl"
 	},
 	"then-begin": {
 		"prefix": "then begin",
-		"body": "then begin\n  $2\nendif$0\n",
+		"body": "then begin\n  $2\nendif\n$0",
 		"description": "Then begin",
 		"scope": "source.idl"
 	},
 	"endif-else-begin": {
 		"prefix": "endif else",
-		"body": "else begin\n  $1\nendif$0\n",
+		"body": "else begin\n  $1\nendif\n$0",
 		"description": "Endif else begin",
 		"scope": "source.idl"
 	},
 	"else-begin": {
 		"prefix": "else",
-		"body": "else begin\n  $2\nendif$0\n",
+		"body": "else begin\n  $2\nendif\n$0",
 		"description": "Else begin",
 		"scope": "source.idl"
 	},
 	"endif-else-if": {
 		"prefix": "endif else if",
-		"body": "else if ($1) then begin\n  $2\nendif$0\n",
+		"body": "else if ($1) then begin\n  $2\nendif\n$0",
 		"description": "Endif else if",
 		"scope": "source.idl"
 	},
@@ -77,6 +77,12 @@
 		"description": "Case statement",
 		"scope": "source.idl"
 	},
+	"switch-case-begin":{
+		"prefix": "begin",
+		"body": "begin\n  $1\nend",
+		"description": "Begin end statement",
+		"scope": "source.idl"
+	},
 	"compile-opt": {
 		"prefix": "comp",
 		"body": "compile_opt ${1|idl2|}\n\n$0",
@@ -85,13 +91,13 @@
 	},
 	"function-definition": {
 		"prefix": "function",
-		"body": "function $1\n  compile_opt idl2\n\n  $2\nend",
+		"body": "function $1\n  compile_opt idl2\n\n  $2\nend\n$0",
 		"description": "function definition",
 		"scope": "source.idl"
 	},
 	"procedure-definition": {
 		"prefix": "pro",
-		"body": "pro $1\n  compile_opt idl2\n\n  $2\nend",
+		"body": "pro $1\n  compile_opt idl2\n\n  $2\nend\n$0",
 		"description": "procedure definition",
 		"scope": "source.idl"
 	},

@@ -48,15 +48,15 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#idl_structure_tag_names</string>
-		</dict>
-		<dict>
-			<key>include</key>
 			<string>#all_idl_comments</string>
 		</dict>
 		<dict>
 			<key>include</key>
 			<string>#idl_executive_commands</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#idl_structure_tag_names</string>
 		</dict>
 	</array>
 	<key>repository</key>
@@ -79,15 +79,15 @@
 				</dict>
 				<dict>
 					<key>include</key>
+					<string>#idl_control_statements</string>
+				</dict>
+				<dict>
+					<key>include</key>
 					<string>#idl_functions</string>
 				</dict>
 				<dict>
 					<key>include</key>
 					<string>#idl_structures</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_control_statements</string>
 				</dict>
 			</array>
 		</dict>
@@ -268,6 +268,14 @@
 					<string>Control keywords</string>
 					<key>match</key>
 					<string>(?i)(?&lt;!\.)\b(begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|function|goto|if|inherits|of|on_ioerror|pro|repeat|switch|then|until|while)\b</string>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+					<dict>
+					<key>comment</key>
+					<string>Control keywords</string>
+					<key>match</key>
+					<string>(?i)^\s*else\s*(?=:)</string>
 					<key>name</key>
 					<string>keyword.control.idl</string>
 				</dict>
