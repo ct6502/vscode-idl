@@ -1,67 +1,123 @@
 {	
 	"for-loop": {
 		"prefix": "for",
-		"body": "for $1 = $2, $3 do begin\n  $4\nendfor\n$0",
+		"body": [
+			"for $1 = $2, $3 do begin",
+			"  $4",
+			"endfor$0"
+		],
 		"description": "For loop",
 		"scope": "source.idl"
 	},
 	"foreach-loop": {
 		"prefix": "foreach",
-		"body": "foreach $1, $2, $3 do begin\n  $4\nendforeach\n$0",
+		"body": [
+			"foreach $1, $2, $3 do begin",
+			"  $4",
+			"endforeach",
+			"$0"
+		],
 		"description": "Foreach loop",
 		"scope": "source.idl"
 	},
 	"repeat-loop": {
 		"prefix": "repeat",
-		"body": "repeat begin\n  $2\nendrep until ($1)\n$0",
+		"body": [
+			"repeat begin",
+			"  $2",
+			"endrep until ($1)",
+			"$0"
+		],
 		"description": "Repeat Loop",
 		"scope": "source.idl"
 	},
 	"while-loop": {
 		"prefix": "while",
-		"body": "while ($1) do begin\n  $2\nendwhile\n$0",
+		"body": [
+			"while ($1) do begin",
+			"  $2",
+			"endwhile",
+			"$0"
+		],
 		"description": "While loop",
 		"scope": "source.idl"
 	},
 	"if-then-begin": {
 		"prefix": "if",
-		"body": "if ($1) then begin\n  $2\nendif\n$0",
+		"body": [
+			"if ($1) then begin",
+			"  $2",
+			"endif",
+			"$0"
+		],
 		"description": "If then begin",
 		"scope": "source.idl"
 	},
 	"then-begin": {
 		"prefix": "then begin",
-		"body": "then begin\n  $2\nendif\n$0",
+		"body": [
+			"then begin",
+			"  $2",
+			"endif",
+			"$0"
+		],
 		"description": "Then begin",
 		"scope": "source.idl"
 	},
 	"endif-else-begin": {
 		"prefix": "endif else",
-		"body": "else begin\n  $1\nendif\n$0",
+		"body": [
+			"else begin",
+			"  $1",
+			"endif",
+			"$0"
+		],
 		"description": "Endif else begin",
 		"scope": "source.idl"
 	},
 	"else-begin": {
 		"prefix": "else",
-		"body": "else begin\n  $2\nendif\n$0",
+		"body": [
+			"else begin",
+			"  $2",
+			"endif",
+			"$0"
+		],
 		"description": "Else begin",
 		"scope": "source.idl"
 	},
 	"endif-else-if": {
 		"prefix": "endif else if",
-		"body": "else if ($1) then begin\n  $2\nendif\n$0",
+		"body": [
+			"else if ($1) then begin",
+			"  $2",
+			"endif",
+			"$0"
+		],
 		"description": "Endif else if",
 		"scope": "source.idl"
 	},
 	"switch-statement": {
 		"prefix": "switch",
-		"body": "switch ($1) of\n  $2: ${3}\n  else: \nendswitch\n$0\n",
+		"body": [
+			"switch ($1) of",
+			"  ($2): begin",
+			"    ${3}",
+			"  end",
+			"  else: begin ",
+			"    ; do nothing",
+			"  end",
+			"endswitch",
+			"$0"
+		],
 		"description": "Switch statement",
 		"scope": "source.idl"
 	},
 	"switch-statement-of": {
 		"prefix": "of",
-		"body": "of\n  $2: ${3}\n  else: \nendswitch\n$0\n",
+		"body": [
+			"of\n  $2: ${3}\n  else: \nendswitch\n$0\n"
+		],
 		"description": "Switch statement",
 		"scope": "source.idl"
 	},
