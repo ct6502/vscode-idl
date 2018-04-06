@@ -1,5 +1,5 @@
 {
-	"Function-ENVI": {
+	"Function (ENVI)": {
 		"prefix": "function",
 		"body": [
 			"function $1",
@@ -11,13 +11,14 @@
 			"    message, 'ENVI has not started yet, required!'",
 			"  endif",
 			"",
-			"  $2",
+			"  $0",
 			"",
 			"end"
-		],		"description": "Function definition with ENVI",
+    ],		
+    "description": "Function (ENVI)",
 		"scope": "source.idl"
 	},
-	"Procedure-ENVI": {
+	"Procedure (ENVI)": {
 		"prefix": "pro",
 		"body": [
 			"pro $1",
@@ -29,11 +30,12 @@
 			"    message, 'ENVI has not started yet, required!'",
 			"  endif",
 			"",
-			"  $2",
+			"  $0",
 			"",
-			"end"
+      "end",
+      ""
 		],
-		"description": "Procedure definition with ENVI",
+		"description": "Procedure (ENVI)",
 		"scope": "source.idl"
 	}
 }

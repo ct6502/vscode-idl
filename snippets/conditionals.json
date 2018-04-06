@@ -1,87 +1,44 @@
 {	
-	"For-loop": {
-		"prefix": "for",
-		"body": [
-			"for $1 = $2, $3 do begin",
-			"  $4",
-			"endfor$0"
-		],
-		"description": "For loop",
-		"scope": "source.idl"
-	},
-	"Foreach-loop": {
-		"prefix": "foreach",
-		"body": [
-			"foreach $1, $2, $3 do begin",
-			"  $4",
-			"endforeach",
-			"$0"
-		],
-		"description": "Foreach loop",
-		"scope": "source.idl"
-	},
-	"Repeat-loop": {
-		"prefix": "repeat",
-		"body": [
-			"repeat begin",
-			"  $2",
-			"endrep until ($1)",
-			"$0"
-		],
-		"description": "Repeat Loop",
-		"scope": "source.idl"
-	},
-	"While-loop": {
-		"prefix": "while",
-		"body": [
-			"while ($1) do begin",
-			"  $2",
-			"endwhile",
-			"$0"
-		],
-		"description": "While loop",
-		"scope": "source.idl"
-	},
-	"Tf-then-begin": {
+	"If then begin": {
 		"prefix": "if",
 		"body": [
 			"if ($1) then begin",
-			"  $2",
+			"  $0",
 			"endif",
-			"$0"
+			""
 		],
 		"description": "If then begin",
 		"scope": "source.idl"
 	},
-	"Then-begin": {
+	"Then begin": {
 		"prefix": "then begin",
 		"body": [
 			"then begin",
-			"  $2",
+			"  $0",
 			"endif",
-			"$0"
+			""
 		],
 		"description": "Then begin",
 		"scope": "source.idl"
 	},
-	"Endif-else-begin": {
+	"Endif else begin": {
 		"prefix": "endif else",
 		"body": [
 			"else begin",
-			"  $1",
+			"  $0",
 			"endif",
-			"$0"
+			""
 		],
 		"description": "Endif else begin",
 		"scope": "source.idl"
 	},
-	"Else-begin": {
+	"Else begin": {
 		"prefix": "else",
 		"body": [
 			"else begin",
-			"  $2",
+			"  $0",
 			"endif",
-			"$0"
+			""
 		],
 		"description": "Else begin",
 		"scope": "source.idl"
@@ -90,9 +47,9 @@
 		"prefix": "endif else if",
 		"body": [
 			"else if ($1) then begin",
-			"  $2",
+			"  $0",
 			"endif",
-			"$0"
+			""
 		],
 		"description": "Endif else if",
 		"scope": "source.idl"
@@ -108,7 +65,7 @@
 			"    ${4|; do nothing|}",
 			"  end",
 			"endswitch",
-			"$0"
+			""
 		],
 		"description": "Switch statement",
 		"scope": "source.idl"
@@ -124,7 +81,7 @@
 			"    ${4|; do nothing|}",
 			"  end",
 			"endswitch",
-			"$0"
+			""
 		],
 		"description": "Switch statement",
 		"scope": "source.idl"
@@ -140,7 +97,7 @@
 			"    ${4|; do nothing|}",
 			"  end",
 			"endcase",
-			"$0"
+			""
 		],
 		"description": "Case statement",
 		"scope": "source.idl"
@@ -156,7 +113,7 @@
 			"    ${4|; do nothing|}",
 			"  end",
 			"endcase",
-			"$0"
+			""
 		],
 		"description": "Case statement",
 		"scope": "source.idl"
@@ -165,7 +122,7 @@
 		"prefix": "begin",
 		"body": [
 			"begin",
-			"  $1",
+			"  $0",
 			"end"
 		],
 		"description": "Begin end statement",

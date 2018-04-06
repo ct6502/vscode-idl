@@ -43,7 +43,7 @@
             },
             {
                 "language": "idl",
-                "path": "./snippets/objects.json"
+                "path": "./snippets/loops.json"
             },
             {
                 "language": "idl",
@@ -52,6 +52,10 @@
             {
                 "language": "idl",
                 "path": "./snippets/envi.json"
+            },
+            {
+                "language": "idl",
+                "path": "./snippets/objects.json"
             }
         ]
     }

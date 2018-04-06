@@ -489,7 +489,7 @@
 					<key>comment</key>
 					<string>IDL Function Methods</string>
 					<key>match</key>
-					<string>(?i)(?<=\.)[a-z_][a-z0-9_$]*(?=\()</string>
+					<string>(?i)(?<=\.|->)[a-z_][a-z0-9_$:]*(?=\()</string>
 					<key>name</key>
 					<string>entity.name.function.idl</string>
 				</dict>
@@ -511,7 +511,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods with args/keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.)([a-z_][a-z0-9_$]*(?=\,))</string>
+					<string>(?i)(^\s*[a-z_][a-z0-9_$]*\.|\s*\(*[a-z_][a-z0-9_$:]*\)*->)([a-z_][a-z0-9_$:]*(?=\,))</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
@@ -583,7 +583,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods with no arguments or keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(*[a-z_][a-z0-9_$]*\)*\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*\(*[a-z_][a-z0-9_$]*\)*\.|\s*\(*[a-z_][a-z0-9_$:]*\)*->)([a-z_][a-z0-9_$:]*)(\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
@@ -645,7 +645,7 @@
 					<key>comment</key>
 					<string>Structure tag/property name declarations - false positives in array indexing</string>
 					<key>match</key>
-					<string>(?i)(\s*|{\s*)((?!else)[a-z_][a-z0-9_$]*\s*(?!:\s*begin)(?=:))</string>
+					<string>(?i)(\s*|{\s*)((?!else)[a-z_][a-z0-9_$]*\s*(?!:\s*begin|::)(?=:))</string>
 					<key>name</key>
 					<string>entity.name.tag</string>
 				</dict>
@@ -717,7 +717,7 @@
 					<key>comment</key>
 					<string>Inheritance in structure declaration</string>
 					<key>match</key>
-					<string>(?i)(\s*inherits\s+)([a-z_][a-z0-9_$]*\s*(?=,|}|\n))</string>
+					<string>(?i)(\s*inherits\s+)([a-z_][a-z0-9_$]*\s*(?=,|}|\$|\n))</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
