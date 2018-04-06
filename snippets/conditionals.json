@@ -1,5 +1,5 @@
 {	
-	"for-loop": {
+	"For-loop": {
 		"prefix": "for",
 		"body": [
 			"for $1 = $2, $3 do begin",
@@ -9,7 +9,7 @@
 		"description": "For loop",
 		"scope": "source.idl"
 	},
-	"foreach-loop": {
+	"Foreach-loop": {
 		"prefix": "foreach",
 		"body": [
 			"foreach $1, $2, $3 do begin",
@@ -20,7 +20,7 @@
 		"description": "Foreach loop",
 		"scope": "source.idl"
 	},
-	"repeat-loop": {
+	"Repeat-loop": {
 		"prefix": "repeat",
 		"body": [
 			"repeat begin",
@@ -31,7 +31,7 @@
 		"description": "Repeat Loop",
 		"scope": "source.idl"
 	},
-	"while-loop": {
+	"While-loop": {
 		"prefix": "while",
 		"body": [
 			"while ($1) do begin",
@@ -42,7 +42,7 @@
 		"description": "While loop",
 		"scope": "source.idl"
 	},
-	"if-then-begin": {
+	"Tf-then-begin": {
 		"prefix": "if",
 		"body": [
 			"if ($1) then begin",
@@ -53,7 +53,7 @@
 		"description": "If then begin",
 		"scope": "source.idl"
 	},
-	"then-begin": {
+	"Then-begin": {
 		"prefix": "then begin",
 		"body": [
 			"then begin",
@@ -64,7 +64,7 @@
 		"description": "Then begin",
 		"scope": "source.idl"
 	},
-	"endif-else-begin": {
+	"Endif-else-begin": {
 		"prefix": "endif else",
 		"body": [
 			"else begin",
@@ -75,7 +75,7 @@
 		"description": "Endif else begin",
 		"scope": "source.idl"
 	},
-	"else-begin": {
+	"Else-begin": {
 		"prefix": "else",
 		"body": [
 			"else begin",
@@ -86,7 +86,7 @@
 		"description": "Else begin",
 		"scope": "source.idl"
 	},
-	"endif-else-if": {
+	"Endif-else-if": {
 		"prefix": "endif else if",
 		"body": [
 			"else if ($1) then begin",
@@ -97,7 +97,7 @@
 		"description": "Endif else if",
 		"scope": "source.idl"
 	},
-	"switch-statement": {
+	"Switch-statement": {
 		"prefix": "switch",
 		"body": [
 			"switch ($1) of",
@@ -105,7 +105,7 @@
 			"    ${3}",
 			"  end",
 			"  else: begin ",
-			"    ; do nothing",
+			"    ${4|; do nothing|}",
 			"  end",
 			"endswitch",
 			"$0"
@@ -113,66 +113,62 @@
 		"description": "Switch statement",
 		"scope": "source.idl"
 	},
-	"switch-statement-of": {
+	"Switch-statement-of": {
 		"prefix": "of",
 		"body": [
-			"of\n  $2: ${3}\n  else: \nendswitch\n$0\n"
+			"of",
+			"  ($2): begin",
+			"    $3",
+			"  end",
+			"  else: begin",
+			"    ${4|; do nothing|}",
+			"  end",
+			"endswitch",
+			"$0"
 		],
 		"description": "Switch statement",
 		"scope": "source.idl"
 	},
-	"case-statement": {
+	"Case-statement": {
 		"prefix": "case",
-		"body": "case ($1) of\n  $2: ${3}\n  else:; do nothing\nendcase\n$0\n",
+		"body": [
+			"case ($1) of",
+			"  ($2): begin",
+			"    $3",
+			"  end",
+			"  else: begin ",
+			"    ${4|; do nothing|}",
+			"  end",
+			"endcase",
+			"$0"
+		],
 		"description": "Case statement",
 		"scope": "source.idl"
 	},
-	"case-statement-of": {
+	"Case-statement-of": {
 		"prefix": "of",
-		"body": "of\n  $2: ${3}\n  else:; do nothing\nendcase\n$0\n",
+		"body": [
+			"of",
+			"  ($2): begin",
+			"    $3",
+			"  end",
+			"  else: begin ",
+			"    ${4|; do nothing|}",
+			"  end",
+			"endcase",
+			"$0"
+		],
 		"description": "Case statement",
 		"scope": "source.idl"
 	},
-	"switch-case-begin":{
+	"Switch-case-begin":{
 		"prefix": "begin",
-		"body": "begin\n  $1\nend",
+		"body": [
+			"begin",
+			"  $1",
+			"end"
+		],
 		"description": "Begin end statement",
-		"scope": "source.idl"
-	},
-	"compile-opt": {
-		"prefix": "comp",
-		"body": "compile_opt ${1|idl2|}\n\n$0",
-		"description": "compile_opt",
-		"scope": "source.idl"
-	},
-	"function-definition": {
-		"prefix": "function",
-		"body": "function $1\n  compile_opt idl2\n\n  $2\nend\n$0",
-		"description": "function definition",
-		"scope": "source.idl"
-	},
-	"procedure-definition": {
-		"prefix": "pro",
-		"body": "pro $1\n  compile_opt idl2\n\n  $2\nend\n$0",
-		"description": "procedure definition",
-		"scope": "source.idl"
-	},
-	"class-definition": {
-		"prefix": "pro",
-		"body": "pro $1__define\n  compile_opt idl2, hidden\n\n  struct={$1,$\n    $2}\nend",
-		"description": "IDL Class Definition",
-		"scope": "source.idl"
-	},
-	"function-definition-envi": {
-		"prefix": "function",
-		"body": "function $1\n  compile_opt idl2\n\n  ; get current ENVI session\n  e = envi(/CURRENT)\n  if (e eq !NULL) then begin\n    message, 'ENVI has not started yet, required!'\n  end\n\n$2\nend",
-		"description": "function definition with ENVI",
-		"scope": "source.idl"
-	},
-	"procedure-definition-envi": {
-		"prefix": "pro",
-		"body": "pro $1\n  compile_opt idl2\n\n  ; get current ENVI session\n  e = envi(/CURRENT)\n  if (e eq !NULL) then begin\n    message, 'ENVI has not started yet, required!'\n  end\n\n$2\nend",
-		"description": "procedure definition with ENVI",
 		"scope": "source.idl"
 	}
 }

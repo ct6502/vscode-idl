@@ -1,0 +1,40 @@
+{
+	"compile-opt": {
+		"prefix": "compile_opt",
+		"body": [
+			"compile_opt ${1|idl2|}",
+			"",
+			"",
+			"$0"
+		],
+		"description": "compile_opt",
+		"scope": "source.idl"
+	},
+	"Function": {
+		"prefix": "function",
+		"body": [
+			"function $1",
+			"  compile_opt idl2",
+			"",
+			"  $2",
+			"",
+			"end"
+		],
+		"description": "Function definition",
+		"scope": "source.idl"
+	},
+	"Procedure": {
+		"prefix": "pro",
+		"body": [
+			"pro $1",
+			"  compile_opt idl2",
+			"",
+			"",
+			"  $2",
+			"",
+			"end"
+		],
+		"description": "Procedure definition",
+		"scope": "source.idl"
+	}
+}

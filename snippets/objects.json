@@ -1,0 +1,17 @@
+{
+  	"Class-Definition": {
+		"prefix": "pro",
+		"body": [
+			"pro $1__define",
+			"  compile_opt idl2, hidden",
+			"",
+			"  struct = {$1,$",
+			"    $2: $3 $",
+			"  }",
+			"",
+			"end"
+		],
+		"description": "Class definition",
+		"scope": "source.idl"
+	}
+}

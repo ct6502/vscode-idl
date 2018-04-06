@@ -1,0 +1,39 @@
+{
+	"Function-ENVI": {
+		"prefix": "function",
+		"body": [
+			"function $1",
+			"  compile_opt idl2",
+			"",
+			"  ; get the current session of ENVI",
+			"  e = envi(/CURRENT)",
+			"  if (e eq !NULL) then begin",
+			"    message, 'ENVI has not started yet, required!'",
+			"  endif",
+			"",
+			"  $2",
+			"",
+			"end"
+		],		"description": "Function definition with ENVI",
+		"scope": "source.idl"
+	},
+	"Procedure-ENVI": {
+		"prefix": "pro",
+		"body": [
+			"pro $1",
+			"  compile_opt idl2",
+			"",
+			"  ; get the current session of ENVI",
+			"  e = envi(/CURRENT)",
+			"  if (e eq !NULL) then begin",
+			"    message, 'ENVI has not started yet, required!'",
+			"  endif",
+			"",
+			"  $2",
+			"",
+			"end"
+		],
+		"description": "Procedure definition with ENVI",
+		"scope": "source.idl"
+	}
+}

@@ -39,7 +39,19 @@
         "snippets": [
             {
                 "language": "idl",
-                "path": "./snippets/snippets.json"
+                "path": "./snippets/idl.json"
+            },
+            {
+                "language": "idl",
+                "path": "./snippets/objects.json"
+            },
+            {
+                "language": "idl",
+                "path": "./snippets/conditionals.json"
+            },
+            {
+                "language": "idl",
+                "path": "./snippets/envi.json"
             }
         ]
     }
