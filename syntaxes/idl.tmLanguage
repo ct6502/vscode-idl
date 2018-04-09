@@ -535,7 +535,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods from (variables) args/keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(.*\)\.)([a-z_][a-z0-9_$]*(?=\,))</string>
+					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.)([a-z_][a-z0-9_$]*(?=\,))</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -549,6 +549,16 @@
 							</array>
 						</dict>
 						<key>2</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_structures</string>
+								</dict>
+							</array>
+						</dict>
+						<key>3</key>
 						<dict>
 							<key>name</key>
 							<string>support.function.idl</string>
@@ -559,7 +569,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods from (variables) with no arguments or keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(.*\)\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -574,10 +584,20 @@
 						</dict>
 						<key>2</key>
 						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_structures</string>
+								</dict>
+							</array>
+						</dict>
+						<key>3</key>
+						<dict>
 							<key>name</key>
 							<string>support.function.idl</string>
 						</dict>
-						<key>3</key>
+						<key>4</key>
 						<dict>
 							<key>patterns</key>
 							<array>
