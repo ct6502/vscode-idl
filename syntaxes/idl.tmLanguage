@@ -535,7 +535,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods from (variables) args/keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.)([a-z_][a-z0-9_$]*(?=\,))</string>
+					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_][a-z0-9_$]*(?=\,))</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -569,7 +569,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods from (variables) with no arguments or keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -755,6 +755,20 @@
 				</dict>
 				<dict>
 					<key>comment</key>
+					<string>Referencing ourself in objects</string>
+					<key>match</key>
+					<string>(?i)(\bself\b)</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.type.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
 					<string>Inheritance in structure declaration</string>
 					<key>match</key>
 					<string>(?i)(\s*inherits\s+)([a-z_][a-z0-9_$]*\s*(?=,|}|\$|\n))</string>
@@ -781,7 +795,7 @@
 					<key>comment</key>
 					<string>Getting properties</string>
 					<key>match</key>
-					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[|~|if|while|until|and|eq|ge|gt|le|lt|mod|ne|not|or|xor)\s*([a-z_][a-z0-9_$]*\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
+					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[|~|if|while|until|and|eq|ge|gt|le|lt|mod|ne|not|or|xor)\s*([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -794,7 +808,27 @@
 								</dict>
 							</array>
 						</dict>
+						<key>2</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_structures</string>
+								</dict>
+							</array>
+						</dict>
 						<key>3</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_structures</string>
+								</dict>
+							</array>
+						</dict>
+						<key>4</key>
 						<dict>
 							<key>name</key>
 							<string>entity.name.tag.idl</string>
@@ -805,7 +839,7 @@
 					<key>comment</key>
 					<string>Getting properties from (variables)</string>
 					<key>match</key>
-					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[)\s*(\(.*\)\.(?![a-z_][a-z0-9_$]*\())([a-z_][a-z0-9_$]*)</string>
+					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[)(\s*\(.*\)\.)([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -829,6 +863,21 @@
 							</array>
 						</dict>
 						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.idl</string>
+						</dict>
+						<key>4</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#idl_structures</string>
+								</dict>
+							</array>
+						</dict>
+						<key>5</key>
 						<dict>
 							<key>name</key>
 							<string>entity.name.tag.idl</string>
