@@ -905,6 +905,10 @@
 							<array>
 								<dict>
 									<key>include</key>
+									<string>#idl_structures</string>
+								</dict>
+								<dict>
+									<key>include</key>
 									<string>#idl_sysvar</string>
 								</dict>
 							</array>
