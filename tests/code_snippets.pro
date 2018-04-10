@@ -42,7 +42,6 @@
   this = this.prop.prop.prop
   !NULL = self.prop
   if ~self.debug then on_error,2
-  val = (item.res()).property
   5+ this.that
   - this.that
   ne this.that
@@ -60,6 +59,8 @@
   5 ## this.that
   ne= this.that
 
+  val = (item.res()).property
+
 
   ;----------------------------------------------------------------------------
   ; routines, procedure or function with and without args
@@ -70,13 +71,16 @@
   generateOccamsClassifier_getCombinations, this, that ;comment
   anyNameHere  ;comment
   if (space_after) then printf, lun, '', /IMPLIED_PRINT
-
+  repeat print, !NULL until (stmnt) 
+  if (this) then print, thiat else if (thing) then print, this
+  if (!TRUE) then print, !TRUE else print, !FALSE
+  if keyword_set(space_before) AND ~keyword_set(log_only) then begin
+    print
+  end
   function some
   function some::withmethod
   pro some
   pro some::withmethod
-
-  
 
   ;----------------------------------------------------------------------------
   ; invoking methods, procedure or function with and without args
@@ -104,8 +108,14 @@
   (it.expects(5))._not_.toBeNull()
 
   foreach line, lines do newStrings.Add, line
-  for i=0,9 do this.Add, i
-  repeat print, !NULL until (stmnt)
-  if (!TRUE) then print, !TRUE else print, !FALSE
+  for i=0,9 do this.Add, if else something.Add, 42
   if ~trimFirst.startsWith('```') then newStrings.Add, '```'
+  if ~trimFirst.startsWith('```') then (newStrings).Add, '```'
+  repeat newStrings.Add, '```'
+  
+
+  ;wish list
+  (stmnt): print, this
+  (stmnt): item.method, this
+  [(item).that:thing.this, this.that:that.this]
 end
