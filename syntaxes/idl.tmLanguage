@@ -795,7 +795,7 @@
 					<key>comment</key>
 					<string>Getting properties</string>
 					<key>match</key>
-					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[|~|if|while|until|and|eq|ge|gt|le|lt|mod|ne|not|or|xor)\s*([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
+					<string>(?i)(&&|#|##|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[|~|if\s|while\s|until\s|and\s|eq\s|ge\s|gt\s|le\s|lt\s|mod\s|ne\s|not\s|or\s|xor\s)\s*([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -839,7 +839,7 @@
 					<key>comment</key>
 					<string>Getting properties from (variables)</string>
 					<key>match</key>
-					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[)(\s*\(.*\)\.)([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
+					<string>(?i)(&&|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[\])(\s*\(.*\)\.)([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
