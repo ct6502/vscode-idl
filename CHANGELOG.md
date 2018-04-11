@@ -5,6 +5,26 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+A lot of changes have been made to improve the colorization of IDL's procedures which are challenging to delineate from standard text. In general here are the changes that have been made:
+
+- Added a "test" file with many sample cases for easy comparison when testing the syntax highlighting. Any problems are at the top of the file, exerything else is a reference for what things should look like.
+
+- Procedures now highlight correctly when you have single-line if statements of the form `if (this) then print, 'that'`.
+
+- Added line continuations to prevent false positive procedures from beign highlighted. This requries you to indent the next line (as you should anyways) otherwise the rest of your file is highlighted incorrectly. With this change, properties are not colored correctly on the next line. Not sure why this is happening, I'm guessing another group is grabbing the text and preventing the highlighting, but this is better than highlighting too much.
+
+- Some of the procedure captures have been consolidated and simplified.
+
+- New groups have been added in the tmLanguage file for braces, switch-case, and line continuations. See the note on line continuations above.
+
+- With the new groups, structure tag names have been limited to braces.
+
+- With the new groups, there is special syntax to highlight procedures and procedure methods correctly inside switch or case blocks.
+
+- Fix with properties highlighting correctly in elvis operators, i.e. `(this) ? something.that : this.that`
+
+- Snippets have been improved and organized (may have been snuck into the last release)
+
 ## [1.1.0] - 2018-04-02
 
 - Organized and restructured the language file

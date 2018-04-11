@@ -382,15 +382,15 @@
 					<array>
 						<dict>
 							<key>include</key>
+							<string>#idl_properties_in_continuedlines</string>
+						</dict>
+						<dict>
+							<key>include</key>
 							<string>#allofembutprocedures</string>
 						</dict>
 						<dict>
 							<key>include</key>
 							<string>#linecontinuationblocks</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#idl_properties_in_continuedlines</string>
 						</dict>
 					</array>
 				</dict>
@@ -399,15 +399,15 @@
 			<array>
 				<dict>
 					<key>include</key>
+					<string>#idl_properties_in_continuedlines</string>
+				</dict>
+				<dict>
+					<key>include</key>
 					<string>#allofembutprocedures</string>
 				</dict>
 				<dict>
 					<key>include</key>
 					<string>#linecontinuationblocks</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#idl_properties_in_continuedlines</string>
 				</dict>
 			</array>
 		</dict>
@@ -689,6 +689,20 @@
 						</dict>
 					</dict>
 				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedure methods after case statements</string>
+					<key>match</key>
+					<string>(?i)(:\s+[a-z_][a-z0-9$_]*\.)([a-z_][a-z0-9$_]*\s*(?=,|\$|$|;.*$))</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
 			</array>
 		</dict>
 		<key>idl_procedures</key>
@@ -890,9 +904,9 @@
 			<array>
 				<dict>
 					<key>comment</key>
-					<string>Getting properties at bracket</string>
+					<string>Getting properties in line continuations, relaxed conditions</string>
 					<key>match</key>
-					<string>(?i)\.([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*,)</string>
+					<string>(?i)((?<=\.)[a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>

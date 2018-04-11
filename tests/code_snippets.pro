@@ -4,13 +4,6 @@
 ;----------------------------------------------------------------------------
 ;wish list
 
-;to get these, practically need to copy/paste procedure method rules
-;in the switch-case-block capture group, at least it is colored?
-case (1) of
-  (stmnt): item.method, this
-  (stmnt): item.method
-endcase
-
 self.latestLine = trace[-3].LINE   ;square bracket it captured by brackets, need new match for structures
 
 ;make sure that this doesn't get goofy from changing above
@@ -80,12 +73,26 @@ mm = ij ? jm.duh : im
 ;----------------------------------------------------------------------------
 generateccamsClassifier_getCombinati2ons() ;comment
 generateOccamsClassifier_getCombinations, $ ;comment
-  this, that ;comment
+  this, that,$ ;comment
+  something
 
 anyNameHere, clogs.th,$  ;comment
-procedurehere
+  ;comment and still line continuation
+  procedurehere
+
 print,$
-  false_positive, this
+  ;comment here for fanciness
+  false_positive.this(),$
+  andthis(),$
+  nothing,$
+  procedure
+  
+procedure,asfdg, $
+  somethingelse.this
+
+procedure, $
+  somethingelse
+
 file_mkdir, self.buildDir
 if (space_after) then printf, lun, '', /IMPLIED_PRINT
 repeat print, !NULL until (stmnt) 
