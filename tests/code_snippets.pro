@@ -65,8 +65,12 @@ print, !COLOR.BLACK
 5 ## this.that
 ne= this.that
 val = (item.res()).property
-mm = ij ? jm.duh : im
+mm = ij ? jm.duh : im.this
 
+something, $
+  this,$
+  ;comments here
+  something
 
 ;----------------------------------------------------------------------------
 ; routines, procedure or function with and without args
@@ -114,6 +118,15 @@ of
   (stmnt): print, this.that(), something->else() ;comment
   (stmnt): print ;comment
   "ERASE": slicer_erase
+endcase
+
+;to get these, practically need to copy/paste procedure method rules
+;in the switch-case-block capture group, at least it is colored?
+case (1) of
+  (stmnt): (item).method, this ;comment
+  (stmnt): (item.this()).method, ;comment
+  (stmnt): item.method, this ;commet
+  (stmnt): item.method ;commetn
 endcase
 
 ;----------------------------------------------------------------------------

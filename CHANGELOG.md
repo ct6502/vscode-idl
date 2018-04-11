@@ -11,7 +11,7 @@ A lot of changes have been made to improve the colorization of IDL's procedures 
 
 - Procedures now highlight correctly when you have single-line if statements of the form `if (this) then print, 'that'`.
 
-- Added line continuations to prevent false positive procedures from beign highlighted. This requries you to indent the next line (as you should anyways) otherwise the rest of your file is highlighted incorrectly. With this change, properties are not colored correctly on the next line. Not sure why this is happening, I'm guessing another group is grabbing the text and preventing the highlighting, but this is better than highlighting too much.
+- (Commented out) Added code for line continuations to prevent false positive procedures from beign highlighted. This requires you to indent the next line (as you should anyways) otherwise the rest of your file is highlighted incorrectly. With this change, properties are not colored correctly on the next line. Not sure why this is happening, I'm guessing another group is grabbing the text and preventing the highlighting, but this is better than highlighting too much. Holding off on exposing this as it has the potential to cause more problems than it solves.
 
 - Some of the procedure captures have been consolidated and simplified.
 

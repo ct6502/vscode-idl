@@ -31,14 +31,14 @@ You should be doing this anyways in your code, but if you don't, then the highli
 
 ## Known Issues
 
-- When you have code blocks from line continuations (the `$`), properties will not highlight corectly if they are the first item on the next line. Here is an example:
+- Properties will not highlight correctly if being accessed directly from square brackets such as `trace[-3].LINE`. 
+
+- When you have code blocks from line continuations (the `$`), sometimes procedures are highlighted incorrectly on the next line
 
 ```idl
 someProcedure,$
-  nextLine.prop
+  nextLine,
 ```
-
-- Properties will not highlight correctly if being accessed directly from square brackets such as `trace[-3].LINE`. 
 
 ## Release Notes
 

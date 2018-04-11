@@ -388,10 +388,6 @@
 							<key>include</key>
 							<string>#allofembutprocedures</string>
 						</dict>
-						<dict>
-							<key>include</key>
-							<string>#linecontinuationblocks</string>
-						</dict>
 					</array>
 				</dict>
 			</dict>
@@ -404,10 +400,6 @@
 				<dict>
 					<key>include</key>
 					<string>#allofembutprocedures</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#linecontinuationblocks</string>
 				</dict>
 			</array>
 		</dict>
