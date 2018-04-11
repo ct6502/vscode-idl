@@ -28,7 +28,7 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#curlybrackets</string>
+			<string>#braces</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -53,10 +53,6 @@
 		<dict>
 			<key>include</key>
 			<string>#idl_executive_commands</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#idl_structure_tag_names</string>
 		</dict>
 	</array>
 	<key>repository</key>
@@ -97,7 +93,7 @@
 			<array>
 				<dict>
 					<key>include</key>
-					<string>#curlybrackets</string>
+					<string>#braces</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -216,6 +212,42 @@
 				<dict>
 					<key>include</key>
 					<string>#idl_properties_in_brackets</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#allofem</string>
+				</dict>
+			</array>
+		</dict>
+		<key>braces</key>
+		<dict>
+			<key>begin</key>
+			<string>\{</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>meta.brackets.idl</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>meta.brackets.idl</string>
+			<key>end</key>
+			<string>\}</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>meta.brackets.idl</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#idl_structure_tag_names</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -509,9 +541,23 @@
 			<array>
 				<dict>
 					<key>comment</key>
+					<string>IDL Procedure Methods from pointer notation</string>
+					<key>match</key>
+					<string>(?i)->([a-z_][a-z0-9_$:]*(?=\,|\s))</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
 					<string>IDL Procedure Methods with args/keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*[a-z_][a-z0-9_$\.]*\.|\s*\(*[a-z_][a-z0-9_$:]*\)*->)([a-z_][a-z0-9_$:]*(?=\,))</string>
+					<string>(?i)(^\s*[a-z_][a-z0-9_$\.]*\.)([a-z_][a-z0-9_$:]*(?=\,))</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -613,7 +659,7 @@
 					<key>comment</key>
 					<string>IDL Procedure Methods with no arguments or keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(*[a-z_][a-z0-9_$\.]*\)*\.|\s*\(*[a-z_][a-z0-9_$:]*\)*->)([a-z_][a-z0-9_$:]*)(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*\(*[a-z_][a-z0-9_$\.]*\)*\.)([a-z_][a-z0-9_$:]*)(\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
