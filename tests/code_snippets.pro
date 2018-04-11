@@ -5,18 +5,11 @@
 ;wish list
 
 ;to get these, practically need to copy/paste procedure method rules
+;in the switch-case-block capture group, at least it is colored?
 case (1) of
   (stmnt): item.method, this
   (stmnt): item.method
 endcase
-
-impactsRange = oObj->GetXYZRange(xRange, $
-    yRange, zRange, DATA=bDataRange )
-
-print, this,$
-    
-    ;comments
-  false_positive,
 
 self.latestLine = trace[-3].LINE   ;square bracket it captured by brackets, need new match for structures
 
@@ -86,8 +79,14 @@ mm = ij ? jm.duh : im
 ; routines, procedure or function with and without args
 ;----------------------------------------------------------------------------
 generateccamsClassifier_getCombinati2ons() ;comment
-generateOccamsClassifier_getCombinations, this, that ;comment
-anyNameHere, clogs.th  ;comment
+generateOccamsClassifier_getCombinations, $ ;comment
+  this, that ;comment
+
+anyNameHere, clogs.th,$  ;comment
+procedurehere
+print,$
+  false_positive, this
+file_mkdir, self.buildDir
 if (space_after) then printf, lun, '', /IMPLIED_PRINT
 repeat print, !NULL until (stmnt) 
 if (this) then print, thiat else if (thing) then print, this else that = 5
