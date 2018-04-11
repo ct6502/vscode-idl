@@ -13,6 +13,11 @@ endcase
 impactsRange = oObj->GetXYZRange(xRange, $
     yRange, zRange, DATA=bDataRange )
 
+print, this,$
+    
+    ;comments
+  false_positive,
+
 self.latestLine = trace[-3].LINE   ;square bracket it captured by brackets, need new match for structures
 
 ;make sure that this doesn't get goofy from changing above
@@ -24,7 +29,6 @@ self.latestLine = trace[-3].LINE   ;square bracket it captured by brackets, need
 goto, gotojump ;comment
 gotojump:
 gotojump: ;comment
-if (ISA(name) && ~ISA(identifier)) then identifier
 
 ;----------------------------------------------------------------------------
 ; structures, including tag names. array indexing should have no tag color
@@ -81,8 +85,6 @@ mm = ij ? jm.duh : im
 ;----------------------------------------------------------------------------
 ; routines, procedure or function with and without args
 ;----------------------------------------------------------------------------
-print, this,$
-  false_positive,
 generateccamsClassifier_getCombinati2ons() ;comment
 generateOccamsClassifier_getCombinations, this, that ;comment
 anyNameHere, clogs.th  ;comment
@@ -99,6 +101,7 @@ function some
 function some::withmethod
 pro some
 pro some::withmethod
+if (ISA(name) && ~ISA(identifier)) then identifier
 
 ;to get these, practically need to copy/paste procedure rules
 of
@@ -142,3 +145,7 @@ repeat newStrings.Add, '```'
 foreach line, lines do newStrings.Add, line
 foreach line, lines do newStrings->Add, line
 end
+
+end
+
+

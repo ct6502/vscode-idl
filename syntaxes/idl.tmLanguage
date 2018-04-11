@@ -36,6 +36,10 @@
 		</dict>
 		<dict>
 			<key>include</key>
+			<string>#linecontinuationblocks</string>
+		</dict>
+		<dict>
+			<key>include</key>
 			<string>#float</string>
 		</dict>
 		<dict>
@@ -122,6 +126,56 @@
 				<dict>
 					<key>include</key>
 					<string>#idl_procedures</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#all_idl_comments</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#variable</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#float</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#integer</string>
+				</dict>
+			</array>
+		</dict>
+		<key>allofembutprocedures</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#braces</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#linecontinuationblocks</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#case_switch</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#end_in_parens</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#brackets</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#string</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#all_idl_keywords_except_procedures</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -299,6 +353,38 @@
 				</dict>
 			</array>
 		</dict>
+		<key>linecontinuationblocks</key>
+		<dict>
+			<key>begin</key>
+			<string>\$</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>meta.brackets.idl</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>meta.brackets.idl</string>
+			<key>end</key>
+			<string>^(?!.*\$).*$</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>meta.brackets.idl</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#allofembutprocedures</string>
+				</dict>
+			</array>
+		</dict>
 		<key>end_in_parens</key>
 		<dict>
 			<key>comment</key>
@@ -352,6 +438,14 @@
 					<string>Control keywords</string>
 					<key>match</key>
 					<string>(?i)^\s*else\s*(?=:)</string>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Special case for end, some odd bug somewhere makes this needed to highlight in case-switch statements</string>
+					<key>match</key>
+					<string>(?i)\s*end\b</string>
 					<key>name</key>
 					<string>keyword.control.idl</string>
 				</dict>
