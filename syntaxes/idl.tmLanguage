@@ -32,6 +32,10 @@
 		</dict>
 		<dict>
 			<key>include</key>
+			<string>#case_switch</string>
+		</dict>
+		<dict>
+			<key>include</key>
 			<string>#float</string>
 		</dict>
 		<dict>
@@ -94,6 +98,10 @@
 				<dict>
 					<key>include</key>
 					<string>#braces</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#case_switch</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -248,6 +256,42 @@
 				<dict>
 					<key>include</key>
 					<string>#idl_structure_tag_names</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#allofem</string>
+				</dict>
+			</array>
+		</dict>
+		<key>case_switch</key>
+		<dict>
+			<key>begin</key>
+			<string>(?i)\bof\b</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>meta.brackets.idl</string>
+			<key>end</key>
+			<string>(?i)\s*endcase\b|\s*endswitch\b</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#idl_procedures_in_case_switch</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -535,6 +579,26 @@
 				</dict>
 			</array>
 		</dict>
+		<key>idl_procedures_in_case_switch</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedures after case statements</string>
+					<key>match</key>
+					<string>(?i)(:\s+)((?!begin|if|foreach|for|while|break|continue|goto|case|switch|repeat)[a-z_][a-z0-9$_]*\s*(?=,|\$|$|;.*$))</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
 		<key>idl_procedures</key>
 		<dict>
 			<key>patterns</key>
@@ -683,7 +747,7 @@
 					<key>comment</key>
 					<string>IDL Procedures in single-line blocks - must be after methods and (variables)</string>
 					<key>match</key>
-					<string>(?i)\b(do|repeat|then|else)\s+((?!begin|if|foreach|for|while|break|continue|goto)[a-z_][a-z0-9$_]*(?=,|\s*|\s*;.*))</string>
+					<string>(?i)\b(do|repeat|then|else)\s+((?!begin|if|foreach|for|while|break|continue|goto|repeat)[a-z_][a-z0-9$_]*\s*(?=,|\$|else|$|;.*$))</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>

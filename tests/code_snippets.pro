@@ -3,18 +3,20 @@
 ; wish list of things to highlight
 ;----------------------------------------------------------------------------
 ;wish list
-(stmnt): print, this
-(stmnt): item.method, this
+
+;to get these, practically need to copy/paste procedure method rules
+case (1) of
+  (stmnt): item.method, this
+  (stmnt): item.method
+endcase
+
 impactsRange = oObj->GetXYZRange(xRange, $
     yRange, zRange, DATA=bDataRange )
 
+self.latestLine = trace[-3].LINE   ;square bracket it captured by brackets, need new match for structures
+
 ;make sure that this doesn't get goofy from changing above
 [(item).that:thing.this, this.that:that.this]
-
-;things to fix
-foreach line, lines do newStrings->Add, line
-if (ISA(name) && ~ISA(identifier)) then identifier = name
-self.latestLine = trace[-3].LINE
 
 ;----------------------------------------------------------------------------
 ; special control statement checks
@@ -22,8 +24,7 @@ self.latestLine = trace[-3].LINE
 goto, gotojump ;comment
 gotojump:
 gotojump: ;comment
-foreach line, lines do newStrings.Add, line
-
+if (ISA(name) && ~ISA(identifier)) then identifier
 
 ;----------------------------------------------------------------------------
 ; structures, including tag names. array indexing should have no tag color
@@ -40,10 +41,6 @@ output_combinations = {MINS: mins.toArray, MAXS: maxs.toArray()}
 !NULL = idxSort[-nMutate:-nMutate]
 idxSort[nRandom:nRandom-1]
 !NULL = idxSort[nRandom:nRandom-1, r:nrandom]
-
-;should be NO highlighting
-mm = ij ? jm : im
-
 ;----------------------------------------------------------------------------
 ; executive commands
 ;----------------------------------------------------------------------------
@@ -74,12 +71,11 @@ print, this.prop
 print, !COLOR.BLACK
 !this.that = 5
 !COLOR.BLACK
-
 5 # this.that
 5 ## this.that
 ne= this.that
-
 val = (item.res()).property
+mm = ij ? jm.duh : im
 
 
 ;----------------------------------------------------------------------------
@@ -89,19 +85,27 @@ print, this,$
   false_positive,
 generateccamsClassifier_getCombinati2ons() ;comment
 generateOccamsClassifier_getCombinations, this, that ;comment
-anyNameHere  ;comment
+anyNameHere, clogs.th  ;comment
 if (space_after) then printf, lun, '', /IMPLIED_PRINT
 repeat print, !NULL until (stmnt) 
-if (this) then print, thiat else if (thing) then print, this
+if (this) then print, thiat else if (thing) then print, this else that = 5
 if (!TRUE) then print, !TRUE else print, !FALSE
 if keyword_set(space_before) AND ~keyword_set(log_only) then begin
   print
 end
+for i=0,9 do print ;something
 if (this) then return else on_error,2
 function some
 function some::withmethod
 pro some
 pro some::withmethod
+
+;to get these, practically need to copy/paste procedure rules
+of
+  (stmnt): print, this.that(), something->else() ;comment
+  (stmnt): print ;comment
+  "ERASE": slicer_erase
+endcase
 
 ;----------------------------------------------------------------------------
 ; invoking methods, procedure or function with and without args
@@ -116,8 +120,8 @@ self.this
 self.this,
 void = self.method()
 self.luna_test._failed ;comment
-self.luna_test._failed,
-(self.luna_test)._failed.this.that, ;comment
+self.luna_test._failed, this.that ;comment
+(self.luna_test)._failed.this.that, andthis.that ;comment
 (self.luna_test)._failed.this.that  ;comment
 (self.luna_test)._failed.this.that() 
 strings.add, self.luna_test.luna_suite.luna._generateFancyString(msg, self.flags[midx], FANCY = fancy) ;comment
@@ -135,4 +139,6 @@ for i=0,9 do this.Add, if else something.Add, 42
 if ~trimFirst.startsWith('```') then newStrings.Add, '```'
 if ~trimFirst.startsWith('```') then (newStrings).Add, '```'
 repeat newStrings.Add, '```'
+foreach line, lines do newStrings.Add, line
+foreach line, lines do newStrings->Add, line
 end

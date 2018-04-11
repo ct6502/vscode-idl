@@ -43,7 +43,7 @@
 		"description": "Else begin",
 		"scope": "source.idl"
 	},
-	"Endif-else-if": {
+	"Endif else if": {
 		"prefix": "endif else if",
 		"body": [
 			"else if ($1) then begin",
@@ -54,7 +54,7 @@
 		"description": "Endif else if",
 		"scope": "source.idl"
 	},
-	"Switch-statement": {
+	"Switch statement": {
 		"prefix": "switch",
 		"body": [
 			"switch ($1) of",
@@ -70,7 +70,7 @@
 		"description": "Switch statement",
 		"scope": "source.idl"
 	},
-	"Switch-statement-of": {
+	"Switch statement of": {
 		"prefix": "of",
 		"body": [
 			"of",
@@ -86,7 +86,7 @@
 		"description": "Switch statement",
 		"scope": "source.idl"
 	},
-	"Case-statement": {
+	"Case statement": {
 		"prefix": "case",
 		"body": [
 			"case ($1) of",
@@ -102,7 +102,7 @@
 		"description": "Case statement",
 		"scope": "source.idl"
 	},
-	"Case-statement-of": {
+	"Case statement of": {
 		"prefix": "of",
 		"body": [
 			"of",
@@ -118,14 +118,14 @@
 		"description": "Case statement",
 		"scope": "source.idl"
 	},
-	"Switch-case-begin":{
+	"Begin-end statement":{
 		"prefix": "begin",
 		"body": [
 			"begin",
 			"  $0",
 			"end"
 		],
-		"description": "Begin end statement",
+		"description": "Begin-end statement",
 		"scope": "source.idl"
 	}
 }
