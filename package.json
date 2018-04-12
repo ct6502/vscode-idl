@@ -8,6 +8,11 @@
         "type": "git",
         "url": "https://github.com/chris-torrence/vscode-idl"
     },
+    "scripts": {
+        "contributors:init": "all-contributors init",
+        "contributors:add": "all-contributors add",
+        "contributors:generate": "all-contributors generate"
+    },
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
         "vscode": "^1.19.0"
@@ -17,25 +22,41 @@
     ],
     "icon": "images/idlicon.png",
     "contributes": {
-        "languages": [{
-            "id": "idl",
-            "aliases": ["IDL", "idl"],
-            "extensions": [".pro"],
-            "configuration": "./language-configuration.json"
-        },{
-            "id": "task",
-            "aliases": ["Task", "task"],
-            "extensions": [".task"]
-        }],
-        "grammars": [{
-            "language": "idl",
-            "scopeName": "source.idl",
-            "path": "./syntaxes/idl.tmLanguage"
-        },{
-            "language": "task",
-            "scopeName": "source.json",
-            "path": "./syntaxes/json-task/JSON.tmLanguage"
-        }],
+        "languages": [
+            {
+                "id": "idl",
+                "aliases": [
+                    "IDL",
+                    "idl"
+                ],
+                "extensions": [
+                    ".pro"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "task",
+                "aliases": [
+                    "Task",
+                    "task"
+                ],
+                "extensions": [
+                    ".task"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "idl",
+                "scopeName": "source.idl",
+                "path": "./syntaxes/idl.tmLanguage"
+            },
+            {
+                "language": "task",
+                "scopeName": "source.json",
+                "path": "./syntaxes/json-task/JSON.tmLanguage"
+            }
+        ],
         "snippets": [
             {
                 "language": "idl",
@@ -58,5 +79,8 @@
                 "path": "./snippets/objects.json"
             }
         ]
+    },
+    "devDependencies": {
+        "all-contributors-cli": "^4.11.1"
     }
 }

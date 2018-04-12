@@ -1,8 +1,9 @@
 
 ;----------------------------------------------------------------------------
-; wish list of things to highlight
+; things to fix in highlighting
 ;----------------------------------------------------------------------------
-;wish list
+if this then $
+  return else return 
 
 self.latestLine = trace[-3].LINE   ;square bracket it captured by brackets, need new match for structures
 
@@ -82,20 +83,23 @@ generateOccamsClassifier_getCombinations, $ ;comment
 
 anyNameHere, clogs.th,$  ;comment
   ;comment and still line continuation
-  procedurehere
+  procedurehere,$
+  andHere
 
 print,$
   ;comment here for fanciness
   false_positive.this(),$
   andthis(),$
-  nothing,$
+  nothing, $
   procedure
   
 procedure,asfdg, $
   somethingelse.this
 
 procedure, $
-  somethingelse
+  ;comment
+  somethingelse,$
+  thing.that,
 
 file_mkdir, self.buildDir
 if (space_after) then printf, lun, '', /IMPLIED_PRINT

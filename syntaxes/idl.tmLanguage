@@ -367,6 +367,10 @@
 							<key>include</key>
 							<string>#allofem</string>
 						</dict>
+						<dict>
+							<key>include</key>
+							<string>#idl_properties_in_continuedlines</string>
+						</dict>
 					</array>
 				</dict>
 			</dict>
@@ -382,11 +386,11 @@
 					<array>
 						<dict>
 							<key>include</key>
-							<string>#idl_properties_in_continuedlines</string>
+							<string>#allofembutprocedures</string>
 						</dict>
 						<dict>
 							<key>include</key>
-							<string>#allofembutprocedures</string>
+							<string>#idl_properties_in_continuedlines</string>
 						</dict>
 					</array>
 				</dict>
@@ -395,11 +399,11 @@
 			<array>
 				<dict>
 					<key>include</key>
-					<string>#idl_properties_in_continuedlines</string>
+					<string>#allofembutprocedures</string>
 				</dict>
 				<dict>
 					<key>include</key>
-					<string>#allofembutprocedures</string>
+					<string>#idl_properties_in_continuedlines</string>
 				</dict>
 			</array>
 		</dict>
@@ -898,13 +902,23 @@
 					<key>comment</key>
 					<string>Getting properties in line continuations, relaxed conditions</string>
 					<key>match</key>
-					<string>(?i)((?<=\.)[a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
+					<string>(?i)\.([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)(,.*|\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
 						<dict>
 							<key>name</key>
 							<string>entity.name.tag.idl</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#allofembutprocedures</string>
+								</dict>
+							</array>
 						</dict>
 					</dict>
 				</dict>
