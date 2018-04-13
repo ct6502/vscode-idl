@@ -20,7 +20,7 @@ The JSON syntax rules for the `.task` files are from [VSCode](https://github.com
 
 - The actual code that gets highlighted is strongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
 
-The previous issue for line continuations, where arguments were being colored as procedures has been resolved. In order to have the line continuation correctly highlight your code, you will **need** to have the next line indented such as:
+- The previous issue for line continuations, where arguments were being colored as procedures has been resolved. In order to have the line continuation correctly highlight your code, you will **need** to have the next line indented such as:
 
 ```idl
 someProcedure,$

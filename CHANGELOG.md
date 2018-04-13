@@ -30,6 +30,8 @@ A lot of changes have been made to improve the colorization of IDL's procedures 
 
 - Snippets have been improved and organized (may have been snuck into the last release)
 
+- Added the all-contributors NPM package to the package.json file for adding a nice attribution section to the README as other people contribute.
+
 ## [1.1.0] - 2018-04-02
 
 - Organized and restructured the language file
