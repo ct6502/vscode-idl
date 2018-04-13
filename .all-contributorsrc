@@ -1,0 +1,45 @@
+{
+  "projectName": "vscode-idl",
+  "projectOwner": "chris-torrence",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "chris-torrence",
+      "name": "Chris Torrence",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/5461379?v=4",
+      "profile": "https://github.com/chris-torrence",
+      "contributions": [
+        "code",
+        "design",
+        "platform"
+      ]
+    },
+    {
+      "login": "znorman-harris",
+      "name": "Zachary Norman",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/31664668?v=4",
+      "profile": "https://github.com/znorman-harris",
+      "contributions": [
+        "code",
+        "design",
+        "doc"
+      ]
+    },
+    {
+      "login": "mgalloy",
+      "name": "Michael Galloy",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/713524?v=4",
+      "profile": "http://michaelgalloy.com",
+      "contributions": [
+        "code",
+        "plugin"
+      ]
+    }
+  ]
+}

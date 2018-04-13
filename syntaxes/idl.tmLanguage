@@ -28,7 +28,15 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#curlybrackets</string>
+			<string>#braces</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#case_switch</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#linecontinuationblocks</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -53,10 +61,6 @@
 		<dict>
 			<key>include</key>
 			<string>#idl_executive_commands</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#idl_structure_tag_names</string>
 		</dict>
 	</array>
 	<key>repository</key>
@@ -97,7 +101,11 @@
 			<array>
 				<dict>
 					<key>include</key>
-					<string>#curlybrackets</string>
+					<string>#braces</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#case_switch</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -118,6 +126,56 @@
 				<dict>
 					<key>include</key>
 					<string>#idl_procedures</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#all_idl_comments</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#variable</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#float</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#integer</string>
+				</dict>
+			</array>
+		</dict>
+		<key>allofembutprocedures</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#braces</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#linecontinuationblocks</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#case_switch</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#end_in_parens</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#brackets</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#string</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#all_idl_keywords_except_procedures</string>
 				</dict>
 				<dict>
 					<key>include</key>
@@ -223,6 +281,132 @@
 				</dict>
 			</array>
 		</dict>
+		<key>braces</key>
+		<dict>
+			<key>begin</key>
+			<string>\{</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>meta.brackets.idl</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>meta.brackets.idl</string>
+			<key>end</key>
+			<string>\}</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>meta.brackets.idl</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#idl_structure_tag_names</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#allofem</string>
+				</dict>
+			</array>
+		</dict>
+		<key>case_switch</key>
+		<dict>
+			<key>begin</key>
+			<string>(?i)\bof\b</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>meta.brackets.idl</string>
+			<key>end</key>
+			<string>(?i)\s*endcase\b|\s*endswitch\b</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#idl_procedures_in_case_switch</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#allofem</string>
+				</dict>
+			</array>
+		</dict>
+		<key>linecontinuationblocks</key>
+		<dict>
+			<key>begin</key>
+			<string>\$.*$</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#allofem</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#idl_properties_in_continuedlines</string>
+						</dict>
+					</array>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>meta.brackets.idl</string>
+			<key>end</key>
+			<string>^\s+(?!;.*)(?=\S)</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#allofembutprocedures</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#idl_properties_in_continuedlines</string>
+						</dict>
+					</array>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#allofembutprocedures</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#idl_properties_in_continuedlines</string>
+				</dict>
+			</array>
+		</dict>
 		<key>end_in_parens</key>
 		<dict>
 			<key>comment</key>
@@ -276,6 +460,14 @@
 					<string>Control keywords</string>
 					<key>match</key>
 					<string>(?i)^\s*else\s*(?=:)</string>
+					<key>name</key>
+					<string>keyword.control.idl</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>Special case for end, some odd bug somewhere makes this needed to highlight in case-switch statements</string>
+					<key>match</key>
+					<string>(?i)\s*end\b</string>
 					<key>name</key>
 					<string>keyword.control.idl</string>
 				</dict>
@@ -453,34 +645,6 @@
 				</dict>
 			</dict>
 		</dict>
-		<!-- <key>idl_line_continuation_blocks</key>
-		<dict>
-			<key>comment</key>
-			<string>IDL Code Continuation Blocks</string>
-			<key>begin</key>
-			<string>(?i)(?<![a-z0-9_])\$</string>
-			<key>end</key>
-			<string>^((?!\$).)*$</string> or the one on the next line
-			<string>^((?!((?<![a-z0-9_])\$.*\n)).)*$</string>
-			<key>name</key>
-			<string>meta.variable.other.valid.idl</string>
-		</dict> -->
-		<!-- <key>idl_line_continuation_blocks</key>
-		<dict>
-			<key>comment</key>
-			<string>IDL Code Continuation Blocks</string>
-			<key>begin</key>
-			<string>(?i)(?<![a-z0-9_])\$.*\n</string>
-			<key>end</key>
-			<string>(?i)^((?!((?<![a-z0-9_])\$.*\n)).)*$</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>#all_idl_keywords_except_procedures</string>
-				</dict>
-			</array>
-		</dict> -->
 		<key>idl_functions</key>
 		<dict>
 			<key>patterns</key>
@@ -503,15 +667,63 @@
 				</dict>
 			</array>
 		</dict>
+		<key>idl_procedures_in_case_switch</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedures after case statements</string>
+					<key>match</key>
+					<string>(?i)(:\s+)((?!begin|if|foreach|for|while|break|continue|goto|case|switch|repeat)[a-z_][a-z0-9$_]*\s*(?=,|\$|$|;.*$))</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedure methods after case statements</string>
+					<key>match</key>
+					<string>(?i)(:\s+[a-z_][a-z0-9$_]*\.)([a-z_][a-z0-9$_]*\s*(?=,|\$|$|;.*$))</string>
+					<key>captures</key>
+					<dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+			</array>
+		</dict>
 		<key>idl_procedures</key>
 		<dict>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>comment</key>
-					<string>IDL Procedure Methods with args/keywords</string>
+					<string>IDL Procedure Methods from pointer notation</string>
 					<key>match</key>
-					<string>(?i)(^\s*[a-z_][a-z0-9_$\.]*\.|\s*\(*[a-z_][a-z0-9_$:]*\)*->)([a-z_][a-z0-9_$:]*(?=\,))</string>
+					<string>(?i)->([a-z_][a-z0-9_$:]*(?=\,|\s))</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>support.function.idl</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>IDL Procedure Methods</string>
+					<key>match</key>
+					<string>(?i)(^\s*[a-z_][a-z0-9_$\.]*\.)([a-z_][a-z0-9_$:]*)(,.*|\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -529,16 +741,7 @@
 							<key>name</key>
 							<string>support.function.idl</string>
 						</dict>
-					</dict>
-				</dict>
-				<dict>
-					<key>comment</key>
-					<string>IDL Procedure Methods from (variables) args/keywords</string>
-					<key>match</key>
-					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_][a-z0-9_$]*(?=\,))</string>
-					<key>captures</key>
-					<dict>
-						<key>1</key>
+						<key>3</key>
 						<dict>
 							<key>patterns</key>
 							<array>
@@ -548,28 +751,13 @@
 								</dict>
 							</array>
 						</dict>
-						<key>2</key>
-						<dict>
-							<key>patterns</key>
-							<array>
-								<dict>
-									<key>include</key>
-									<string>#idl_structures</string>
-								</dict>
-							</array>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>name</key>
-							<string>support.function.idl</string>
-						</dict>
 					</dict>
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>IDL Procedure Methods from (variables) with no arguments or keywords</string>
+					<string>IDL Procedure Methods from (variables) args/keywords</string>
 					<key>match</key>
-					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_][a-z0-9_$]*)(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*\(.*\))(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_][a-z0-9_$]*)(,.*|\s*;.*|\s*)$</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -603,41 +791,7 @@
 							<array>
 								<dict>
 									<key>include</key>
-									<string>#all_idl_comments</string>
-								</dict>
-							</array>
-						</dict>
-					</dict>
-				</dict>
-				<dict>
-					<key>comment</key>
-					<string>IDL Procedure Methods with no arguments or keywords</string>
-					<key>match</key>
-					<string>(?i)(^\s*\(*[a-z_][a-z0-9_$\.]*\)*\.|\s*\(*[a-z_][a-z0-9_$:]*\)*->)([a-z_][a-z0-9_$:]*)(\s*;.*|\s*)$</string>
-					<key>captures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>patterns</key>
-							<array>
-								<dict>
-									<key>include</key>
-									<string>#idl_structures</string>
-								</dict>
-							</array>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>support.function.idl</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>patterns</key>
-							<array>
-								<dict>
-									<key>include</key>
-									<string>#all_idl_comments</string>
+									<string>#allofem</string>
 								</dict>
 							</array>
 						</dict>
@@ -693,9 +847,9 @@
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>IDL Procedures in single-line blocks must be after methods and (variables)</string>
+					<string>IDL Procedures in single-line blocks - must be after methods and (variables)</string>
 					<key>match</key>
-					<string>(?i)\b(do|repeat|then|else)\s+((?!begin|if|foreach|for|while|break|continue|goto)[a-z_][a-z0-9$_]*(?=,|\s*|\s*;.*))</string>
+					<string>(?i)\b(do|repeat|then|else)\s+((?!begin|if|foreach|for|while|break|continue|goto|repeat)[a-z_][a-z0-9$_]*\s*(?=,|\$|else|$|;.*$))</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -712,33 +866,15 @@
 				</dict>
 				<dict>
 					<key>comment</key>
-					<string>IDL Procedures with args/keywords</string>
+					<string>IDL Procedures</string>
 					<key>match</key>
-					<string>(?i)(^\s*)(?!and\s|eq\s|ge\s|gt\s|le\s|lt\s|mod\s|ne\s|not\s|or\s|xor\s|begin\s|break\s|case\s|common\s|compile_opt\s|continue\s|do\s|else\s|end\s|endcase\s|endelse\s|endfor\s|endforeach\s|endif\s|endrep\s|endswitch\s|endwhile\s|for\s|foreach\s|forward_function\s|function\s|goto\s*,|if\s|inherits\s|of\s|on_ioerror\s|pro\s|repeat\s|switch\s|then\s|until\s|while\s)[a-z_][a-z0-9_$]*(?=\,)\b</string>
-					<key>name</key>
-					<string>support.function.idl</string>
-				</dict>
-				<dict>
-					<key>comment</key>
-					<string>IDL Procedures with no arguments or keywords</string>
-					<key>match</key>
-					<string>(?i)(^\s*)(?!and\s|eq\s|ge\s|gt\s|le\s|lt\s|mod\s|ne\s|not\s|or\s|xor\s|begin\s|break\s|case\s|common\s|compile_opt\s|continue\s|do\s|else\s|end\s|endcase\s|endelse\s|endfor\s|endforeach\s|endif\s|endrep\s|endswitch\s|endwhile\s|for\s|foreach\s|forward_function\s|function\s|goto\s*,|if\s|inherits\s|of\s|on_ioerror\s|pro\s|repeat\s|switch\s|then\s|until\s|while\s)([a-z_][a-z0-9_$]*(?!\.))(\s*;.*|\s*)$</string>
+					<string>(?i)(^\s*)(?!and\s|eq\s|ge\s|gt\s|le\s|lt\s|mod\s|ne\s|not\s|or\s|xor\s|begin\s|break\s|case\s|common\s|compile_opt\s|continue\s|do\s|else\s|end\s|endcase\s|endelse\s|endfor\s|endforeach\s|endif\s|endrep\s|endswitch\s|endwhile\s|for\s|foreach\s|forward_function\s|function\s|goto\s*,|if\s|inherits\s|of\s|on_ioerror\s|pro\s|repeat\s|switch\s|then\s|until\s|while\s)([a-z_][a-z0-9_$]*(?!\.)(?=\s*,|\s*;.*$|\s*$))</string>
 					<key>captures</key>
 					<dict>
 						<key>2</key>
 						<dict>
 							<key>name</key>
 							<string>support.function.idl</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>patterns</key>
-							<array>
-								<dict>
-									<key>include</key>
-									<string>#all_idl_comments</string>
-								</dict>
-							</array>
 						</dict>
 					</dict>
 				</dict>
@@ -750,11 +886,41 @@
 			<array>
 				<dict>
 					<key>comment</key>
-					<string>Structure tag/property name declarations - false positives in array indexing</string>
+					<string>Structure tag/property name declarations - only used in braces block above</string>
 					<key>match</key>
 					<string>(?i)(\s*|{\s*)((?!else)[a-z_][a-z0-9_$]*\s*(?!:\s*begin|::)(?=:))</string>
 					<key>name</key>
 					<string>entity.name.tag</string>
+				</dict>
+			</array>
+		</dict>
+		<key>idl_properties_in_continuedlines</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>comment</key>
+					<string>Getting properties in line continuations, relaxed conditions</string>
+					<key>match</key>
+					<string>(?i)\.([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)(,.*|\s*;.*|\s*)$</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.idl</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>patterns</key>
+							<array>
+								<dict>
+									<key>include</key>
+									<string>#allofembutprocedures</string>
+								</dict>
+							</array>
+						</dict>
+					</dict>
 				</dict>
 			</array>
 		</dict>
@@ -862,7 +1028,7 @@
 					<key>comment</key>
 					<string>Getting properties</string>
 					<key>match</key>
-					<string>(?i)(&&|#|##|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[|~|if\s|while\s|until\s|and\s|eq\s|ge\s|gt\s|le\s|lt\s|mod\s|ne\s|not\s|or\s|xor\s)\s*([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
+					<string>(?i)(\?|&&|#|##|\|\||\*|\/|\+|mod\s|\-|\(|\:|=|,|\^|\[|~|if\s|while\s|until\s|and\s|eq\s|ge\s|gt\s|le\s|lt\s|mod\s|ne\s|not\s|or\s|xor\s)\s*([a-z_][a-z0-9_$]*)(\.[a-z_][a-z0-9_$\.]*\.|\.)([a-z_](?![a-z0-9_$]*\()[a-z0-9_$]*)</string>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
