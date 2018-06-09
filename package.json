@@ -18,7 +18,7 @@
         "vscode": "^1.19.0"
     },
     "categories": [
-        "Languages"
+        "Programming Languages"
     ],
     "icon": "images/idlicon.png",
     "contributes": {
@@ -43,6 +43,26 @@
                 "extensions": [
                     ".task"
                 ]
+            },
+            {
+                "id": "style",
+                "aliases": [
+                    "Style",
+                    "style"
+                ],
+                "extensions": [
+                    ".style"
+                ]
+            },
+            {
+                "id": "model",
+                "aliases": [
+                    "Model",
+                    "model"
+                ],
+                "extensions": [
+                    ".model"
+                ]
             }
         ],
         "grammars": [
@@ -53,6 +73,16 @@
             },
             {
                 "language": "task",
+                "scopeName": "source.json",
+                "path": "./syntaxes/json-task/JSON.tmLanguage"
+            },
+            {
+                "language": "style",
+                "scopeName": "source.json",
+                "path": "./syntaxes/json-task/JSON.tmLanguage"
+            },
+            {
+                "language": "model",
                 "scopeName": "source.json",
                 "path": "./syntaxes/json-task/JSON.tmLanguage"
             }
@@ -77,6 +107,10 @@
             {
                 "language": "idl",
                 "path": "./snippets/objects.json"
+            },
+            {
+                "language": "idl",
+                "path": "./snippets/tests.json"
             }
         ]
     },
