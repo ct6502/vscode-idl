@@ -23,38 +23,44 @@ let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 // load our different routines
-const idlRoutines = require('../routines/idl.json');
+const idlRoutines = require("../routines/idl.json");
 // give proper symbol
 idlRoutines.docs.forEach((item, idx) => {
     // get key as string
     const str = idx.toString();
     // check for our system variable !null
     if (item.label === null) {
-        item.label = '!null';
+        item.label = "!null";
     }
     // handle setting proper information for our data things and such
     switch (true) {
         case idlRoutines.functions[str]:
-            item.insertText = item.label + '(';
+            item.insertText = item.label + "(";
             item.kind = vscode_languageserver_1.CompletionItemKind.Function;
             break;
         case idlRoutines.procedures[str]:
-            item.insertText = item.label + ',';
+            item.insertText = item.label + ",";
             item.kind = vscode_languageserver_1.CompletionItemKind.Function;
             break;
-        case item.label.startsWith('!'):
+        case item.label.startsWith("!"):
             item.kind = vscode_languageserver_1.CompletionItemKind.Constant;
             break;
         default:
             item.kind = vscode_languageserver_1.CompletionItemKind.Text;
     }
     // check if we are an ENVI task, replace with ENVITask('TaskName')
-    if (item.label.startsWith('ENVI') && item.label.endsWith('Task')) {
-        item.insertText = "ENVITask('" + item.label.substr(0, item.label.length - 4).substr(4) + "')";
+    if (item.label.startsWith("ENVI") && item.label.endsWith("Task")) {
+        item.insertText =
+            "ENVITask('" +
+                item.label.substr(0, item.label.length - 4).substr(4) +
+                "')";
     }
     // check if we are an IDL task, replace with ENVITask('TaskName')
-    if (item.label.startsWith('IDL') && item.label.endsWith('Task')) {
-        item.insertText = "IDLTask('" + item.label.substr(0, item.label.length - 4).substr(3) + "')";
+    if (item.label.startsWith("IDL") && item.label.endsWith("Task")) {
+        item.insertText =
+            "IDLTask('" +
+                item.label.substr(0, item.label.length - 4).substr(3) +
+                "')";
     }
     // save change
     idlRoutines.docs[idx] = item;
@@ -85,7 +91,7 @@ connection.onInitialized(() => {
     }
     if (hasWorkspaceFolderCapability) {
         connection.workspace.onDidChangeWorkspaceFolders(_event => {
-            connection.console.log('Workspace folder change event received.');
+            connection.console.log("Workspace folder change event received.");
         });
     }
 });
@@ -115,7 +121,7 @@ function getDocumentSettings(resource) {
     if (!result) {
         result = connection.workspace.getConfiguration({
             scopeUri: resource,
-            section: 'IDLLanguageServer'
+            section: "IDLLanguageServer"
         });
         documentSettings.set(resource, result);
     }
@@ -177,7 +183,7 @@ function validateTextDocument(textDocument) {
 }
 connection.onDidChangeWatchedFiles(_change => {
     // Monitored files have change in VSCode
-    connection.console.log('We received an file change event');
+    connection.console.log("We received an file change event");
 });
 // This handler provides the initial list of the completion items.
 connection.onCompletion((_textDocumentPosition) => {
