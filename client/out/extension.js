@@ -7,10 +7,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const vscode_1 = require("vscode");
 const vscode_languageclient_1 = require("vscode-languageclient");
+const idl_document_symbols_1 = require("./providers/idl-document-symbols");
 let client;
-function activate(context) {
+const IDL_MODE = { language: 'idl', scheme: 'file' };
+function activate(ctx) {
     // The server is implemented in node
-    let serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js'));
+    let serverModule = ctx.asAbsolutePath(path.join('server', 'out', 'server.js'));
     // The debug options for the server
     // --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
     let debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
@@ -30,11 +32,14 @@ function activate(context) {
         documentSelector: [{ scheme: 'file', language: 'idl' }],
         synchronize: {
             // Notify the server about file changes to '.clientrc files contained in the workspace
-            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.clientrc')
+            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.idlrc')
         }
     };
     // Create the language client and start the client.
-    client = new vscode_languageclient_1.LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
+    client = new vscode_languageclient_1.LanguageClient('IDLLanguageServer', 'IDL Language Server', serverOptions, clientOptions);
+    // register our symbol provider
+    const documentProvider = new idl_document_symbols_1.IDLDocumentSymbolProvider();
+    ctx.subscriptions.push(vscode_1.languages.registerDocumentSymbolProvider(IDL_MODE, documentProvider));
     // Start the client. This will also launch the server
     client.start();
 }

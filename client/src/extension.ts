@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, languages, DocumentFilter } from 'vscode';
 
 import {
 	LanguageClient,
@@ -12,12 +12,16 @@ import {
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient';
+import { IDLDocumentSymbolProvider } from './providers/idl-document-symbols';
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+const IDL_MODE: DocumentFilter = { language: 'idl', scheme: 'file' };
+
+
+export function activate(ctx: ExtensionContext) {
 	// The server is implemented in node
-	let serverModule = context.asAbsolutePath(
+	let serverModule = ctx.asAbsolutePath(
 		path.join('server', 'out', 'server.js')
 	);
 	// The debug options for the server
@@ -41,17 +45,24 @@ export function activate(context: ExtensionContext) {
 		documentSelector: [{ scheme: 'file', language: 'idl' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+			fileEvents: workspace.createFileSystemWatcher('**/.idlrc')
 		}
 	};
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
-		'languageServerExample',
-		'Language Server Example',
+		'IDLLanguageServer',
+		'IDL Language Server',
 		serverOptions,
 		clientOptions
 	);
+
+	// register our symbol provider
+	const documentProvider = new IDLDocumentSymbolProvider();
+	ctx.subscriptions.push(
+    languages.registerDocumentSymbolProvider(IDL_MODE, documentProvider),
+  );
+
 
 	// Start the client. This will also launch the server
 	client.start();

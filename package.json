@@ -24,10 +24,11 @@
         "@types/node": "^8.0.0",
         "tslint": "^5.16.0",
         "typescript": "^3.4.5",
-        "all-contributors-cli": "^4.11.1"
+        "all-contributors-cli": "^4.11.1",
+        "vscode": "^1.1.34"
     },
     "engines": {
-        "vscode": "^1.19.0"
+        "vscode": "^1.30.0"
     },
     "activationEvents": [
         "onLanguage:idl"

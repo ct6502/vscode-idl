@@ -16,6 +16,7 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams
 } from 'vscode-languageserver';
+import { IRoutines } from './core/routines.interface';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -28,6 +29,51 @@ let documents: TextDocuments = new TextDocuments();
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
+
+
+// load our different routines
+const idlRoutines: IRoutines = require('../routines/idl.json');
+
+// give proper symbol
+idlRoutines.docs.forEach((item, idx) => {
+	// get key as string
+	const str = idx.toString();
+
+	// check for our system variable !null
+	if (item.label === null) {
+		item.label = '!null';
+	}
+
+	// handle setting proper information for our data things and such
+	switch (true) {
+		case idlRoutines.functions[str]:
+			item.insertText = item.label + '(';
+			item.kind = CompletionItemKind.Function;
+			break;
+		case idlRoutines.procedures[str]:
+			item.insertText = item.label + ',';
+			item.kind = CompletionItemKind.Function;
+			break;
+		case item.label.startsWith('!'):
+			item.kind = CompletionItemKind.Constant;
+			break;
+		default:
+			item.kind = CompletionItemKind.Text;
+	}
+
+	// check if we are an ENVI task, replace with ENVITask('TaskName')
+	if (item.label.startsWith('ENVI') && item.label.endsWith('Task')) {
+		item.insertText = "ENVITask('" + item.label.substr(0, item.label.length-4).substr(4) + "')";
+	}
+
+	// check if we are an IDL task, replace with ENVITask('TaskName')
+	if (item.label.startsWith('IDL') && item.label.endsWith('Task')) {
+		item.insertText = "IDLTask('" + item.label.substr(0, item.label.length-4).substr(3) + "')";
+	}
+
+	// save change
+	idlRoutines.docs[idx] = item;
+});
 
 connection.onInitialize((params: InitializeParams) => {
 	let capabilities = params.capabilities;
@@ -105,7 +151,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	if (!result) {
 		result = connection.workspace.getConfiguration({
 			scopeUri: resource,
-			section: 'languageServerExample'
+			section: 'IDLLanguageServer'
 		});
 		documentSettings.set(resource, result);
 	}
@@ -125,46 +171,46 @@ documents.onDidChangeContent(change => {
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
-	let settings = await getDocumentSettings(textDocument.uri);
+	// let settings = await getDocumentSettings(textDocument.uri);
 
 	// The validator creates diagnostics for all uppercase words length 2 and more
-	let text = textDocument.getText();
-	let pattern = /\b[A-Z]{2,}\b/g;
-	let m: RegExpExecArray | null;
+	// let text = textDocument.getText();
+	// let pattern = /\b[A-Z]{2,}\b/g;
+	// let m: RegExpExecArray | null;
 
-	let problems = 0;
+	// let problems = 0;
 	let diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-		problems++;
-		let diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is all uppercase.`,
-			source: 'ex'
-		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
-		diagnostics.push(diagnostic);
-	}
+	// while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+	// 	problems++;
+	// 	let diagnostic: Diagnostic = {
+	// 		severity: DiagnosticSeverity.Warning,
+	// 		range: {
+	// 			start: textDocument.positionAt(m.index),
+	// 			end: textDocument.positionAt(m.index + m[0].length)
+	// 		},
+	// 		message: `${m[0]} is all uppercase.`,
+	// 		source: 'ex'
+	// 	};
+	// 	if (hasDiagnosticRelatedInformationCapability) {
+	// 		diagnostic.relatedInformation = [
+	// 			{
+	// 				location: {
+	// 					uri: textDocument.uri,
+	// 					range: Object.assign({}, diagnostic.range)
+	// 				},
+	// 				message: 'Spelling matters'
+	// 			},
+	// 			{
+	// 				location: {
+	// 					uri: textDocument.uri,
+	// 					range: Object.assign({}, diagnostic.range)
+	// 				},
+	// 				message: 'Particularly for names'
+	// 			}
+	// 		];
+	// 	}
+	// 	diagnostics.push(diagnostic);
+	// }
 
 	// Send the computed diagnostics to VSCode.
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
@@ -181,32 +227,23 @@ connection.onCompletion(
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
-		return [
-			{
-				label: 'TypeScript',
-				kind: CompletionItemKind.Text,
-				data: 1
-			},
-			{
-				label: 'JavaScript',
-				kind: CompletionItemKind.Text,
-				data: 2
-			}
-		];
+		return idlRoutines.docs;
 	}
 );
 
-// This handler resolves additional information for the item selected in
-// the completion list.
+// when we auto complete, do any custom adjustments to the data before the auto-complete
+// request gets back to the client
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		if (item.data === 1) {
-			item.detail = 'TypeScript details';
-			item.documentation = 'TypeScript documentation';
-		} else if (item.data === 2) {
-			item.detail = 'JavaScript details';
-			item.documentation = 'JavaScript documentation';
-		}
+		// // get the id
+		// const key = item.data.toString();
+
+		// // check if function or procedure
+		// switch (true) {
+		// 	default:
+		// 		// do nothing
+		// }
+
 		return item;
 	}
 );
