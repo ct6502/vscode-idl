@@ -153,7 +153,6 @@ export class IDLDocumentSymbolManager {
   async remove(uri: string) {
     // check if we need to remove it from the symbol list
     if (this.moizes.documentSymbols.has([uri])) {
-      this.connection.console.log(JSON.stringify("Have cached symbols"));
       // get our symbols and clean up
       const symbols = await this.get.documentSymbols(uri);
 

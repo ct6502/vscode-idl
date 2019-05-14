@@ -161,7 +161,6 @@ class IDLDocumentSymbolManager {
         return __awaiter(this, void 0, void 0, function* () {
             // check if we need to remove it from the symbol list
             if (this.moizes.documentSymbols.has([uri])) {
-                this.connection.console.log(JSON.stringify("Have cached symbols"));
                 // get our symbols and clean up
                 const symbols = yield this.get.documentSymbols(uri);
                 // clean up our symbol information
