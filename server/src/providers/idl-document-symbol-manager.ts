@@ -175,47 +175,35 @@ export class IDLDocumentSymbolManager {
 
   // wrapper that uses the text document synchronization to update symbols
   // for all files managed by the VScode instance
-  indexWorkspaces(folders: WorkspaceFolder[]): Promise<any> {
-    return new Promise((resolve, reject) => {
-      try {
-        const promises: Promise<any>[] = [];
+  async indexWorkspaces(folders: WorkspaceFolder[]) {
+    const promises: Promise<any>[] = [];
 
-        // get the current folder
-        const firstDir = process.cwd();
+    // get the current folder
+    const firstDir = process.cwd();
 
-        // process each folder
-        folders.forEach(folder => {
-          // get path as actual folder, fix windows symbols from HTML
-          const folderPath = Uri.parse(folders[0].uri).fsPath;
-          // this.connection.console.log(folderPath);
+    // process each folder
+    folders.forEach(folder => {
+      // get path as actual folder, fix windows symbols from HTML
+      const folderPath = Uri.parse(folders[0].uri).fsPath;
+      // this.connection.console.log(folderPath);
 
-          process.chdir(folderPath);
-          const files: string[] = glob.readdirSync("**/*.pro");
+      process.chdir(folderPath);
+      const files: string[] = glob.readdirSync("**/*.pro");
 
-          // process each file
-          files.forEach(file => {
-            // get the URI as a string
-            const uriStr = Uri.file(folderPath + path.sep + file).toString();
+      // process each file
+      files.forEach(file => {
+        // get the URI as a string
+        const uriStr = Uri.file(folderPath + path.sep + file).toString();
 
-            promises.push(this.get.documentSymbols(uriStr));
-          });
-        });
-
-        // change back to the fiest directory
-        process.chdir(firstDir);
-
-        // wait to finish indexing all documents
-        Promise.all(promises)
-          .then(res => {
-            resolve(true);
-          })
-          .catch(err => {
-            reject(err);
-          });
-      } catch (err) {
-        reject(err);
-      }
+        promises.push(this.get.documentSymbols(uriStr));
+      });
     });
+
+    // change back to the fiest directory
+    process.chdir(firstDir);
+
+    // wait to finish indexing all documents
+    await Promise.all(promises);
   }
 
   private _getStrings(uri: string): string {
@@ -237,8 +225,8 @@ export class IDLDocumentSymbolManager {
   // define our getters for extracting document information
   get: ISearches = {
     documentSymbols: moize(
-      (uri: string): Promise<DocumentSymbol[]> => {
-        return new Promise((resolve, reject) => {
+      async (uri: string): Promise<DocumentSymbol[]> => {
+        return new Promise(async (resolve, reject) => {
           try {
             // get the strings we are processing
             const text = this._getStrings(uri);
@@ -277,8 +265,8 @@ export class IDLDocumentSymbolManager {
       { maxSize: 1000, isPromise: true }
     ),
     documentSymbolInformation: moize(
-      (uri: string): Promise<SymbolInformation[]> => {
-        return new Promise((resolve, reject) => {
+      async (uri: string): Promise<SymbolInformation[]> => {
+        return new Promise(async (resolve, reject) => {
           try {
             const text = this._getStrings(uri);
             resolve(this.extractor.symbolizeAsSymbolInformation(text, uri));

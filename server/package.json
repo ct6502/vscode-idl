@@ -19,8 +19,6 @@
 		"webpack-deploy": "npm run clean && webpack"
 	},
 	"dependencies": {
-		"file-uri-to-path": "^1.0.0",
-		"file-url": "^3.0.0",
 		"fuzzysort": "^1.1.4",
 		"glob-fs": "^0.1.7",
 		"moize": "^5.4.4",

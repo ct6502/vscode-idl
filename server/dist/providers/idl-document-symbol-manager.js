@@ -30,8 +30,8 @@ class IDLDocumentSymbolManager {
         this.symbolKeysSearch = [];
         // define our getters for extracting document information
         this.get = {
-            documentSymbols: moize_1.default((uri) => {
-                return new Promise((resolve, reject) => {
+            documentSymbols: moize_1.default((uri) => __awaiter(this, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                     try {
                         // get the strings we are processing
                         const text = this._getStrings(uri);
@@ -60,10 +60,10 @@ class IDLDocumentSymbolManager {
                     catch (err) {
                         reject(err);
                     }
-                });
-            }, { maxSize: 1000, isPromise: true }),
-            documentSymbolInformation: moize_1.default((uri) => {
-                return new Promise((resolve, reject) => {
+                }));
+            }), { maxSize: 1000, isPromise: true }),
+            documentSymbolInformation: moize_1.default((uri) => __awaiter(this, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                     try {
                         const text = this._getStrings(uri);
                         resolve(this.extractor.symbolizeAsSymbolInformation(text, uri));
@@ -71,8 +71,8 @@ class IDLDocumentSymbolManager {
                     catch (err) {
                         reject(err);
                     }
-                });
-            }, { maxSize: 1000, isPromise: true })
+                }));
+            }), { maxSize: 1000, isPromise: true })
         };
         this.moizes = this.get;
         this.connection = connection;
@@ -182,39 +182,28 @@ class IDLDocumentSymbolManager {
     // wrapper that uses the text document synchronization to update symbols
     // for all files managed by the VScode instance
     indexWorkspaces(folders) {
-        return new Promise((resolve, reject) => {
-            try {
-                const promises = [];
-                // get the current folder
-                const firstDir = process.cwd();
-                // process each folder
-                folders.forEach(folder => {
-                    // get path as actual folder, fix windows symbols from HTML
-                    const folderPath = vscode_uri_1.default.parse(folders[0].uri).fsPath;
-                    // this.connection.console.log(folderPath);
-                    process.chdir(folderPath);
-                    const files = glob.readdirSync("**/*.pro");
-                    // process each file
-                    files.forEach(file => {
-                        // get the URI as a string
-                        const uriStr = vscode_uri_1.default.file(folderPath + path.sep + file).toString();
-                        promises.push(this.get.documentSymbols(uriStr));
-                    });
+        return __awaiter(this, void 0, void 0, function* () {
+            const promises = [];
+            // get the current folder
+            const firstDir = process.cwd();
+            // process each folder
+            folders.forEach(folder => {
+                // get path as actual folder, fix windows symbols from HTML
+                const folderPath = vscode_uri_1.default.parse(folders[0].uri).fsPath;
+                // this.connection.console.log(folderPath);
+                process.chdir(folderPath);
+                const files = glob.readdirSync("**/*.pro");
+                // process each file
+                files.forEach(file => {
+                    // get the URI as a string
+                    const uriStr = vscode_uri_1.default.file(folderPath + path.sep + file).toString();
+                    promises.push(this.get.documentSymbols(uriStr));
                 });
-                // change back to the fiest directory
-                process.chdir(firstDir);
-                // wait to finish indexing all documents
-                Promise.all(promises)
-                    .then(res => {
-                    resolve(true);
-                })
-                    .catch(err => {
-                    reject(err);
-                });
-            }
-            catch (err) {
-                reject(err);
-            }
+            });
+            // change back to the fiest directory
+            process.chdir(firstDir);
+            // wait to finish indexing all documents
+            yield Promise.all(promises);
         });
     }
     _getStrings(uri) {

@@ -3,6 +3,14 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode_languageserver_1 = require("vscode-languageserver");
 const idl_routine_helper_1 = require("./providers/idl-routine-helper");
@@ -25,6 +33,7 @@ let hasWorkspaceFolderCapability = true;
 let hasDiagnosticRelatedInformationCapability = false;
 connection.onInitialize((params) => {
     let capabilities = params.capabilities;
+    // params.workspaceFolders.
     // Does the client support the `workspace/configuration` request?
     // If not, we will fall back using global settings
     hasConfigurationCapability = !!(capabilities.workspace && !!capabilities.workspace.configuration);
@@ -45,59 +54,43 @@ connection.onInitialize((params) => {
         }
     };
 });
-connection.onInitialized(() => {
-    try {
-        if (hasConfigurationCapability) {
-            // Register for all configuration changes.
-            connection.client.register(vscode_languageserver_1.DidChangeConfigurationNotification.type, undefined);
-        }
-        // listen for workspace folder event changes and update our serve-side cache
-        // TODO: detect when workspace is closed and remove files
-        if (hasWorkspaceFolderCapability) {
-            // get the list of current workspaces
-            connection.workspace
-                .getWorkspaceFolders()
-                .then(folders => {
-                // refresh our index and detect problems on success
-                symbolProvider
-                    .indexWorkspaces(folders)
-                    .then(() => {
-                    // detect problems because we had change
-                    problemDetector.detectAndSendProblems();
-                })
-                    .catch(err => {
-                    connection.console.log(JSON.stringify(err));
-                });
+connection.onInitialized(() => __awaiter(this, void 0, void 0, function* () {
+    if (hasConfigurationCapability) {
+        // Register for all configuration changes.
+        connection.client.register(vscode_languageserver_1.DidChangeConfigurationNotification.type, undefined);
+    }
+    // listen for workspace folder event changes and update our serve-side cache
+    // TODO: detect when workspace is closed and remove files
+    if (hasWorkspaceFolderCapability) {
+        // get the list of current workspaces
+        connection.workspace.getWorkspaceFolders().then(folders => {
+            // refresh our index and detect problems on success
+            symbolProvider
+                .indexWorkspaces(folders)
+                .then(() => {
+                // detect problems because we had change
+                problemDetector.detectAndSendProblems();
             })
-                .then(undefined, err => {
+                .catch(err => {
                 connection.console.log(JSON.stringify(err));
             });
-            connection.workspace.connection.workspace // listen for new workspaces
-                .onDidChangeWorkspaceFolders(_event => {
-                try {
-                    connection.console.log("Workspace folder change event received. " +
-                        JSON.stringify(_event));
-                    // refresh our index and detect problems on success
-                    symbolProvider
-                        .indexWorkspaces(_event.added)
-                        .then(() => {
-                        // detect problems because we had change
-                        problemDetector.detectAndSendProblems();
-                    })
-                        .catch(err => {
-                        connection.console.log(JSON.stringify(err));
-                    });
-                }
-                catch (err) {
-                    connection.console.log(JSON.stringify(err));
-                }
+        });
+        connection.workspace.connection.workspace // listen for new workspaces
+            .onDidChangeWorkspaceFolders((_event) => __awaiter(this, void 0, void 0, function* () {
+            connection.console.log("Workspace folder change event received. " + JSON.stringify(_event));
+            // refresh our index and detect problems on success
+            yield symbolProvider
+                .indexWorkspaces(_event.added)
+                .then(() => {
+                // detect problems because we had change
+                problemDetector.detectAndSendProblems();
+            })
+                .catch(err => {
+                connection.console.log(JSON.stringify(err));
             });
-        }
+        }));
     }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-    }
-});
+}));
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
@@ -137,84 +130,38 @@ documents.onDidClose(e => {
 // TODO: work with just the changed parts of a document
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
-documents.onDidChangeContent(change => {
-    try {
-        // generate new symbols with the update, seems to magically sync when there are changes?
-        symbolProvider
-            .update(change.document.uri)
-            .then(res => {
-            // detect problems because we had change
-            problemDetector.detectAndSendProblems();
-        })
-            .catch(err => {
-            connection.console.log(JSON.stringify(err));
-        });
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-    }
-});
-documents.onDidOpen(event => {
-    try {
-        symbolProvider.get
-            .documentSymbols(event.document.uri)
-            .then(res => {
-            // detect problems because we had change
-            problemDetector.detectAndSendProblems();
-        })
-            .catch(err => {
-            connection.console.log(JSON.stringify(err));
-        });
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-    }
-});
+documents.onDidChangeContent((change) => __awaiter(this, void 0, void 0, function* () {
+    // generate new symbols with the update, seems to magically sync when there are changes?
+    const newSymbols = yield symbolProvider.update(change.document.uri);
+    // detect problems because we had change
+    problemDetector.detectAndSendProblems();
+}));
+documents.onDidOpen((event) => __awaiter(this, void 0, void 0, function* () {
+    yield symbolProvider.get.documentSymbols(event.document.uri);
+    // detect problems because we had change
+    problemDetector.detectAndSendProblems();
+}));
 connection.onDidChangeWatchedFiles(_change => {
     // Monitored files have change in VSCode
     connection.console.log("We received an file change event");
 });
 // This handler provides the initial list of the completion items.
 connection.onCompletion((_textDocumentPosition) => {
-    try {
-        return routineHelper.completion(_textDocumentPosition);
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-        return [];
-    }
+    return routineHelper.completion(_textDocumentPosition);
 });
 // when we auto complete, do any custom adjustments to the data before the auto-complete
 // request gets back to the client
 connection.onCompletionResolve((item) => {
-    try {
-        return routineHelper.postCompletion(item);
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-        return item;
-    }
+    return routineHelper.postCompletion(item);
 });
 // handle when a user searches for a symbol
 connection.onWorkspaceSymbol((params) => {
-    try {
-        return symbolProvider.searchByName(params.query);
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-        return [];
-    }
+    return symbolProvider.searchByName(params.query);
 });
 // handle when we want the definition of a symbol
 connection.onDefinition((params) => {
-    try {
-        const res = symbolProvider.searchByLine(params);
-        return res;
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-        return null;
-    }
+    const res = symbolProvider.searchByLine(params);
+    return res;
 });
 // connection.onHover(
 //   (params: TextDocumentPositionParams): Hover => {
@@ -223,23 +170,9 @@ connection.onDefinition((params) => {
 //   }
 // )
 // handle when we request document symbols
-connection.onDocumentSymbol((params) => {
-    try {
-        symbolProvider.get
-            .documentSymbols(params.textDocument.uri)
-            .then(res => {
-            return res;
-        })
-            .catch(err => {
-            connection.console.log(JSON.stringify(err));
-            return [];
-        });
-    }
-    catch (err) {
-        connection.console.log(JSON.stringify(err));
-        return [];
-    }
-});
+connection.onDocumentSymbol((params) => __awaiter(this, void 0, void 0, function* () {
+    return yield symbolProvider.get.documentSymbols(params.textDocument.uri);
+}));
 /*
 connection.onDidOpenTextDocument((params) => {
     // A text document got opened in VSCode.
