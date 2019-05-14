@@ -1,3 +1,11 @@
 {
-  "editor.formatOnSave": true
+    "[json]": {
+        "editor.tabSize": 4,
+        "editor.formatOnSave": false,
+        "editor.formatOnPaste": false
+    },
+    "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": false
+    }
 }

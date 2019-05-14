@@ -2,9 +2,9 @@
 	"name": "idl-language-server-client",
 	"description": "Client for IDL Language Server",
 	"author": "Zachary Norman",
-	"license": "MIT",
 	"version": "0.0.1",
 	"publisher": "CT6502",
+	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/chris-torrence/vscode-idl"

@@ -14,9 +14,20 @@ import {
   DidChangeConfigurationNotification,
   CompletionItem,
   CompletionItemKind,
-  TextDocumentPositionParams
+  TextDocumentPositionParams,
+  WorkspaceSymbolParams,
+  SymbolInformation,
+  DocumentSymbolParams,
+  DocumentFilter,
+  DocumentSymbol,
+  Definition,
+  Hover
 } from "vscode-languageserver";
-import { IRoutines } from "./core/routines.interface";
+import { IDLRoutineHelper } from "./providers/idl-routine-helper";
+import { IDLDocumentSymbolManager } from "./providers/idl-document-symbol-manager";
+import { connect } from "net";
+
+const IDL_MODE: DocumentFilter = { language: "idl", scheme: "file" };
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -26,62 +37,19 @@ let connection = createConnection(ProposedFeatures.all);
 // supports full document sync only
 let documents: TextDocuments = new TextDocuments();
 
+// create all of our helper objects for different requests
+const routineHelper = new IDLRoutineHelper(connection, documents);
+const symbolProvider = new IDLDocumentSymbolManager(connection, documents);
+
+// flags for configuration
 let hasConfigurationCapability: boolean = false;
-let hasWorkspaceFolderCapability: boolean = false;
+let hasWorkspaceFolderCapability: boolean = true;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
-
-// load our different routines
-const idlRoutines: IRoutines = require("../routines/idl.json");
-
-// give proper symbol
-idlRoutines.docs.forEach((item, idx) => {
-  // get key as string
-  const str = idx.toString();
-
-  // check for our system variable !null
-  if (item.label === null) {
-    item.label = "!null";
-  }
-
-  // handle setting proper information for our data things and such
-  switch (true) {
-    case idlRoutines.functions[str]:
-      item.insertText = item.label + "(";
-      item.kind = CompletionItemKind.Function;
-      break;
-    case idlRoutines.procedures[str]:
-      item.insertText = item.label + ",";
-      item.kind = CompletionItemKind.Function;
-      break;
-    case item.label.startsWith("!"):
-      item.kind = CompletionItemKind.Constant;
-      break;
-    default:
-      item.kind = CompletionItemKind.Text;
-  }
-
-  // check if we are an ENVI task, replace with ENVITask('TaskName')
-  if (item.label.startsWith("ENVI") && item.label.endsWith("Task")) {
-    item.insertText =
-      "ENVITask('" +
-      item.label.substr(0, item.label.length - 4).substr(4) +
-      "')";
-  }
-
-  // check if we are an IDL task, replace with ENVITask('TaskName')
-  if (item.label.startsWith("IDL") && item.label.endsWith("Task")) {
-    item.insertText =
-      "IDLTask('" +
-      item.label.substr(0, item.label.length - 4).substr(3) +
-      "')";
-  }
-
-  // save change
-  idlRoutines.docs[idx] = item;
-});
 
 connection.onInitialize((params: InitializeParams) => {
   let capabilities = params.capabilities;
+
+  // params.workspaceFolders.
 
   // Does the client support the `workspace/configuration` request?
   // If not, we will fall back using global settings
@@ -103,12 +71,15 @@ connection.onInitialize((params: InitializeParams) => {
       // Tell the client that the server supports code completion
       completionProvider: {
         resolveProvider: true
-      }
+      },
+      definitionProvider: true,
+      workspaceSymbolProvider: true,
+      documentSymbolProvider: true
     }
   };
 });
 
-connection.onInitialized(() => {
+connection.onInitialized(async () => {
   if (hasConfigurationCapability) {
     // Register for all configuration changes.
     connection.client.register(
@@ -116,10 +87,31 @@ connection.onInitialized(() => {
       undefined
     );
   }
+
+  // listen for workspace folder event changes and update our serve-side cache
+  // TODO: detect when workspace is closed and remove files
   if (hasWorkspaceFolderCapability) {
-    connection.workspace.onDidChangeWorkspaceFolders(_event => {
-      connection.console.log("Workspace folder change event received.");
+    // get the list of current workspaces
+    connection.workspace.getWorkspaceFolders().then(folders => {
+      // when we have our folder, index files which should have all files?
+      symbolProvider.indexWorkspaces(folders).catch(err => {
+        connection.console.log(JSON.stringify(err));
+      });
     });
+
+    connection.workspace.connection.workspace // listen for new workspaces
+      .onDidChangeWorkspaceFolders(async _event => {
+        connection.console.log(
+          "Workspace folder change event received. " + JSON.stringify(_event)
+        );
+
+        // refresh our index in case we have additional files
+        // because we cache results, should only be incremental processing
+        // as we add more folders
+        await symbolProvider.indexWorkspaces(_event.added).catch(err => {
+          connection.console.log(JSON.stringify(err));
+        });
+      });
   }
 });
 
@@ -171,10 +163,16 @@ documents.onDidClose(e => {
   documentSettings.delete(e.document.uri);
 });
 
+// TODO: work with just the changed parts of a document
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
-documents.onDidChangeContent(change => {
-  validateTextDocument(change.document);
+documents.onDidChangeContent(async change => {
+  // generate new symbols with the update, seems to magically sync when there are changes?
+  const newSymbols = await symbolProvider.update(change.document.uri);
+});
+
+documents.onDidOpen(async event => {
+  await symbolProvider.get.documentSymbols(event.document.uri);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
@@ -232,10 +230,7 @@ connection.onDidChangeWatchedFiles(_change => {
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    // The pass parameter contains the position of the text document in
-    // which code complete got requested. For the example we ignore this
-    // info and always provide the same completion items.
-    return idlRoutines.docs;
+    return routineHelper.completion(_textDocumentPosition);
   }
 );
 
@@ -243,16 +238,38 @@ connection.onCompletion(
 // request gets back to the client
 connection.onCompletionResolve(
   (item: CompletionItem): CompletionItem => {
-    // // get the id
-    // const key = item.data.toString();
+    return routineHelper.postCompletion(item);
+  }
+);
 
-    // // check if function or procedure
-    // switch (true) {
-    // 	default:
-    // 		// do nothing
-    // }
+// handle when a user searches for a symbol
+connection.onWorkspaceSymbol(
+  (params: WorkspaceSymbolParams): SymbolInformation[] => {
+    return symbolProvider.searchByName(params.query);
+  }
+);
 
-    return item;
+// handle when we want the definition of a symbol
+connection.onDefinition(
+  (params: TextDocumentPositionParams): Definition => {
+    const res = symbolProvider.searchByLine(params);
+    return res;
+  }
+);
+
+// connection.onHover(
+//   (params: TextDocumentPositionParams): Hover => {
+//     const res = symbolProvider.searchByLine(params);
+//     return res;
+//   }
+// )
+
+// handle when we request document symbols
+connection.onDocumentSymbol(
+  async (
+    params: DocumentSymbolParams
+  ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
+    return await symbolProvider.get.documentSymbols(params.textDocument.uri);
   }
 );
 

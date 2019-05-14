@@ -12,7 +12,6 @@ import {
   ServerOptions,
   TransportKind
 } from "vscode-languageclient";
-import { IDLDocumentSymbolProvider } from "./providers/idl-document-symbols";
 
 let client: LanguageClient;
 
@@ -54,12 +53,6 @@ export function activate(ctx: ExtensionContext) {
     "IDL Language Server",
     serverOptions,
     clientOptions
-  );
-
-  // register our symbol provider
-  const documentProvider = new IDLDocumentSymbolProvider();
-  ctx.subscriptions.push(
-    languages.registerDocumentSymbolProvider(IDL_MODE, documentProvider)
   );
 
   // Start the client. This will also launch the server

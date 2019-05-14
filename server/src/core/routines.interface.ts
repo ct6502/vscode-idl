@@ -1,4 +1,4 @@
-import { CompletionItemKind, CompletionItem } from "vscode-languageserver";
+import { CompletionItem } from "vscode-languageserver";
 
 export interface IPropertyItem {
   [key: string]: string; // key name of property, value is the IDL data type

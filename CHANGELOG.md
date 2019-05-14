@@ -3,8 +3,17 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.4.0] - 2019-05-13
 
+Added an initial IDL language server for more features. It contains capabilities for:
+
+- Searching through symbols (procedure/function/method definitions) with VScode's symbol searching
+
+- Support for finding routine definitions in a workspace
+
+- Go-to definitions for routines
+
+- Auto-complete for built-in IDL routines when typing procedures or functions out
 
 ## [1.3.0] - 2018-04-11
 

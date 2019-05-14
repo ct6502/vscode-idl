@@ -8,6 +8,12 @@ The JSON syntax rules for the `.task` files are from [VSCode](https://github.com
 
 ## Features
 
+* Function/procedure completion for  built in ENVI + IDL routines
+
+* Go-to definition for functions and procedures (not methods)
+
+* Search for procedure/function definitions through symbols
+
 * Support for VSCode's auto-comment (Ctrl+/ or command+/)
 
 * Syntax highlighting and coloring

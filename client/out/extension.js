@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const vscode_1 = require("vscode");
 const vscode_languageclient_1 = require("vscode-languageclient");
-const idl_document_symbols_1 = require("./providers/idl-document-symbols");
 let client;
 const IDL_MODE = { language: "idl", scheme: "file" };
 function activate(ctx) {
@@ -37,9 +36,6 @@ function activate(ctx) {
     };
     // Create the language client and start the client.
     client = new vscode_languageclient_1.LanguageClient("IDLLanguageServer", "IDL Language Server", serverOptions, clientOptions);
-    // register our symbol provider
-    const documentProvider = new idl_document_symbols_1.IDLDocumentSymbolProvider();
-    ctx.subscriptions.push(vscode_1.languages.registerDocumentSymbolProvider(IDL_MODE, documentProvider));
     // Start the client. This will also launch the server
     client.start();
 }

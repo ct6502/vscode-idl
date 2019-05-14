@@ -31,7 +31,8 @@
         "vscode": "^1.30.0"
     },
     "activationEvents": [
-        "onLanguage:idl"
+        "onLanguage:idl",
+        "workspaceContains:**/.pro"
     ],
     "main": "./client/out/extension.js",
     "categories": [
