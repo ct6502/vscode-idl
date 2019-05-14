@@ -41,7 +41,8 @@ const symbolProvider = new IDLDocumentSymbolManager(connection, documents);
 const problemDetector = new IDLProblemDetector(
   connection,
   documents,
-  symbolProvider
+  symbolProvider,
+  routineHelper
 );
 
 // flags for configuration

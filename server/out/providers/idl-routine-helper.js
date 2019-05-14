@@ -4,6 +4,8 @@ const vscode_languageserver_1 = require("vscode-languageserver");
 // class definition
 class IDLRoutineHelper {
     constructor(connection, documents) {
+        this.functions = {};
+        this.procedures = {};
         this.connection = connection;
         this.documents = documents;
         this.routines = this._parseRoutines();
@@ -41,10 +43,12 @@ class IDLRoutineHelper {
                 case idlRoutines.functions[str]:
                     item.insertText = item.label + "(";
                     item.kind = vscode_languageserver_1.CompletionItemKind.Function;
+                    this.functions[item.label.toLowerCase()] = true;
                     break;
                 case idlRoutines.procedures[str]:
                     item.insertText = item.label + ",";
                     item.kind = vscode_languageserver_1.CompletionItemKind.Function;
+                    this.procedures[item.label.toLowerCase()] = true;
                     break;
                 case item.label.startsWith("!"):
                     item.kind = vscode_languageserver_1.CompletionItemKind.Constant;

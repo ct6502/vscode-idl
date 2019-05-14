@@ -16,6 +16,8 @@ The JSON syntax rules for the `.task` files are from [VSCode](https://github.com
 
 * Duplicate routine definition detection for files open in VSCode or a workspace, not for IDL's search path
 
+* Duplicate routine definition detection against documented ENVI + IDL routines
+
 * Support for VSCode's auto-comment (Ctrl+/ or command+/)
 
 * Syntax highlighting and coloring

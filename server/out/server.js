@@ -26,7 +26,7 @@ let documents = new vscode_languageserver_1.TextDocuments();
 // create all of our helper objects for different requests
 const routineHelper = new idl_routine_helper_1.IDLRoutineHelper(connection, documents);
 const symbolProvider = new idl_document_symbol_manager_1.IDLDocumentSymbolManager(connection, documents);
-const problemDetector = new idl_problem_detector_1.IDLProblemDetector(connection, documents, symbolProvider);
+const problemDetector = new idl_problem_detector_1.IDLProblemDetector(connection, documents, symbolProvider, routineHelper);
 // flags for configuration
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;

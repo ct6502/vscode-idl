@@ -12,6 +12,8 @@ export class IDLRoutineHelper {
   connection: Connection;
   documents: TextDocuments;
   routines: IRoutines;
+  functions: { [key: string]: boolean } = {};
+  procedures: { [key: string]: boolean } = {};
 
   constructor(connection: Connection, documents: TextDocuments) {
     this.connection = connection;
@@ -60,10 +62,12 @@ export class IDLRoutineHelper {
         case idlRoutines.functions[str]:
           item.insertText = item.label + "(";
           item.kind = CompletionItemKind.Function;
+          this.functions[item.label.toLowerCase()] = true;
           break;
         case idlRoutines.procedures[str]:
           item.insertText = item.label + ",";
           item.kind = CompletionItemKind.Function;
+          this.procedures[item.label.toLowerCase()] = true;
           break;
         case item.label.startsWith("!"):
           item.kind = CompletionItemKind.Constant;

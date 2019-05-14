@@ -17,6 +17,8 @@ Added an initial IDL language server for more features. It contains capabilities
 
 - Duplicate routine definition detection for files open in VSCode or the workspace, not for IDL's search path
 
+- Duplicate routine definition detection against documented ENVI + IDL routines
+
 ## [1.3.0] - 2018-04-11
 
 Added new package to packge.json for adding contributors. Updated the readme and added attribution to Mike Galloy, Chris Torrence, and Zach Norman.
