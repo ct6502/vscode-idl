@@ -46,7 +46,7 @@ class IDLDocumentSymbolExtractor {
             const start = split[split.length - 1].length; // length of string start
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                const range = vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(lineNumber, start), vscode_languageserver_1.Position.create(lineNumber, start + m.length));
+                const range = vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(lineNumber, start), vscode_languageserver_1.Position.create(lineNumber, start + match.length));
                 const symbol = vscode_languageserver_1.DocumentSymbol.create(match, "Function" + resolveRoutineNameAdd(match), resolveRoutineType(match), range, range);
                 symbols.push(symbol);
             });
@@ -71,7 +71,7 @@ class IDLDocumentSymbolExtractor {
             const start = split[split.length - 1].length; // length of string start
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                const range = vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(lineNumber, start), vscode_languageserver_1.Position.create(lineNumber, start + m.length));
+                const range = vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(lineNumber, start), vscode_languageserver_1.Position.create(lineNumber, start + match.length));
                 const symbol = vscode_languageserver_1.DocumentSymbol.create(match, "Procedure" + resolveRoutineNameAdd(match), resolveRoutineType(match), range, range);
                 symbols.push(symbol);
             });

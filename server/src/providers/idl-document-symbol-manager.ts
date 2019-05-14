@@ -127,20 +127,23 @@ export class IDLDocumentSymbolManager {
         delete this.symbols[key];
       } else {
         // init index
-        let idx = -1;
+        let remove: number[] = [];
 
         // TODO: for more than function names, use some rigor for matching symbols
         // as we can have multiple symbols with the same name that are different entities
         // compare each document with a match for that symbol
         this.symbols[key].forEach((docMatch, dIdx) => {
           if (docMatch.uri === uri) {
-            idx = dIdx;
+            remove.push(dIdx);
           }
         });
 
         // delete if we found a match
-        if (idx !== -1) {
-          this.symbols[key].splice(idx, 1);
+        if (remove.length > 0) {
+          remove.reverse();
+          remove.forEach(idx => {
+            this.symbols[key].splice(idx, 1);
+          });
         }
       }
     });
@@ -150,6 +153,7 @@ export class IDLDocumentSymbolManager {
   async remove(uri: string) {
     // check if we need to remove it from the symbol list
     if (this.moizes.documentSymbols.has([uri])) {
+      this.connection.console.log(JSON.stringify("Have cached symbols"));
       // get our symbols and clean up
       const symbols = await this.get.documentSymbols(uri);
 

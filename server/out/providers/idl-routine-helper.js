@@ -14,6 +14,7 @@ class IDLRoutineHelper {
     completion(_textDocumentPosition) {
         return this.routines.docs;
     }
+    // after we use auto-complete on an item, do anything afterwards to clean it up?
     postCompletion(item) {
         // // get the id
         // const key = item.data.toString();

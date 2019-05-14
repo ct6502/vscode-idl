@@ -7,13 +7,10 @@ import {
   createConnection,
   TextDocuments,
   TextDocument,
-  Diagnostic,
-  DiagnosticSeverity,
   ProposedFeatures,
   InitializeParams,
   DidChangeConfigurationNotification,
   CompletionItem,
-  CompletionItemKind,
   TextDocumentPositionParams,
   WorkspaceSymbolParams,
   SymbolInformation,
@@ -26,6 +23,7 @@ import {
 import { IDLRoutineHelper } from "./providers/idl-routine-helper";
 import { IDLDocumentSymbolManager } from "./providers/idl-document-symbol-manager";
 import { connect } from "net";
+import { IDLProblemDetector } from "./providers/idl-problem-detector";
 
 const IDL_MODE: DocumentFilter = { language: "idl", scheme: "file" };
 
@@ -40,6 +38,11 @@ let documents: TextDocuments = new TextDocuments();
 // create all of our helper objects for different requests
 const routineHelper = new IDLRoutineHelper(connection, documents);
 const symbolProvider = new IDLDocumentSymbolManager(connection, documents);
+const problemDetector = new IDLProblemDetector(
+  connection,
+  documents,
+  symbolProvider
+);
 
 // flags for configuration
 let hasConfigurationCapability: boolean = false;
@@ -93,10 +96,16 @@ connection.onInitialized(async () => {
   if (hasWorkspaceFolderCapability) {
     // get the list of current workspaces
     connection.workspace.getWorkspaceFolders().then(folders => {
-      // when we have our folder, index files which should have all files?
-      symbolProvider.indexWorkspaces(folders).catch(err => {
-        connection.console.log(JSON.stringify(err));
-      });
+      // refresh our index and detect problems on success
+      symbolProvider
+        .indexWorkspaces(folders)
+        .then(() => {
+          // detect problems because we had change
+          problemDetector.detectAndSendProblems();
+        })
+        .catch(err => {
+          connection.console.log(JSON.stringify(err));
+        });
     });
 
     connection.workspace.connection.workspace // listen for new workspaces
@@ -105,12 +114,16 @@ connection.onInitialized(async () => {
           "Workspace folder change event received. " + JSON.stringify(_event)
         );
 
-        // refresh our index in case we have additional files
-        // because we cache results, should only be incremental processing
-        // as we add more folders
-        await symbolProvider.indexWorkspaces(_event.added).catch(err => {
-          connection.console.log(JSON.stringify(err));
-        });
+        // refresh our index and detect problems on success
+        await symbolProvider
+          .indexWorkspaces(_event.added)
+          .then(() => {
+            // detect problems because we had change
+            problemDetector.detectAndSendProblems();
+          })
+          .catch(err => {
+            connection.console.log(JSON.stringify(err));
+          });
       });
   }
 });
@@ -140,7 +153,7 @@ connection.onDidChangeConfiguration(change => {
   }
 
   // Revalidate all open text documents
-  documents.all().forEach(validateTextDocument);
+  problemDetector.detectAndSendProblems();
 });
 
 function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
@@ -169,58 +182,17 @@ documents.onDidClose(e => {
 documents.onDidChangeContent(async change => {
   // generate new symbols with the update, seems to magically sync when there are changes?
   const newSymbols = await symbolProvider.update(change.document.uri);
+
+  // detect problems because we had change
+  problemDetector.detectAndSendProblems();
 });
 
 documents.onDidOpen(async event => {
   await symbolProvider.get.documentSymbols(event.document.uri);
+
+  // detect problems because we had change
+  problemDetector.detectAndSendProblems();
 });
-
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-  // In this simple example we get the settings for every validate run.
-  // let settings = await getDocumentSettings(textDocument.uri);
-
-  // The validator creates diagnostics for all uppercase words length 2 and more
-  // let text = textDocument.getText();
-  // let pattern = /\b[A-Z]{2,}\b/g;
-  // let m: RegExpExecArray | null;
-
-  // let problems = 0;
-  let diagnostics: Diagnostic[] = [];
-  // while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-  // 	problems++;
-  // 	let diagnostic: Diagnostic = {
-  // 		severity: DiagnosticSeverity.Warning,
-  // 		range: {
-  // 			start: textDocument.positionAt(m.index),
-  // 			end: textDocument.positionAt(m.index + m[0].length)
-  // 		},
-  // 		message: `${m[0]} is all uppercase.`,
-  // 		source: 'ex'
-  // 	};
-  // 	if (hasDiagnosticRelatedInformationCapability) {
-  // 		diagnostic.relatedInformation = [
-  // 			{
-  // 				location: {
-  // 					uri: textDocument.uri,
-  // 					range: Object.assign({}, diagnostic.range)
-  // 				},
-  // 				message: 'Spelling matters'
-  // 			},
-  // 			{
-  // 				location: {
-  // 					uri: textDocument.uri,
-  // 					range: Object.assign({}, diagnostic.range)
-  // 				},
-  // 				message: 'Particularly for names'
-  // 			}
-  // 		];
-  // 	}
-  // 	diagnostics.push(diagnostic);
-  // }
-
-  // Send the computed diagnostics to VSCode.
-  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-}
 
 connection.onDidChangeWatchedFiles(_change => {
   // Monitored files have change in VSCode

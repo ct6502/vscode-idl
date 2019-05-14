@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vscode_languageserver_1 = require("vscode-languageserver");
 const idl_routine_helper_1 = require("./providers/idl-routine-helper");
 const idl_document_symbol_manager_1 = require("./providers/idl-document-symbol-manager");
+const idl_problem_detector_1 = require("./providers/idl-problem-detector");
 const IDL_MODE = { language: "idl", scheme: "file" };
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -25,6 +26,7 @@ let documents = new vscode_languageserver_1.TextDocuments();
 // create all of our helper objects for different requests
 const routineHelper = new idl_routine_helper_1.IDLRoutineHelper(connection, documents);
 const symbolProvider = new idl_document_symbol_manager_1.IDLDocumentSymbolManager(connection, documents);
+const problemDetector = new idl_problem_detector_1.IDLProblemDetector(connection, documents, symbolProvider);
 // flags for configuration
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
@@ -62,18 +64,28 @@ connection.onInitialized(() => __awaiter(this, void 0, void 0, function* () {
     if (hasWorkspaceFolderCapability) {
         // get the list of current workspaces
         connection.workspace.getWorkspaceFolders().then(folders => {
-            // when we have our folder, index files which should have all files?
-            symbolProvider.indexWorkspaces(folders).catch(err => {
+            // refresh our index and detect problems on success
+            symbolProvider
+                .indexWorkspaces(folders)
+                .then(() => {
+                // detect problems because we had change
+                problemDetector.detectAndSendProblems();
+            })
+                .catch(err => {
                 connection.console.log(JSON.stringify(err));
             });
         });
         connection.workspace.connection.workspace // listen for new workspaces
             .onDidChangeWorkspaceFolders((_event) => __awaiter(this, void 0, void 0, function* () {
             connection.console.log("Workspace folder change event received. " + JSON.stringify(_event));
-            // refresh our index in case we have additional files
-            // because we cache results, should only be incremental processing
-            // as we add more folders
-            yield symbolProvider.indexWorkspaces(_event.added).catch(err => {
+            // refresh our index and detect problems on success
+            yield symbolProvider
+                .indexWorkspaces(_event.added)
+                .then(() => {
+                // detect problems because we had change
+                problemDetector.detectAndSendProblems();
+            })
+                .catch(err => {
                 connection.console.log(JSON.stringify(err));
             });
         }));
@@ -95,7 +107,7 @@ connection.onDidChangeConfiguration(change => {
         globalSettings = ((change.settings.languageServerExample || defaultSettings));
     }
     // Revalidate all open text documents
-    documents.all().forEach(validateTextDocument);
+    problemDetector.detectAndSendProblems();
 });
 function getDocumentSettings(resource) {
     if (!hasConfigurationCapability) {
@@ -121,55 +133,14 @@ documents.onDidClose(e => {
 documents.onDidChangeContent((change) => __awaiter(this, void 0, void 0, function* () {
     // generate new symbols with the update, seems to magically sync when there are changes?
     const newSymbols = yield symbolProvider.update(change.document.uri);
+    // detect problems because we had change
+    problemDetector.detectAndSendProblems();
 }));
 documents.onDidOpen((event) => __awaiter(this, void 0, void 0, function* () {
     yield symbolProvider.get.documentSymbols(event.document.uri);
+    // detect problems because we had change
+    problemDetector.detectAndSendProblems();
 }));
-function validateTextDocument(textDocument) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // In this simple example we get the settings for every validate run.
-        // let settings = await getDocumentSettings(textDocument.uri);
-        // The validator creates diagnostics for all uppercase words length 2 and more
-        // let text = textDocument.getText();
-        // let pattern = /\b[A-Z]{2,}\b/g;
-        // let m: RegExpExecArray | null;
-        // let problems = 0;
-        let diagnostics = [];
-        // while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-        // 	problems++;
-        // 	let diagnostic: Diagnostic = {
-        // 		severity: DiagnosticSeverity.Warning,
-        // 		range: {
-        // 			start: textDocument.positionAt(m.index),
-        // 			end: textDocument.positionAt(m.index + m[0].length)
-        // 		},
-        // 		message: `${m[0]} is all uppercase.`,
-        // 		source: 'ex'
-        // 	};
-        // 	if (hasDiagnosticRelatedInformationCapability) {
-        // 		diagnostic.relatedInformation = [
-        // 			{
-        // 				location: {
-        // 					uri: textDocument.uri,
-        // 					range: Object.assign({}, diagnostic.range)
-        // 				},
-        // 				message: 'Spelling matters'
-        // 			},
-        // 			{
-        // 				location: {
-        // 					uri: textDocument.uri,
-        // 					range: Object.assign({}, diagnostic.range)
-        // 				},
-        // 				message: 'Particularly for names'
-        // 			}
-        // 		];
-        // 	}
-        // 	diagnostics.push(diagnostic);
-        // }
-        // Send the computed diagnostics to VSCode.
-        connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-    });
-}
 connection.onDidChangeWatchedFiles(_change => {
     // Monitored files have change in VSCode
     connection.console.log("We received an file change event");

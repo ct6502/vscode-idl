@@ -1,6 +1,5 @@
 import {
   SymbolInformation,
-  TextDocument,
   DocumentSymbol,
   SymbolKind,
   Location,
@@ -61,7 +60,7 @@ export class IDLDocumentSymbolExtractor {
       m.forEach((match, groupIndex) => {
         const range = Range.create(
           Position.create(lineNumber, start),
-          Position.create(lineNumber, start + m.length)
+          Position.create(lineNumber, start + match.length)
         );
         const symbol = DocumentSymbol.create(
           match,
@@ -101,7 +100,7 @@ export class IDLDocumentSymbolExtractor {
       m.forEach((match, groupIndex) => {
         const range = Range.create(
           Position.create(lineNumber, start),
-          Position.create(lineNumber, start + m.length)
+          Position.create(lineNumber, start + match.length)
         );
         const symbol = DocumentSymbol.create(
           match,

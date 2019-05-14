@@ -15,6 +15,8 @@ Added an initial IDL language server for more features. It contains capabilities
 
 - Auto-complete for built-in IDL routines when typing procedures or functions out
 
+- Duplicate routine definition detection for files open in VSCode or the workspace, not for IDL's search path
+
 ## [1.3.0] - 2018-04-11
 
 Added new package to packge.json for adding contributors. Updated the readme and added attribution to Mike Galloy, Chris Torrence, and Zach Norman.
