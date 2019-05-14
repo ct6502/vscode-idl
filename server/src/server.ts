@@ -53,8 +53,6 @@ let hasDiagnosticRelatedInformationCapability: boolean = false;
 connection.onInitialize((params: InitializeParams) => {
   let capabilities = params.capabilities;
 
-  // params.workspaceFolders.
-
   // Does the client support the `workspace/configuration` request?
   // If not, we will fall back using global settings
   hasConfigurationCapability = !!(
@@ -83,49 +81,63 @@ connection.onInitialize((params: InitializeParams) => {
   };
 });
 
-connection.onInitialized(async () => {
-  if (hasConfigurationCapability) {
-    // Register for all configuration changes.
-    connection.client.register(
-      DidChangeConfigurationNotification.type,
-      undefined
-    );
-  }
+connection.onInitialized(() => {
+  try {
+    if (hasConfigurationCapability) {
+      // Register for all configuration changes.
+      connection.client.register(
+        DidChangeConfigurationNotification.type,
+        undefined
+      );
+    }
 
-  // listen for workspace folder event changes and update our serve-side cache
-  // TODO: detect when workspace is closed and remove files
-  if (hasWorkspaceFolderCapability) {
-    // get the list of current workspaces
-    connection.workspace.getWorkspaceFolders().then(folders => {
-      // refresh our index and detect problems on success
-      symbolProvider
-        .indexWorkspaces(folders)
-        .then(() => {
-          // detect problems because we had change
-          problemDetector.detectAndSendProblems();
+    // listen for workspace folder event changes and update our serve-side cache
+    // TODO: detect when workspace is closed and remove files
+    if (hasWorkspaceFolderCapability) {
+      // get the list of current workspaces
+      connection.workspace
+        .getWorkspaceFolders()
+        .then(folders => {
+          // refresh our index and detect problems on success
+          symbolProvider
+            .indexWorkspaces(folders)
+            .then(() => {
+              // detect problems because we had change
+              problemDetector.detectAndSendProblems();
+            })
+            .catch(err => {
+              connection.console.log(JSON.stringify(err));
+            });
         })
-        .catch(err => {
+        .then(undefined, err => {
           connection.console.log(JSON.stringify(err));
         });
-    });
 
-    connection.workspace.connection.workspace // listen for new workspaces
-      .onDidChangeWorkspaceFolders(async _event => {
-        connection.console.log(
-          "Workspace folder change event received. " + JSON.stringify(_event)
-        );
+      connection.workspace.connection.workspace // listen for new workspaces
+        .onDidChangeWorkspaceFolders(_event => {
+          try {
+            connection.console.log(
+              "Workspace folder change event received. " +
+                JSON.stringify(_event)
+            );
 
-        // refresh our index and detect problems on success
-        await symbolProvider
-          .indexWorkspaces(_event.added)
-          .then(() => {
-            // detect problems because we had change
-            problemDetector.detectAndSendProblems();
-          })
-          .catch(err => {
+            // refresh our index and detect problems on success
+            symbolProvider
+              .indexWorkspaces(_event.added)
+              .then(() => {
+                // detect problems because we had change
+                problemDetector.detectAndSendProblems();
+              })
+              .catch(err => {
+                connection.console.log(JSON.stringify(err));
+              });
+          } catch (err) {
             connection.console.log(JSON.stringify(err));
-          });
-      });
+          }
+        });
+    }
+  } catch (err) {
+    connection.console.log(JSON.stringify(err));
   }
 });
 
@@ -180,19 +192,37 @@ documents.onDidClose(e => {
 // TODO: work with just the changed parts of a document
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
-documents.onDidChangeContent(async change => {
-  // generate new symbols with the update, seems to magically sync when there are changes?
-  const newSymbols = await symbolProvider.update(change.document.uri);
-
-  // detect problems because we had change
-  problemDetector.detectAndSendProblems();
+documents.onDidChangeContent(change => {
+  try {
+    // generate new symbols with the update, seems to magically sync when there are changes?
+    symbolProvider
+      .update(change.document.uri)
+      .then(res => {
+        // detect problems because we had change
+        problemDetector.detectAndSendProblems();
+      })
+      .catch(err => {
+        connection.console.log(JSON.stringify(err));
+      });
+  } catch (err) {
+    connection.console.log(JSON.stringify(err));
+  }
 });
 
-documents.onDidOpen(async event => {
-  await symbolProvider.get.documentSymbols(event.document.uri);
-
-  // detect problems because we had change
-  problemDetector.detectAndSendProblems();
+documents.onDidOpen(event => {
+  try {
+    symbolProvider.get
+      .documentSymbols(event.document.uri)
+      .then(res => {
+        // detect problems because we had change
+        problemDetector.detectAndSendProblems();
+      })
+      .catch(err => {
+        connection.console.log(JSON.stringify(err));
+      });
+  } catch (err) {
+    connection.console.log(JSON.stringify(err));
+  }
 });
 
 connection.onDidChangeWatchedFiles(_change => {
@@ -203,7 +233,12 @@ connection.onDidChangeWatchedFiles(_change => {
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    return routineHelper.completion(_textDocumentPosition);
+    try {
+      return routineHelper.completion(_textDocumentPosition);
+    } catch (err) {
+      connection.console.log(JSON.stringify(err));
+      return [];
+    }
   }
 );
 
@@ -211,22 +246,37 @@ connection.onCompletion(
 // request gets back to the client
 connection.onCompletionResolve(
   (item: CompletionItem): CompletionItem => {
-    return routineHelper.postCompletion(item);
+    try {
+      return routineHelper.postCompletion(item);
+    } catch (err) {
+      connection.console.log(JSON.stringify(err));
+      return item;
+    }
   }
 );
 
 // handle when a user searches for a symbol
 connection.onWorkspaceSymbol(
   (params: WorkspaceSymbolParams): SymbolInformation[] => {
-    return symbolProvider.searchByName(params.query);
+    try {
+      return symbolProvider.searchByName(params.query);
+    } catch (err) {
+      connection.console.log(JSON.stringify(err));
+      return [];
+    }
   }
 );
 
 // handle when we want the definition of a symbol
 connection.onDefinition(
   (params: TextDocumentPositionParams): Definition => {
-    const res = symbolProvider.searchByLine(params);
-    return res;
+    try {
+      const res = symbolProvider.searchByLine(params);
+      return res;
+    } catch (err) {
+      connection.console.log(JSON.stringify(err));
+      return null;
+    }
   }
 );
 
@@ -239,10 +289,21 @@ connection.onDefinition(
 
 // handle when we request document symbols
 connection.onDocumentSymbol(
-  async (
-    params: DocumentSymbolParams
-  ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
-    return await symbolProvider.get.documentSymbols(params.textDocument.uri);
+  (params: DocumentSymbolParams): SymbolInformation[] | DocumentSymbol[] => {
+    try {
+      symbolProvider.get
+        .documentSymbols(params.textDocument.uri)
+        .then(res => {
+          return res;
+        })
+        .catch(err => {
+          connection.console.log(JSON.stringify(err));
+          return [];
+        });
+    } catch (err) {
+      connection.console.log(JSON.stringify(err));
+      return [];
+    }
   }
 );
 
