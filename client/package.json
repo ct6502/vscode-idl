@@ -16,20 +16,14 @@
 		"update-vscode": "vscode-install",
 		"postinstall": "vscode-install",
 		"clean": "rimraf dist",
-		"start": "npm-run-all clean --parallel webpack --print-label",
-		"webpack": "webpack --mode production --watch",
+		"webpack": "npm run clean && webpack --mode production --watch",
 		"webpack-deploy": "npm run clean && webpack"
 	},
 	"dependencies": {
 		"vscode-languageclient": "^4.1.4",
-		"npm-run-all": "^4.1.5",
 		"rimraf": "^2.6.2"
 	},
 	"devDependencies": {
-		"webpack": "^4.16.5",
-		"webpack-cli": "^3.1.0",
-		"vscode": "^1.1.30",
-		"terser-webpack-plugin": "^1.2.3",
-		"ts-loader": "^6.0.0"
+		"vscode": "^1.1.30"
 	}
 }

@@ -6,7 +6,6 @@
 import {
   createConnection,
   TextDocuments,
-  TextDocument,
   ProposedFeatures,
   InitializeParams,
   DidChangeConfigurationNotification,
@@ -17,12 +16,10 @@ import {
   DocumentSymbolParams,
   DocumentFilter,
   DocumentSymbol,
-  Definition,
-  Hover
+  Definition
 } from "vscode-languageserver";
 import { IDLRoutineHelper } from "./providers/idl-routine-helper";
 import { IDLDocumentSymbolManager } from "./providers/idl-document-symbol-manager";
-import { connect } from "net";
 import { IDLProblemDetector } from "./providers/idl-problem-detector";
 
 const IDL_MODE: DocumentFilter = { language: "idl", scheme: "file" };
