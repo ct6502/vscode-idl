@@ -8,7 +8,12 @@ const srcDir = path.dirname(thisDir);
 const clientDir = path.dirname(srcDir);
 const extensionDir = path.dirname(clientDir);
 // specify the children for the command parent in the tree view
-const commandChildren = [
+exports.commandChildren = [
+    {
+        name: "Open",
+        descripion: "a new IDL terminal window",
+        icon: "open-new.svg"
+    },
     {
         name: "Compile",
         descripion: "the active PRO file",
@@ -23,6 +28,11 @@ const commandChildren = [
         name: "Stop",
         descripion: "the IDL interpreter",
         icon: "stop.svg"
+    },
+    {
+        name: "Continue",
+        descripion: "running the IDL interpreter",
+        icon: "play.svg"
     },
     {
         name: "In",
@@ -69,7 +79,7 @@ class IDLTreeViewProvider {
             // determine who our parent is so that we can dynamically build our tree
             switch (true) {
                 case element.label === "Commands":
-                    return Promise.resolve(commandChildren.map(child => new IDLAction(child.name, child.descripion, vscode.TreeItemCollapsibleState.None, child.icon)));
+                    return Promise.resolve(exports.commandChildren.map(child => new IDLAction(child.name, child.descripion, vscode.TreeItemCollapsibleState.None, child.icon)));
                     break;
                 default:
                     // no children

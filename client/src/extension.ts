@@ -14,6 +14,7 @@ import {
   TransportKind
 } from "vscode-languageclient";
 import { IDLTreeViewProvider } from "./providers/idl-tree-view";
+import { IDLTreeClickHandler } from "./providers/idl-tree-click-handler";
 
 let client: LanguageClient;
 
@@ -58,8 +59,10 @@ export function activate(ctx: ExtensionContext) {
     clientOptions
   );
 
-  // add some buttons
-  // Samples of `window.registerTreeDataProvider`
+  // create our click handler
+  const clickHandler = new IDLTreeClickHandler();
+
+  // generate our tree provider and get the view for listening to events
   const idlTreeProvider = new IDLTreeViewProvider(vscode.workspace.rootPath);
   const treeView = vscode.window.createTreeView("idlTree", {
     treeDataProvider: idlTreeProvider
@@ -67,21 +70,18 @@ export function activate(ctx: ExtensionContext) {
 
   // listen for when we click on items in the tree view
   treeView.onDidChangeSelection(event => {
-    // get the selected item
-    const item = event.selection[0];
-
-    // determine what to do, ignore parent requests
-    switch (true) {
-      case item.contextValue === "child":
-        vscode.window.showInformationMessage(
-          `Clicked on code action ${event.selection[0].label}.`
-        );
-        break;
-      default:
-      // do nothing
-    }
+    // handle our click event
+    clickHandler.clickedItem(event.selection[0]);
   });
-
+  treeView.onDidChangeVisibility(event => {
+    console.log(event);
+  });
+  treeView.onDidCollapseElement(event => {
+    console.log(event);
+  });
+  treeView.onDidExpandElement(event => {
+    console.log(event);
+  });
   // Start the client. This will also launch the server
   client.start();
 }

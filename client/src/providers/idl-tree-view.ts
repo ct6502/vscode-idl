@@ -15,7 +15,12 @@ interface IChild {
 }
 
 // specify the children for the command parent in the tree view
-const commandChildren: IChild[] = [
+export const commandChildren: IChild[] = [
+  {
+    name: "Open",
+    descripion: "a new IDL terminal window",
+    icon: "open-new.svg"
+  },
   {
     name: "Compile",
     descripion: "the active PRO file",
@@ -30,6 +35,11 @@ const commandChildren: IChild[] = [
     name: "Stop",
     descripion: "the IDL interpreter",
     icon: "stop.svg"
+  },
+  {
+    name: "Continue",
+    descripion: "running the IDL interpreter",
+    icon: "play.svg"
   },
   {
     name: "In",
