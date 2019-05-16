@@ -72,16 +72,13 @@ export function activate(ctx: ExtensionContext) {
   treeView.onDidChangeSelection(event => {
     // handle our click event
     clickHandler.clickedItem(event.selection[0]);
+    // treeView.reveal(event.selection[0], { select: false, focus: false });
+
+    idlTreeProvider.getChildren().then(kids => {
+      treeView.reveal(kids[0], { select: true });
+    });
   });
-  treeView.onDidChangeVisibility(event => {
-    console.log(event);
-  });
-  treeView.onDidCollapseElement(event => {
-    console.log(event);
-  });
-  treeView.onDidExpandElement(event => {
-    console.log(event);
-  });
+
   // Start the client. This will also launch the server
   client.start();
 }

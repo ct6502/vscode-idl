@@ -70,7 +70,32 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
   readonly onDidChangeTreeData: vscode.Event<IDLAction | undefined> = this
     ._onDidChangeTreeData.event;
 
-  constructor(private workspaceRoot: string) {}
+  parents: { [key: string]: IDLAction };
+  tree: { [key: string]: IDLAction[] };
+
+  constructor(private workspaceRoot: string) {
+    // build our tree
+    this.tree = {
+      Commands: commandChildren.map(
+        child =>
+          new IDLAction(
+            child.name,
+            child.descripion,
+            vscode.TreeItemCollapsibleState.None,
+            child.icon
+          )
+      )
+    };
+
+    this.parents = {
+      Commands: new IDLAction(
+        "Commands",
+        "",
+        vscode.TreeItemCollapsibleState.Expanded,
+        "assessment.svg"
+      )
+    };
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -80,36 +105,35 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
     return element;
   }
 
+  getParent(element: IDLAction): vscode.ProviderResult<IDLAction> {
+    if (this.tree[element.label]) {
+      return null;
+    } else {
+      const parents = Object.keys(this.tree);
+      for (let i = 0; i < parents.length; i++) {
+        const idx = this.tree[parents[i]]
+          .map(c => c.label)
+          .indexOf(element.label);
+        if (idx !== -1) {
+          return this.parents[parents[i]];
+        }
+      }
+      return null;
+    }
+  }
+
   getChildren(element?: IDLAction): Thenable<IDLAction[]> {
     // return all of our parent elements
     if (!element) {
-      return Promise.resolve([
-        new IDLAction(
-          "Commands",
-          "",
-          vscode.TreeItemCollapsibleState.Expanded,
-          "assessment.svg"
-        )
-      ]);
+      const keys = Object.keys(this.parents);
+      return Promise.resolve(keys.map(key => this.parents[key]));
     } else {
-      // determine who our parent is so that we can dynamically build our tree
-      switch (true) {
-        case element.label === "Commands":
-          return Promise.resolve(
-            commandChildren.map(
-              child =>
-                new IDLAction(
-                  child.name,
-                  child.descripion,
-                  vscode.TreeItemCollapsibleState.None,
-                  child.icon
-                )
-            )
-          );
-          break;
-        default:
-          // no children
-          return Promise.resolve([]);
+      // check if we have parent information
+      if (this.tree[element.label]) {
+        console.log(element.label);
+        return Promise.resolve(this.tree[element.label]);
+      } else {
+        return Promise.resolve([]);
       }
     }
   }

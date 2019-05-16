@@ -61,6 +61,13 @@ class IDLTreeViewProvider {
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this
             ._onDidChangeTreeData.event;
+        // build our tree
+        this.tree = {
+            Commands: exports.commandChildren.map(child => new IDLAction(child.name, child.descripion, vscode.TreeItemCollapsibleState.None, child.icon))
+        };
+        this.parents = {
+            Commands: new IDLAction("Commands", "", vscode.TreeItemCollapsibleState.Expanded, "assessment.svg")
+        };
     }
     refresh() {
         this._onDidChangeTreeData.fire();
@@ -68,22 +75,37 @@ class IDLTreeViewProvider {
     getTreeItem(element) {
         return element;
     }
+    getParent(element) {
+        if (this.tree[element.label]) {
+            return null;
+        }
+        else {
+            const parents = Object.keys(this.tree);
+            for (let i = 0; i < parents.length; i++) {
+                const idx = this.tree[parents[i]]
+                    .map(c => c.label)
+                    .indexOf(element.label);
+                if (idx !== -1) {
+                    return this.parents[parents[i]];
+                }
+            }
+            return null;
+        }
+    }
     getChildren(element) {
         // return all of our parent elements
         if (!element) {
-            return Promise.resolve([
-                new IDLAction("Commands", "", vscode.TreeItemCollapsibleState.Expanded, "assessment.svg")
-            ]);
+            const keys = Object.keys(this.parents);
+            return Promise.resolve(keys.map(key => this.parents[key]));
         }
         else {
-            // determine who our parent is so that we can dynamically build our tree
-            switch (true) {
-                case element.label === "Commands":
-                    return Promise.resolve(exports.commandChildren.map(child => new IDLAction(child.name, child.descripion, vscode.TreeItemCollapsibleState.None, child.icon)));
-                    break;
-                default:
-                    // no children
-                    return Promise.resolve([]);
+            // check if we have parent information
+            if (this.tree[element.label]) {
+                console.log(element.label);
+                return Promise.resolve(this.tree[element.label]);
+            }
+            else {
+                return Promise.resolve([]);
             }
         }
     }

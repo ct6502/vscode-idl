@@ -50,15 +50,10 @@ function activate(ctx) {
     treeView.onDidChangeSelection(event => {
         // handle our click event
         clickHandler.clickedItem(event.selection[0]);
-    });
-    treeView.onDidChangeVisibility(event => {
-        console.log(event);
-    });
-    treeView.onDidCollapseElement(event => {
-        console.log(event);
-    });
-    treeView.onDidExpandElement(event => {
-        console.log(event);
+        // treeView.reveal(event.selection[0], { select: false, focus: false });
+        idlTreeProvider.getChildren().then(kids => {
+            treeView.reveal(kids[0], { select: true });
+        });
     });
     // Start the client. This will also launch the server
     client.start();
