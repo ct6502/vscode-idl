@@ -10,7 +10,21 @@ This contains information about how to get set up for development with the tools
 
     Do this with `npm run compile`
 
-## Language Server Development
+## Testing
+
+There are no unit tests for this extension, but if you are developing the functionality, then you should create a package from this extension and locally test to verify that the built extension works. To do this you:
+
+1. From the main folder of this repository, run `vsce package`
+
+    - If you don't have `vsce` installed as a global dependency, then run `npm install --global vsce` and try again
+
+2. Verify in your extensions folder that there is **no** IDL extension already. If there is then the next step does not always work.
+
+3. From the extensions tab in VSCode, you can click the ellipsis at the top left and selecct install from vsix files. Use that to install the extension that you just packaged up and make sure that it works.
+
+4. Optional: send the package to all of your friends and have them try it out before publishing!
+
+## Language Server Development (For when webpack is impemented)
 
 1. Change directories into the `client` folder and run `npm run webpack`.
 
@@ -18,7 +32,7 @@ This contains information about how to get set up for development with the tools
 
 3. After changes are made to the code, in about 5 seconds the server will be recompiled, you can reload the extension debugger.
 
-## VSCode Extension Client Development
+## VSCode Extension Client Development (For when webpack is impemented)
 
 1. Change directories into the `client` folder and run `npm run webpack`.
 

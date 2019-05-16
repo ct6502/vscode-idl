@@ -33,7 +33,8 @@
     },
     "activationEvents": [
         "onLanguage:idl",
-        "workspaceContains:**/.pro"
+        "workspaceContains:**/.pro",
+        "onView:idlTree"
     ],
     "main": "./client/dist/extension",
     "categories": [
@@ -41,6 +42,23 @@
     ],
     "icon": "images/idlicon.png",
     "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "idl-view",
+                    "title": "IDL",
+					"icon": "images/idlicon.svg"
+                }
+            ]
+        },
+        "views": {
+            "idl-view": [
+                {
+                    "id": "idlTree",
+                    "name": "Actions and Commands"
+                }
+            ]
+        },
         "languages": [
             {
                 "id": "idl",
