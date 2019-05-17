@@ -43,6 +43,7 @@ class IDLTreeClickHandler {
     constructor() {
         // get names of buttons for commands
         this.commandIds = idl_tree_view_1.commandChildren.map(c => c.name);
+        this.terminal = {};
     }
     _getIDLTerminal() {
         return vscode.window.terminals.filter(terminal => terminal.name.toLowerCase() === "idl");
@@ -90,6 +91,23 @@ class IDLTreeClickHandler {
                         const newTerminal = vscode.window.createTerminal();
                         newTerminal.sendText("cd " + idlDir + " && idl");
                         newTerminal.show();
+                        this.registerTerminalForCapture(newTerminal);
+                        // newTerminal.sendText = (
+                        //   text: string,
+                        //   addNewLine: boolean = true
+                        // ): void => {
+                        //   (<any>newTerminal)._checkDisposed();
+                        //   console.log([text]);
+                        //   // (<any>newTerminal)._queueApiRequest((<any>newTerminal)._proxy.$sendText, [text, addNewLine]);
+                        // };
+                        // const renderer = (<any>vscode.window).createTerminalRenderer("idl");
+                        // const newTerminal = renderer.terminal;
+                        // renderer.terminal.sendText("cd " + idlDir + " && idl");
+                        // renderer.terminal.show();
+                        // const uri = vscode.Uri.file('');
+                        // vscode.workspace.openTextDocument(uri);
+                        // // vscode.window.showTextDocument()
+                        // renderer.write("\x1b[31mHello world\x1b[0m");
                     }
                     else {
                         // try to spawn IDL
@@ -179,6 +197,20 @@ class IDLTreeClickHandler {
             default:
             // do nothing
         }
+    }
+    registerTerminalForCapture(terminal) {
+        terminal.processId.then(terminalId => {
+            // (<any>terminal).onDidWriteData((data: string) => {
+            //   terminal[terminalId] += data;
+            //   console.log(data.endsWith("\u000d"));
+            //   // console.log(terminal[terminalId]);
+            // });
+            terminal.onLineData((data) => {
+                // terminal[terminalId] += data;
+                console.log(data);
+                // console.log(terminal[terminalId]);
+            });
+        });
     }
 }
 exports.IDLTreeClickHandler = IDLTreeClickHandler;

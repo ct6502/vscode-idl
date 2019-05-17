@@ -130,7 +130,6 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
     } else {
       // check if we have parent information
       if (this.tree[element.label]) {
-        console.log(element.label);
         return Promise.resolve(this.tree[element.label]);
       } else {
         return Promise.resolve([]);
