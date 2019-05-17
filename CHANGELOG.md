@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 
+## [1.3.1] - 2019-05-16
+
+Bump required vscode version to 1.33.0 to resolve security vulnerabilities.
+
 ## [1.3.0] - 2018-04-11
 
 Added new package to packge.json for adding contributors. Updated the readme and added attribution to Mike Galloy, Chris Torrence, and Zach Norman.
