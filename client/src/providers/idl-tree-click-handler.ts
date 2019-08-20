@@ -210,9 +210,9 @@ export class IDLTreeClickHandler {
       //   console.log(data.endsWith("\u000d"));
       //   // console.log(terminal[terminalId]);
       // });
-      (<any>terminal).onLineData((data: string) => {
+      (<any>terminal).onDidWriteData((data: string) => {
         // terminal[terminalId] += data;
-        console.log(data);
+        // console.log(data);
         // console.log(terminal[terminalId]);
       });
     });

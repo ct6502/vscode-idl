@@ -171,7 +171,16 @@ connection.onDefinition((params) => {
 // )
 // handle when we request document symbols
 connection.onDocumentSymbol((params) => __awaiter(this, void 0, void 0, function* () {
-    return yield symbolProvider.get.documentSymbols(params.textDocument.uri);
+    return (yield symbolProvider.get.documentSymbols(params.textDocument.uri)).map(symbol => {
+        return {
+            name: symbol.displayName,
+            detail: symbol.detail,
+            kind: symbol.kind,
+            range: symbol.range,
+            selectionRange: symbol.selectionRange,
+            children: symbol.children
+        };
+    });
 }));
 /*
 connection.onDidOpenTextDocument((params) => {

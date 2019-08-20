@@ -239,7 +239,18 @@ connection.onDocumentSymbol(
   async (
     params: DocumentSymbolParams
   ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
-    return await symbolProvider.get.documentSymbols(params.textDocument.uri);
+    return (await symbolProvider.get.documentSymbols(
+      params.textDocument.uri
+    )).map(symbol => {
+      return {
+        name: symbol.displayName,
+        detail: symbol.detail,
+        kind: symbol.kind,
+        range: symbol.range,
+        selectionRange: symbol.selectionRange,
+        children: symbol.children
+      };
+    });
   }
 );
 

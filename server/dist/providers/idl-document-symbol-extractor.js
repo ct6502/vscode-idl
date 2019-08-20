@@ -29,7 +29,7 @@ function resolveRoutineType(match) {
 }
 class IDLDocumentSymbolExtractor {
     constructor() { }
-    _extractFunctions(text) {
+    _extractFunctions(text, objects) {
         // init symbols
         const symbols = [];
         // find all function definitions
@@ -46,15 +46,37 @@ class IDLDocumentSymbolExtractor {
             const start = split[split.length - 1].length; // length of string start
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
+                // check for object
+                const lowMatch = match.toLowerCase();
+                if (lowMatch.includes("__define")) {
+                    const objName = lowMatch.replace("__define", "");
+                    if (objects.indexOf(objName) == -1) {
+                        objects.push(objName);
+                    }
+                }
+                // build the location of the match
                 const range = vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(lineNumber, start), vscode_languageserver_1.Position.create(lineNumber, start + match.length));
-                const symbol = vscode_languageserver_1.DocumentSymbol.create(match, "Function" + resolveRoutineNameAdd(match), resolveRoutineType(match), range, range);
+                const symbol = vscode_languageserver_1.DocumentSymbol.create(match + "()", "Function" + resolveRoutineNameAdd(match), resolveRoutineType(match), range, range);
+                // save the display name of our symbol, hack to get around custom IDL symbol here
+                symbol.displayName = match + "()";
+                // save
                 symbols.push(symbol);
+            });
+        }
+        // clean up symbol names for object definitions
+        if (objects.length == 1) {
+            symbols.forEach((symbol, idx) => {
+                const lowName = symbol.displayName.toLowerCase();
+                if (lowName.includes(objects[0]) && lowName.includes(":")) {
+                    // update name
+                    symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
+                }
             });
         }
         // return our symbols
         return symbols;
     }
-    _extractProcedures(text) {
+    _extractProcedures(text, objects) {
         // init symbols
         const symbols = [];
         // find all procedure definitions
@@ -71,9 +93,32 @@ class IDLDocumentSymbolExtractor {
             const start = split[split.length - 1].length; // length of string start
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
+                // check for object
+                const lowMatch = match.toLowerCase();
+                if (lowMatch.includes("__define")) {
+                    const objName = lowMatch.replace("__define", "");
+                    if (objects.indexOf(objName) == -1) {
+                        objects.push(objName);
+                    }
+                }
+                // get range
                 const range = vscode_languageserver_1.Range.create(vscode_languageserver_1.Position.create(lineNumber, start), vscode_languageserver_1.Position.create(lineNumber, start + match.length));
+                // make our symbol
                 const symbol = vscode_languageserver_1.DocumentSymbol.create(match, "Procedure" + resolveRoutineNameAdd(match), resolveRoutineType(match), range, range);
+                // save the display name of our symbol, hack to get around custom IDL symbol here
+                symbol.displayName = match;
+                // save
                 symbols.push(symbol);
+            });
+        }
+        // clean up symbol names for object definitions
+        if (objects.length == 1) {
+            symbols.forEach((symbol, idx) => {
+                const lowName = symbol.displayName.toLowerCase();
+                if (lowName.includes(objects[0]) && lowName.includes(":")) {
+                    // update name
+                    symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
+                }
             });
         }
         // return our symbols
@@ -111,8 +156,10 @@ class IDLDocumentSymbolExtractor {
     symbolizeAsDocumentSymbols(text, uri) {
         // init array of symbols
         let symbols = [];
-        symbols = symbols.concat(this._extractFunctions(text));
-        symbols = symbols.concat(this._extractProcedures(text));
+        const objects = [];
+        symbols = symbols.concat(this._extractProcedures(text, objects));
+        // must be second because we need object definitions first, which are procedures
+        symbols = symbols.concat(this._extractFunctions(text, objects));
         // return our symbols
         return symbols;
     }

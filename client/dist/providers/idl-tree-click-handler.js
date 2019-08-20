@@ -205,9 +205,9 @@ class IDLTreeClickHandler {
             //   console.log(data.endsWith("\u000d"));
             //   // console.log(terminal[terminalId]);
             // });
-            terminal.onLineData((data) => {
+            terminal.onDidWriteData((data) => {
                 // terminal[terminalId] += data;
-                console.log(data);
+                // console.log(data);
                 // console.log(terminal[terminalId]);
             });
         });

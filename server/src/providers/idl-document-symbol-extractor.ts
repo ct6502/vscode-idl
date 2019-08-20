@@ -7,6 +7,10 @@ import {
   Position
 } from "vscode-languageserver";
 
+export interface IDLDocumentSymbol extends DocumentSymbol {
+  displayName?: string;
+}
+
 // if we have a method, make it clear we have that in the document description string
 function resolveRoutineNameAdd(match: string): string {
   switch (true) {
@@ -38,9 +42,12 @@ function resolveRoutineType(match: string): SymbolKind {
 export class IDLDocumentSymbolExtractor {
   constructor() {}
 
-  private _extractFunctions(text: string): DocumentSymbol[] {
+  private _extractFunctions(
+    text: string,
+    objects: string[]
+  ): IDLDocumentSymbol[] {
     // init symbols
-    const symbols: DocumentSymbol[] = [];
+    const symbols: IDLDocumentSymbol[] = [];
 
     // find all function definitions
     const funcRegex = /(?<=^\s*function[\s]+)[a-z_][a-z_$0-9:]*/gim;
@@ -58,19 +65,47 @@ export class IDLDocumentSymbolExtractor {
 
       // The result can be accessed through the `m`-variable.
       m.forEach((match, groupIndex) => {
+        // check for object
+        const lowMatch = match.toLowerCase();
+        if (lowMatch.includes("__define")) {
+          const objName = lowMatch.replace("__define", "");
+          if (objects.indexOf(objName) == -1) {
+            objects.push(objName);
+          }
+        }
+
+        // build the location of the match
         const range = Range.create(
           Position.create(lineNumber, start),
           Position.create(lineNumber, start + match.length)
         );
-        const symbol = DocumentSymbol.create(
-          match,
+
+        const symbol: IDLDocumentSymbol = DocumentSymbol.create(
+          match + "()",
           "Function" + resolveRoutineNameAdd(match),
           resolveRoutineType(match),
           range,
           range
         );
 
+        // save the display name of our symbol, hack to get around custom IDL symbol here
+        symbol.displayName = match + "()";
+
+        // save
         symbols.push(symbol);
+      });
+    }
+
+    // clean up symbol names for object definitions
+    if (objects.length == 1) {
+      symbols.forEach((symbol, idx) => {
+        const lowName = symbol.displayName.toLowerCase();
+        if (lowName.includes(objects[0]) && lowName.includes(":")) {
+          // update name
+          symbol.displayName = symbol.displayName.substr(
+            symbol.displayName.indexOf(":")
+          );
+        }
       });
     }
 
@@ -78,9 +113,12 @@ export class IDLDocumentSymbolExtractor {
     return symbols;
   }
 
-  private _extractProcedures(text: string): DocumentSymbol[] {
+  private _extractProcedures(
+    text: string,
+    objects: string[]
+  ): IDLDocumentSymbol[] {
     // init symbols
-    const symbols: DocumentSymbol[] = [];
+    const symbols: IDLDocumentSymbol[] = [];
 
     // find all procedure definitions
     const proRegex = /(?<=^\s*pro[\s]+)[a-z_][a-z_$0-9:]*/gim;
@@ -98,18 +136,48 @@ export class IDLDocumentSymbolExtractor {
 
       // The result can be accessed through the `m`-variable.
       m.forEach((match, groupIndex) => {
+        // check for object
+        const lowMatch = match.toLowerCase();
+        if (lowMatch.includes("__define")) {
+          const objName = lowMatch.replace("__define", "");
+          if (objects.indexOf(objName) == -1) {
+            objects.push(objName);
+          }
+        }
+
+        // get range
         const range = Range.create(
           Position.create(lineNumber, start),
           Position.create(lineNumber, start + match.length)
         );
-        const symbol = DocumentSymbol.create(
+
+        // make our symbol
+        const symbol: IDLDocumentSymbol = DocumentSymbol.create(
           match,
           "Procedure" + resolveRoutineNameAdd(match),
           resolveRoutineType(match),
           range,
           range
         );
+
+        // save the display name of our symbol, hack to get around custom IDL symbol here
+        symbol.displayName = match;
+
+        // save
         symbols.push(symbol);
+      });
+    }
+
+    // clean up symbol names for object definitions
+    if (objects.length == 1) {
+      symbols.forEach((symbol, idx) => {
+        const lowName = symbol.displayName.toLowerCase();
+        if (lowName.includes(objects[0]) && lowName.includes(":")) {
+          // update name
+          symbol.displayName = symbol.displayName.substr(
+            symbol.displayName.indexOf(":")
+          );
+        }
       });
     }
 
@@ -152,11 +220,14 @@ export class IDLDocumentSymbolExtractor {
     return symbolName;
   }
 
-  symbolizeAsDocumentSymbols(text: string, uri: string): DocumentSymbol[] {
+  symbolizeAsDocumentSymbols(text: string, uri: string): IDLDocumentSymbol[] {
     // init array of symbols
-    let symbols: DocumentSymbol[] = [];
-    symbols = symbols.concat(this._extractFunctions(text));
-    symbols = symbols.concat(this._extractProcedures(text));
+    let symbols: IDLDocumentSymbol[] = [];
+    const objects: string[] = [];
+    symbols = symbols.concat(this._extractProcedures(text, objects));
+
+    // must be second because we need object definitions first, which are procedures
+    symbols = symbols.concat(this._extractFunctions(text, objects));
 
     // return our symbols
     return symbols;

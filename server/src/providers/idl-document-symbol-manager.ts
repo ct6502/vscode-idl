@@ -14,7 +14,10 @@ import {
   Definition
 } from "vscode-languageserver";
 import moize from "moize";
-import { IDLDocumentSymbolExtractor } from "./idl-document-symbol-extractor";
+import {
+  IDLDocumentSymbolExtractor,
+  IDLDocumentSymbol
+} from "./idl-document-symbol-extractor";
 
 // get our globby code
 const glob = require("glob-fs")({ gitignore: true }); // file searching
@@ -32,7 +35,7 @@ const searchOptions = {
 
 // define structure for our moize searches to cache the promises for async documentation generation
 interface ISearches {
-  documentSymbols: (uri: string) => Promise<DocumentSymbol[]>;
+  documentSymbols: (uri: string) => Promise<IDLDocumentSymbol[]>;
   documentSymbolInformation: (uri: string) => Promise<SymbolInformation[]>;
 }
 
@@ -225,7 +228,7 @@ export class IDLDocumentSymbolManager {
   // define our getters for extracting document information
   get: ISearches = {
     documentSymbols: moize(
-      async (uri: string): Promise<DocumentSymbol[]> => {
+      async (uri: string): Promise<IDLDocumentSymbol[]> => {
         return new Promise(async (resolve, reject) => {
           try {
             // get the strings we are processing
