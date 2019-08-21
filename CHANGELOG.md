@@ -21,6 +21,10 @@ Added an initial IDL language server for more features. It contains capabilities
 
 - Simple controls for starting a basic IDL Console window with the ability to compile, run, and stop executing IDL code. There is no debugging, but it is better than nothing!
 
+## [1.4.1] - 2019-05-16
+
+Bump required vscode version to 1.33.0 to resolve security vulnerabilities.
+
 ## [1.3.0] - 2018-04-11
 
 Added new package to packge.json for adding contributors. Updated the readme and added attribution to Mike Galloy, Chris Torrence, and Zach Norman.
