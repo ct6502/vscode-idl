@@ -10,6 +10,10 @@ This contains information about how to get set up for development with the tools
 
     Do this with `npm run compile`
 
+## Versioning
+
+In `package.json`, at the top, bump the "version" key to the desired version number in quotes. Be sure to update `CHANGELOG.md` with a description of your changes.
+
 ## Testing
 
 There are no unit tests for this extension, but if you are developing the functionality, then you should create a package from this extension and locally test to verify that the built extension works. To do this you:
@@ -24,7 +28,7 @@ There are no unit tests for this extension, but if you are developing the functi
 
 4. Optional: send the package to all of your friends and have them try it out before publishing!
 
-## Language Server Development (For when webpack is impemented)
+## Language Server Development (For when webpack is implemented)
 
 1. Change directories into the `client` folder and run `npm run webpack`.
 
@@ -32,7 +36,7 @@ There are no unit tests for this extension, but if you are developing the functi
 
 3. After changes are made to the code, in about 5 seconds the server will be recompiled, you can reload the extension debugger.
 
-## VSCode Extension Client Development (For when webpack is impemented)
+## VSCode Extension Client Development (For when webpack is implemented)
 
 1. Change directories into the `client` folder and run `npm run webpack`.
 
