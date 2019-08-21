@@ -28,6 +28,8 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 
 * Colorization of ENVI and IDL task files.
 
+* Ability to launch a basic IDL Console window and buttons similar to the IDL Workbench. Note that debugging is not a part of this.
+
 ## Notes
 
 - The actual code that gets highlighted is strongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
