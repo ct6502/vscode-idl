@@ -3,7 +3,7 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [1.4.0] - 2019-05-13
+## [1.5] - 2019-08-21
 
 Added an initial IDL language server for more features. It contains capabilities for:
 
