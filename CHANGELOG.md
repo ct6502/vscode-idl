@@ -3,7 +3,11 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [1.5] - 2019-08-21
+## [1.5.1] - 2019-08-23
+
+Webpacked the language server to reduce files by about 50% and size to 3.3 MB from about 5 MB
+
+## [1.5.0] - 2019-08-23
 
 Added an initial IDL language server for more features. It contains capabilities for:
 

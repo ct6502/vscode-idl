@@ -93,18 +93,28 @@ connection.onInitialized(async () => {
   // TODO: detect when workspace is closed and remove files
   if (hasWorkspaceFolderCapability) {
     // get the list of current workspaces
-    connection.workspace.getWorkspaceFolders().then(folders => {
-      // refresh our index and detect problems on success
-      symbolProvider
-        .indexWorkspaces(folders)
-        .then(() => {
-          // detect problems because we had change
-          problemDetector.detectAndSendProblems();
-        })
-        .catch(err => {
-          connection.console.log(JSON.stringify(err));
-        });
-    });
+    connection.workspace
+      .getWorkspaceFolders()
+      .then(
+        folders => {
+          // refresh our index and detect problems on success
+          symbolProvider
+            .indexWorkspaces(folders)
+            .then(() => {
+              // detect problems because we had change
+              problemDetector.detectAndSendProblems();
+            })
+            .catch(err => {
+              connection.console.log(JSON.stringify(err));
+            });
+        },
+        rejected => {
+          connection.console.log(JSON.stringify(rejected));
+        }
+      )
+      .then(undefined, rejected => {
+        connection.console.log(JSON.stringify(rejected));
+      });
 
     connection.workspace.connection.workspace // listen for new workspaces
       .onDidChangeWorkspaceFolders(async _event => {

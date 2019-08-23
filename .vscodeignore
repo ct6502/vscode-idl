@@ -7,3 +7,5 @@ vsc-extension-quickstart.md
 **/webpack.config.js
 test/**
 idl/**
+node_modules/**
+server/node_modules/**
