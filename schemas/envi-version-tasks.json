@@ -24,6 +24,8 @@
                     "properties": {
                         "parameters": {
                             "type": "array",
+                            "title": "Parameters",
+                            "description": "A array of objects with key/value pairs.",
                             "items": {
                                 "$ref": "#/definitions/envi-5.3-parameter"
                             }
@@ -72,6 +74,8 @@
                 },
                 "parameters": {
                     "type": "array",
+                    "title": "Parameters",
+                    "description": "A array of objects with key/value pairs.",
                     "items": {
                         "$ref": "#/definitions/envi-5.2.1-parameter"
                     }

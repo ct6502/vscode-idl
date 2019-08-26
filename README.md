@@ -28,7 +28,11 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 
 * Ability to launch a basic IDL Console window and buttons similar to the IDL Workbench. Note that debugging is not a part of this.
 
+* Schema validation for all versions of ENVI and IDL tasks to simplify development.
+
 ## Notes
+
+- For task schema validation, the JSON in the `.task` file must contain a `"schema"` tag which indicates the rulesets for which parameters are required. For older ENVI Tasks, you need `"version"`.
 
 - The actual code that gets highlighted is strongly dependent on your theme. Themes such as Abyss, Atom One Dark (extension), Dark+ (default dark), or Monokai show the most color. 
 

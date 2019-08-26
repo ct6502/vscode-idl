@@ -17,15 +17,75 @@
         "schema": {
             "type": "string",
             "title": "Task Schema",
-            "description": "A string listing the version of ENVITask JSON schema that was used to write this task.\nThe valid values are \"envitask_3.2\", \"envitask_3.1\" or \"envitask_3.0\".",
+            "description": "A string listing the version of ENVITask JSON schema or IDLTask JSON schema that was used to write this task.\nThe valid values are \"envitask_3.2\", \"envitask_3.1\" or \"envitask_3.0\", \"idltask_1.2\",\"idltask_1.1\", \"idltask_1.0\".",
             "enum": [
                 "envitask_3.2",
                 "envitask_3.1",
-                "envitask_3.0"
+                "envitask_3.0",
+                "idltask_1.2",
+                "idltask_1.1",
+                "idltask_1.0"
             ]
         }
     },
     "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "schema": {
+                        "const": "idltask_1.2"
+                    }
+                },
+                "required": [
+                    "schema"
+                ]
+            },
+            "then": {
+                "allOf": [
+                    {
+                        "$ref": "idl-schema-tasks.json#/definitions/idltask-1.2-task"
+                    }
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "schema": {
+                        "const": "idltask_1.1"
+                    }
+                },
+                "required": [
+                    "schema"
+                ]
+            },
+            "then": {
+                "allOf": [
+                    {
+                        "$ref": "idl-schema-tasks.json#/definitions/idltask-1.1-task"
+                    }
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "schema": {
+                        "const": "idltask_1.0"
+                    }
+                },
+                "required": [
+                    "schema"
+                ]
+            },
+            "then": {
+                "allOf": [
+                    {
+                        "$ref": "idl-schema-tasks.json#/definitions/idltask-1.0-task"
+                    }
+                ]
+            }
+        },
         {
             "if": {
                 "properties": {

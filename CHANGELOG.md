@@ -1,9 +1,10 @@
 # Change Log
+
 All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## Unreleased
+## 1.5.2 - 2019-08-25
 
 Corrected the way to add syntax for IDL + ENVI tasks, ENVI style sheets, and ENVI modeler files.
 
@@ -12,6 +13,8 @@ Added basic task schema validation for:
 - ENVI Tasks before ENVI 5.3
 
 - ENVI Tasks after ENVI 5.3
+
+- IDL Tasks, which were introduced in IDL 8.5.2
 
 
 ## [1.5.1] - 2019-08-23
@@ -42,15 +45,15 @@ Bump required vscode version to 1.33.0 to resolve security vulnerabilities.
 
 ## [1.3.0] - 2018-04-11
 
-Added new package to packge.json for adding contributors. Updated the readme and added attribution to Mike Galloy, Chris Torrence, and Zach Norman.
+Added new package to package.json for adding contributors. Updated the readme and added attribution to Mike Galloy, Chris Torrence, and Zach Norman.
 
 A lot of changes have been made to improve the colorization of IDL's procedures which are challenging to delineate from standard text. In general here are the changes that have been made:
 
-- Added a "test" file with many sample cases for easy comparison when testing the syntax highlighting. Any problems are at the top of the file, exerything else is a reference for what things should look like.
+- Added a "test" file with many sample cases for easy comparison when testing the syntax highlighting. Any problems are at the top of the file, everything else is a reference for what things should look like.
 
 - Procedures now highlight correctly when you have single-line if statements of the form `if (this) then print, 'that'`. Does **not** work if you have a line continuation after the `then` statement.
 
-- Added code for line continuations to prevent false positive procedures from beign highlighted. This requires you to indent the next line (as you should anyways) otherwise the rest of your file is highlighted incorrectly. With this change, properties are not colored correctly on the next line. Not sure why this is happening, I'm guessing another group is grabbing the text and preventing the highlighting, but this is better than highlighting too much. Holding off on exposing this as it has the potential to cause more problems than it solves.
+- Added code for line continuations to prevent false positive procedures from being highlighted. This requires you to indent the next line (as you should anyways) otherwise the rest of your file is highlighted incorrectly. With this change, properties are not colored correctly on the next line. Not sure why this is happening, I'm guessing another group is grabbing the text and preventing the highlighting, but this is better than highlighting too much. Holding off on exposing this as it has the potential to cause more problems than it solves.
 
 - Some of the procedure captures have been consolidated and simplified.
 
@@ -74,7 +77,7 @@ A lot of changes have been made to improve the colorization of IDL's procedures 
 
 - The syntax highlighting is now generic and will highlight any function, procedure, function method, or procedure method accordingly.
 
-- Structure/object properties are highlighted when setting/getting, includng those on system variables.
+- Structure/object properties are highlighted when setting/getting, including those on system variables.
 
 - Structure names and `inherits` keys have their own styling.
 

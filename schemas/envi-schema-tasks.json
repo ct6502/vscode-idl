@@ -27,11 +27,14 @@
                     "properties": {
                         "revision": {
                             "type": "string",
+                            "title": "Revision",
                             "description": "A string with the semantic revision number of the task. Semantic versioning provides a quick way to extract information about a new task release using a convention of X.Y.Z, where:\n\n- X represents the major version. An incremented value indicates that task additions and updates are not backward-compatible.\n- Y represents the minor version. An incremented value indicates that task additions and updates are backward-compatible.\n- Z represents the patch number. An incremented value indicates bug fixes that do not affect the task.\n\nThe revision key is for development purposes only. The revision number does not affect which task file is loaded. Whichever task file is found first will be used. If revision is not set, it will default to a value of 1.0.0.",
                             "default": "1.0.0"
                         },
                         "parameters": {
                             "type": "array",
+                            "title": "Parameters",
+                            "description": "A array of objects with key/value pairs.",                            
                             "items": {
                                 "$ref": "#/definitions/envitask-3.1-parameter"
                             }
@@ -80,6 +83,8 @@
                 },
                 "parameters": {
                     "type": "array",
+                    "title": "Parameters",
+                    "description": "A array of objects with key/value pairs.",
                     "items": {
                         "$ref": "#/definitions/envitask-3.0-parameter"
                     }
