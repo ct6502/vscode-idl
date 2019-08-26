@@ -11,6 +11,8 @@ Added basic task schema validation for:
 
 - ENVI Tasks before ENVI 5.3
 
+- ENVI Tasks after ENVI 5.3
+
 
 ## [1.5.1] - 2019-08-23
 
