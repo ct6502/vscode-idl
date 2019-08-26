@@ -135,7 +135,7 @@
                 },
                 "displayName": {
                     "type": "string",
-                    "title": "Display name",
+                    "title": "Display Name",
                     "description": "The name of the task as it appears to the end user. This key is used by tasks that display a dynamic user interface for entering parameters."
                 },
                 "dataType": {
@@ -145,7 +145,7 @@
                 },
                 "direction": {
                     "type": "string",
-                    "title": "Version - Deprecated",
+                    "title": "Direction",
                     "description": "Specify if the parameter is \"input\" or \"output\".",
                     "enum": [
                         "input",
@@ -168,7 +168,7 @@
                 },
                 "choiceList": {
                     "type": "array",
-                    "title": "Parameter Type",
+                    "title": "Choice List",
                     "description": "A string array that lists the possible values for the property. Any IDL data type is supported. You can also map from user-friendly strings to an internal lookup table of values if desired.",
                     "items": {
                         "type": "string"

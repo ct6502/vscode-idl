@@ -29,6 +29,63 @@
         {
             "if": {
                 "properties": {
+                    "schema": {
+                        "const": "envitask_3.2"
+                    }
+                },
+                "required": [
+                    "schema"
+                ]
+            },
+            "then": {
+                "allOf": [
+                    {
+                        "$ref": "envi-schema-tasks.json#/definitions/envitask-3.2-task"
+                    }
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "schema": {
+                        "const": "envitask_3.1"
+                    }
+                },
+                "required": [
+                    "schema"
+                ]
+            },
+            "then": {
+                "allOf": [
+                    {
+                        "$ref": "envi-schema-tasks.json#/definitions/envitask-3.1-task"
+                    }
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "schema": {
+                        "const": "envitask_3.0"
+                    }
+                },
+                "required": [
+                    "schema"
+                ]
+            },
+            "then": {
+                "allOf": [
+                    {
+                        "$ref": "envi-schema-tasks.json#/definitions/envitask-3.0-task"
+                    }
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
                     "version": {
                         "const": "5.3.2"
                     }
@@ -102,6 +159,5 @@
                 ]
             }
         }
-    ],
-    "definitions": {}
+    ]
 }
