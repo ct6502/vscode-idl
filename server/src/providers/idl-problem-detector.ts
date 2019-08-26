@@ -2,7 +2,8 @@ import {
   Connection,
   TextDocuments,
   Diagnostic,
-  DiagnosticSeverity
+  DiagnosticSeverity,
+  SymbolKind
 } from "vscode-languageserver";
 import { IDLDocumentSymbolManager } from "./idl-document-symbol-manager";
 import { IProblems } from "../core/problems.interface";
@@ -41,6 +42,11 @@ export class IDLProblemDetector {
         // we need to compare each symbol to each other symbol
         for (let i = 0; i < symbol.length; i++) {
           const ref = symbol[i];
+
+          // check skip conditions
+          if (ref.symbol.kind === SymbolKind.Constant) {
+            continue
+          }
 
           // check if we are a conflict for ENVI or IDL routines
           switch (true) {

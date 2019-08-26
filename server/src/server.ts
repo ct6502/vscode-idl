@@ -16,7 +16,8 @@ import {
   DocumentSymbolParams,
   DocumentFilter,
   DocumentSymbol,
-  Definition
+  Definition,
+  SymbolKind
 } from "vscode-languageserver";
 import { IDLRoutineHelper } from "./providers/idl-routine-helper";
 import { IDLDocumentSymbolManager } from "./providers/idl-document-symbol-manager";
@@ -251,7 +252,7 @@ connection.onDocumentSymbol(
   ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
     return (await symbolProvider.get.documentSymbols(
       params.textDocument.uri
-    )).map(symbol => {
+    )).filter(symbol => { return symbol.kind !== SymbolKind.Constant }).map(symbol => {
       return {
         name: symbol.displayName,
         detail: symbol.detail,

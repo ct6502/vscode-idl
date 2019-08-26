@@ -40,7 +40,7 @@ function resolveRoutineType(match: string): SymbolKind {
 }
 
 export class IDLDocumentSymbolExtractor {
-  constructor() {}
+  constructor() { }
 
   private _extractFunctions(
     text: string,
@@ -185,6 +185,60 @@ export class IDLDocumentSymbolExtractor {
     return symbols;
   }
 
+  // grab variables, not perfect but a happy fix for losing this functionality
+  private _extractVariables(
+    text: string
+  ): IDLDocumentSymbol[] {
+    // init symbols
+    const symbols: IDLDocumentSymbol[] = [];
+
+    // find all procedure definitions
+    const proRegex = /(?!continue|begin|endif)(?<=^\s*|then |else )[a-z_][a-z_$0-9\s]*(?=\b\s*\=)/gim;
+    let m: RegExpExecArray;
+    while ((m = proRegex.exec(text)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === proRegex.lastIndex) {
+        proRegex.lastIndex++;
+      }
+
+      // get the line of this character
+      const split = text.substr(0, m.index).split("\n");
+      const lineNumber = split.length - 1;
+      const start = split[split.length - 1].length; // length of string start
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach((match, groupIndex) => {
+        // get range
+        const range = Range.create(
+          Position.create(lineNumber, start),
+          Position.create(lineNumber, start + match.length)
+        );
+
+        // make our symbol
+        // TODO: figure out how to associate these with a routine so that
+        // we could "catch" errors with redifining variable. but do we need this?
+        // we dont have this in TS so maybe not
+        const symbol: IDLDocumentSymbol = DocumentSymbol.create(
+          match,
+          "Variable",
+          SymbolKind.Constant,
+          range,
+          range
+        );
+
+        // save the display name of our symbol, hack to get around custom IDL symbol here
+        symbol.displayName = match;
+
+        // save
+        symbols.push(symbol);
+      });
+    }
+
+    // return our symbols
+    return symbols;
+  }
+
+
   getSelectedWord(line: string, position: Position): string {
     // placeholder for the name
     let symbolName = "";
@@ -224,10 +278,15 @@ export class IDLDocumentSymbolExtractor {
     // init array of symbols
     let symbols: IDLDocumentSymbol[] = [];
     const objects: string[] = [];
+
+    // get procedures
     symbols = symbols.concat(this._extractProcedures(text, objects));
 
-    // must be second because we need object definitions first, which are procedures
+    // must be after procedures because we need object definitions first, which are procedures
     symbols = symbols.concat(this._extractFunctions(text, objects));
+
+    // get variable definitions
+    symbols = symbols.concat(this._extractVariables(text))
 
     // return our symbols
     return symbols;
