@@ -116,6 +116,7 @@ function some::withmethod
 pro some
 pro some::withmethod
 if (ISA(name) && ~ISA(identifier)) then identifier
+idxEnd = where(strpos(trim, com + hEnd) eq 0, countEnd)
 
 ;to get these, practically need to copy/paste procedure rules
 of
@@ -127,7 +128,9 @@ endcase
 ;to get these, practically need to copy/paste procedure method rules
 ;in the switch-case-block capture group, at least it is colored?
 case (1) of
-  (stmnt): (item).method, this ;comment
+  (stmnt): begin
+    (item).method, this ;comment
+  end
   (stmnt): (item.this()).method, ;comment
   (stmnt): item.method, this ;commet
   (stmnt): item.method ;commetn

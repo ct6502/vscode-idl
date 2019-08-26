@@ -467,7 +467,7 @@
 					<key>comment</key>
 					<string>Special case for end, some odd bug somewhere makes this needed to highlight in case-switch statements</string>
 					<key>match</key>
-					<string>(?i)\s*end\b</string>
+					<string>(?i)^\s*end\b</string>
 					<key>name</key>
 					<string>keyword.control.idl</string>
 				</dict>
