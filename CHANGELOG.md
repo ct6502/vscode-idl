@@ -3,6 +3,15 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## Unreleased
+
+Corrected the way to add syntax for IDL + ENVI tasks, ENVI style sheets, and ENVI modeler files.
+
+Added basic task schema validation for:
+
+- ENVI Tasks before ENVI 5.3
+
+
 ## [1.5.1] - 2019-08-23
 
 Webpacked the language server to reduce files by about 50% and size to 3.3 MB from about 5 MB

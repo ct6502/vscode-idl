@@ -4,8 +4,6 @@ This extension adds syntax highlighting and code snippets for the Interactive Da
 
 The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbundle](https://github.com/mgalloy/idl.tmbundle).
 
-The JSON syntax rules for the `.task` files are from [VSCode](https://github.com/Microsoft/vscode-JSON.tmLanguage) and are included so that you don't have to edit file associations for them to look correct.
-
 For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting your environment setup.
 
 ## Features
