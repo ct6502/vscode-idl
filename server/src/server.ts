@@ -34,8 +34,8 @@ let connection = createConnection(ProposedFeatures.all);
 let documents: TextDocuments = new TextDocuments();
 
 // create all of our helper objects for different requests
-const routineHelper = new IDLRoutineHelper(connection, documents);
 const symbolProvider = new IDLDocumentSymbolManager(connection, documents);
+const routineHelper = new IDLRoutineHelper(connection, documents, symbolProvider);
 const problemDetector = new IDLProblemDetector(
   connection,
   documents,
@@ -211,7 +211,27 @@ connection.onDidChangeWatchedFiles(_change => {
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    return routineHelper.completion(_textDocumentPosition);
+    // get the word that we are trying to complete
+    // do this here just so we dont have to split larger files more than once
+    // because we need the strings, split, and regex to find our work
+    const query = symbolProvider.getSelectedSymbolName(_textDocumentPosition)
+
+    // get docs matches
+    // const start1: any = new Date();
+    let docsMatches = routineHelper.completion(query)
+    // const end1: any = new Date();
+    // connection.console.log(JSON.stringify(end1 - start1));
+
+    // get symbol matches
+    // const start2: any = new Date();
+    const symMatches = symbolProvider.completion(query, _textDocumentPosition)
+    // const end2: any = new Date();
+    // connection.console.log(JSON.stringify(end2 - start2));
+    if (symMatches.length > 0) {
+      docsMatches = docsMatches.concat(symMatches)
+    }
+
+    return docsMatches
   }
 );
 

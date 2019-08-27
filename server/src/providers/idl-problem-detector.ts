@@ -44,7 +44,7 @@ export class IDLProblemDetector {
           const ref = symbol[i];
 
           // check skip conditions
-          if (ref.symbol.kind === SymbolKind.Constant) {
+          if (ref.symbol.kind === SymbolKind.Variable) {
             continue
           }
 

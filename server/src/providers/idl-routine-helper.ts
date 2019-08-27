@@ -12,8 +12,8 @@ import { IDLDocumentSymbolManager } from "./idl-document-symbol-manager";
 // options for controlling search performance
 const searchOptions = {
   limit: 50, // don't return more results than you need!
-  allowTypo: true // if you don't care about allowing typos
-  // threshold: -10000 // don't return bad results
+  allowTypo: false, // if you don't care about allowing typos
+  threshold: -10000 // don't return bad results
 };
 
 // class definition for object that extracts routines from the help content
@@ -23,8 +23,10 @@ export class IDLRoutineHelper {
   documents: TextDocuments;
   manager: IDLDocumentSymbolManager;
   routines: IRoutines;
-  functions: { [key: string]: boolean } = {};
-  procedures: { [key: string]: boolean } = {};
+  functions: { [key: string]: number } = {};
+  procedures: { [key: string]: number } = {};
+  constants: { [key: string]: number } = {};
+  other: { [key: string]: number } = {};
   routineKeys = [];
   routineKeysSearch: any[] = [];
 
@@ -39,17 +41,64 @@ export class IDLRoutineHelper {
 
   // return items from the docs for completion
   completion(
-    _textDocumentPosition: TextDocumentPositionParams
+    query: string
   ): CompletionItem[] {
-    // get the symbol that we are auto-completing
-    const query = this.manager.getSelectedSymbolName(_textDocumentPosition)
-
     // search, map to indices, filter by matches in our array, map to the completion items
-    return fuzzysort
-      .go(query, this.routineKeysSearch, searchOptions)
-      .map(match => this.routineKeys.indexOf(match.target))
-      .filter(idx => idx !== -1)
-      .map(idx => this.routines.docs[idx]);
+    return this.routines.docs
+
+    // search for our matches
+    const matches = fuzzysort.go(query, this.routineKeysSearch, searchOptions);
+
+    // potentially can be 30% faster method for searching with manual loops
+    // old code is below
+    const items: CompletionItem[] = []
+    for (let idx = 0; idx < matches.length; idx++) {
+      const lc = matches[idx].target.toLowerCase();
+      // handle setting proper information for our data things and such
+      switch (true) {
+        case (lc in this.functions):
+          items.push(this.routines.docs[this.functions[lc]])
+          break;
+        case (lc in this.procedures):
+          items.push(this.routines.docs[this.procedures[lc]])
+          break;
+        case (lc in this.constants):
+          items.push(this.routines.docs[this.constants[lc]])
+          break;
+        case (lc in this.other):
+          items.push(this.routines.docs[this.other[lc]])
+          break;
+        default:
+          return // DO NBOTHING
+      }
+    }
+
+    // method to get our items with maps and filters, can be 8 ms (42 vs 16) slower than below
+    // const items =
+    //   matches.map(match => {
+    //     const lc = match.target.toLowerCase();
+    //     // handle setting proper information for our data things and such
+    //     switch (true) {
+    //       case (lc in this.functions):
+    //         return this.functions[lc]
+    //         break;
+    //       case (lc in this.procedures):
+    //         return this.procedures[lc]
+    //         break;
+    //       case (lc in this.constants):
+    //         return this.constants[lc]
+    //         break;
+    //       case (lc in this.other):
+    //         return this.other[lc]
+    //         break;
+    //       default:
+    //         return -1
+    //     }
+    //   })
+    //     .filter(idx => idx !== -1)
+    //     .map(idx => this.routines.docs[idx]);
+
+    return items
   }
 
   // after we use auto-complete on an item, do anything afterwards to clean it up?
@@ -88,17 +137,19 @@ export class IDLRoutineHelper {
         case idlRoutines.functions[str]:
           item.insertText = item.label + "(";
           item.kind = CompletionItemKind.Function;
-          this.functions[item.label.toLowerCase()] = true;
+          this.functions[item.label.toLowerCase()] = idx;
           break;
         case idlRoutines.procedures[str]:
           item.insertText = item.label + ",";
           item.kind = CompletionItemKind.Function;
-          this.procedures[item.label.toLowerCase()] = true;
+          this.procedures[item.label.toLowerCase()] = idx;
           break;
         case item.label.startsWith("!"):
           item.kind = CompletionItemKind.Constant;
+          this.constants[item.label.toLowerCase()] = idx;
           break;
         default:
+          this.other[item.label.toLowerCase()] = idx;
           item.kind = CompletionItemKind.Text;
       }
 

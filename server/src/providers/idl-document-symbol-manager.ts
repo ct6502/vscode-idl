@@ -11,12 +11,14 @@ import {
   TextDocuments,
   WorkspaceFolder,
   TextDocumentPositionParams,
-  Definition
+  Definition,
+  CompletionItem
 } from "vscode-languageserver";
 import moize from "moize";
 import {
   IDLDocumentSymbolExtractor,
-  IDLDocumentSymbol
+  IDLDocumentSymbol,
+  resolveCompletionItemKind
 } from "./idl-document-symbol-extractor";
 
 // get our globby code
@@ -33,17 +35,26 @@ const searchOptions = {
   // threshold: -10000 // don't return bad results
 };
 
+// options for controlling search performance
+const completionOptions = {
+  limit: 50, // don't return more results than you need!
+  allowTypo: true // if you don't care about allowing typos
+  // threshold: -10000 // don't return bad results
+};
+
 // define structure for our moize searches to cache the promises for async documentation generation
 interface ISearches {
   documentSymbols: (uri: string) => Promise<IDLDocumentSymbol[]>;
   documentSymbolInformation: (uri: string) => Promise<SymbolInformation[]>;
 }
 
+// cache symbol information for the document
 export interface IMoizes {
   documentSymbols: any;
   documentSymbolInformation: any;
 }
 
+// store location of symbol and the symbol
 interface ISymbolLookup {
   uri: string;
   symbol: DocumentSymbol;
@@ -74,6 +85,7 @@ export class IDLDocumentSymbolManager {
     // each symbol has an array of matches because we could have multiple definitions
     const symbolInfo: SymbolInformation[] = [];
     results.forEach(symbols => {
+      // process all matches for that symbol name
       symbols.forEach(lookup => {
         symbolInfo.push({
           name: lookup.symbol.name,
@@ -84,6 +96,45 @@ export class IDLDocumentSymbolManager {
       });
     });
     return symbolInfo;
+  }
+
+  // handle completion items
+  // return items from the docs for completion
+  completion(
+    query: string, _textDocumentPosition: TextDocumentPositionParams
+  ): CompletionItem[] {
+    // get the keys that match
+    const results = fuzzysort
+      .go(query, this.symbolKeysSearch, searchOptions)
+      .map(match => this.symbols[match.target]);
+
+    // make sure we only send one symbol at a time, could get crazy with larger workspaces
+    const foundSymbols = [];
+
+    // get our completion items
+    const items: CompletionItem[] = [];
+    results.forEach(symbols => {
+      symbols.forEach(lookup => {
+        if (foundSymbols.indexOf(lookup.symbol.name) === -1) {
+          let ok = true;
+
+          // only show variables within the document we are searching from
+          if (lookup.symbol.kind === SymbolKind.Variable && lookup.uri !== _textDocumentPosition.textDocument.uri) {
+            ok = false;
+          }
+
+          // check if we can show it
+          if (ok) {
+            foundSymbols.push(lookup.symbol.name)
+            items.push({
+              label: lookup.symbol.name,
+              kind: resolveCompletionItemKind(lookup.symbol.kind)
+            });
+          }
+        }
+      });
+    });
+    return items;
   }
 
   getSelectedSymbolName(params: TextDocumentPositionParams): string {

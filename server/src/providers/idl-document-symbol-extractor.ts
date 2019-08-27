@@ -4,7 +4,8 @@ import {
   SymbolKind,
   Location,
   Range,
-  Position
+  Position,
+  CompletionItemKind
 } from "vscode-languageserver";
 
 export interface IDLDocumentSymbol extends DocumentSymbol {
@@ -36,6 +37,26 @@ function resolveRoutineType(match: string): SymbolKind {
       break;
     default:
       return SymbolKind.Function;
+  }
+}
+
+// get the proper symbol type for what we found, just for routines now
+export function resolveCompletionItemKind(symbol: SymbolKind): CompletionItemKind {
+  switch (symbol) {
+    case SymbolKind.Method:
+      return CompletionItemKind.Method;
+      break;
+    case SymbolKind.Class:
+      return CompletionItemKind.Class;
+      break;
+    case SymbolKind.Function:
+      return CompletionItemKind.Function;
+      break;
+    case SymbolKind.Variable:
+      return CompletionItemKind.Variable;
+      break;
+    default:
+      return CompletionItemKind.Text;
   }
 }
 
@@ -222,7 +243,7 @@ export class IDLDocumentSymbolExtractor {
         const symbol: IDLDocumentSymbol = DocumentSymbol.create(
           match,
           "Variable",
-          SymbolKind.Constant,
+          SymbolKind.Variable,
           range,
           range
         );
@@ -259,7 +280,7 @@ export class IDLDocumentSymbolExtractor {
 
     // split by words to extract our symbol that we may have clicked on
     // TODO: add logic for objects and methods here, func/pro are good for now
-    const wordRegEx = /[a-z_][a-z0-9_$]*/gim;
+    const wordRegEx = /[a-z_][a-z0-9:_$]*/gim;
     let m: RegExpExecArray;
     while ((m = wordRegEx.exec(line)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
