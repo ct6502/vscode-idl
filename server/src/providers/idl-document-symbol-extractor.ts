@@ -193,7 +193,8 @@ export class IDLDocumentSymbolExtractor {
     const symbols: IDLDocumentSymbol[] = [];
 
     // find all procedure definitions
-    const proRegex = /(?!continue|begin|endif)(?<=^\s*|then |else )[a-z_][a-z_$0-9\s]*(?=\b\s*\=)/gim;
+    // (skip if line continuation)(dont use if continue, begin, or endif is ahead)(ok for start or in if statements)
+    const proRegex = /(?<!\$.*\n^\s*)(?!continue|begin|endif)(?<=^\s*|then |else )[a-z_][a-z_$0-9\s]*(?=\b\s*\=)/gmi;
     let m: RegExpExecArray;
     while ((m = proRegex.exec(text)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -243,6 +244,19 @@ export class IDLDocumentSymbolExtractor {
     // placeholder for the name
     let symbolName = "";
 
+    // get the character position - move to the left so that we are in a word
+    // otherwise we are outside a word as we are on the next character
+    // which is usuallya  space
+    let useChar = position.character
+    if (position.character > 0) {
+      useChar = useChar - 1;
+
+      // check if zero, then just try and return the first character
+      if (useChar === 0) {
+        return line.substr(0, 1).trim();
+      }
+    }
+
     // split by words to extract our symbol that we may have clicked on
     // TODO: add logic for objects and methods here, func/pro are good for now
     const wordRegEx = /[a-z_][a-z0-9_$]*/gim;
@@ -258,8 +272,8 @@ export class IDLDocumentSymbolExtractor {
         if (idx !== -1) {
           // check if we have a match
           if (
-            idx < position.character &&
-            idx + m[i].length > position.character
+            idx < useChar &&
+            idx + m[i].length > useChar
           ) {
             symbolName = m[i];
             break;
@@ -273,6 +287,35 @@ export class IDLDocumentSymbolExtractor {
 
     return symbolName;
   }
+
+
+  getClosestWord(line: string, position: Position): string {
+    // get the character position - move to the left so that we are in a word
+    // otherwise we are outside a word as we are on the next character
+    // which is usuallya  space
+    let useChar = position.character
+    if (position.character > 0) {
+      useChar = useChar - 1;
+    }
+
+    // https://ourcodeworld.com/articles/read/223/how-to-retrieve-the-closest-word-in-a-string-with-a-given-index-in-javascript
+    // Perform type conversions.
+    const str = String(line);
+    const pos = Number(useChar) >>> 0;
+
+    // Search for the word's beginning and end.
+    var left = str.slice(0, pos + 1).search(/\S+$/),
+      right = str.slice(pos).search(/\s/);
+
+    // The last word in the string is a special case.
+    if (right < 0) {
+      return str.slice(left);
+    }
+
+    // Return the word, using the located bounds to extract it from the string.
+    return str.slice(left, right + pos);
+  }
+
 
   symbolizeAsDocumentSymbols(text: string, uri: string): IDLDocumentSymbol[] {
     // init array of symbols

@@ -86,18 +86,23 @@ export class IDLDocumentSymbolManager {
     return symbolInfo;
   }
 
-  // search for symbols by line
-  searchByLine(params: TextDocumentPositionParams): Definition {
+  getSelectedSymbolName(params: TextDocumentPositionParams): string {
     // read the strings from our text document
     const line = this._getStrings(params.textDocument.uri).split("\n")[
       params.position.line
     ];
 
+    // get the symbol highlighted
+    return this.extractor.getSelectedWord(line, params.position);
+  }
+
+  // search for symbols by line
+  searchByLine(params: TextDocumentPositionParams, limit = true): Definition {
+    // get the highlighted symbol name
+    const symbolName = this.getSelectedSymbolName(params);
+
     // create a placeholder to return
     let placeholder: Definition = null;
-
-    // get the symbol highlighted
-    const symbolName = this.extractor.getSelectedWord(line, params.position);
 
     // make sure that we only have one match, no idea why we wouldn't have a match here
     if (symbolName !== "") {
@@ -105,7 +110,12 @@ export class IDLDocumentSymbolManager {
 
       // make sure that we have only one match
       if (symbols.length > 0) {
-        if (symbols[0].name.toLowerCase() === symbolName.toLowerCase()) {
+        // are we limiting results and being strict, or loosey goosey?
+        if (limit) {
+          if (symbols[0].name.toLowerCase() === symbolName.toLowerCase()) {
+            placeholder = symbols[0].location;
+          }
+        } else {
           placeholder = symbols[0].location;
         }
       }
@@ -239,6 +249,8 @@ export class IDLDocumentSymbolManager {
               text,
               uri
             );
+
+            // process all of the symbols that we found
             foundSymbols.forEach(symbol => {
               // make our symbol lookup information
               const info: ISymbolLookup = {

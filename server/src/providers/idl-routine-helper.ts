@@ -6,28 +6,50 @@ import {
   Connection,
   TextDocuments
 } from "vscode-languageserver";
+import fuzzysort = require("fuzzysort"); // search through the symbols
+import { IDLDocumentSymbolManager } from "./idl-document-symbol-manager";
 
-// class definition
+// options for controlling search performance
+const searchOptions = {
+  limit: 50, // don't return more results than you need!
+  allowTypo: true // if you don't care about allowing typos
+  // threshold: -10000 // don't return bad results
+};
+
+// class definition for object that extracts routines from the help content
+// and eventually will get docs from things like comments
 export class IDLRoutineHelper {
   connection: Connection;
   documents: TextDocuments;
+  manager: IDLDocumentSymbolManager;
   routines: IRoutines;
   functions: { [key: string]: boolean } = {};
   procedures: { [key: string]: boolean } = {};
+  routineKeys = [];
+  routineKeysSearch: any[] = [];
 
-  constructor(connection: Connection, documents: TextDocuments) {
+  constructor(connection: Connection, documents: TextDocuments, manager: IDLDocumentSymbolManager) {
     this.connection = connection;
     this.documents = documents;
+    this.manager = manager;
+    this.routineKeys = [];
+    this.routineKeysSearch = [];
     this.routines = this._parseRoutines();
   }
 
-  // The pass parameter contains the position of the text document in
-  // which code complete got requested. For the example we ignore this
-  // info and always provide the same completion items.
+  // return items from the docs for completion
   completion(
     _textDocumentPosition: TextDocumentPositionParams
   ): CompletionItem[] {
-    return this.routines.docs;
+    // get the symbol that we are auto-completing
+    const query = this.manager.getSelectedSymbolName(_textDocumentPosition)
+
+    // search, map to indices, filter by matches in our array, map to the completion items
+    return fuzzysort
+      .go(query, this.routineKeysSearch, searchOptions)
+      .map(match => this.routineKeys.indexOf(match.target))
+      .filter(idx => idx !== -1)
+      .map(idx => this.routines.docs[idx]);
   }
 
   // after we use auto-complete on an item, do anything afterwards to clean it up?
@@ -56,6 +78,10 @@ export class IDLRoutineHelper {
       if (item.label === null) {
         item.label = "!null";
       }
+
+      // save our label information
+      this.routineKeys.push(item.label);
+      this.routineKeysSearch.push(fuzzysort.prepare(item.label));
 
       // handle setting proper information for our data things and such
       switch (true) {
