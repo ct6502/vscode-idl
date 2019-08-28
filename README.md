@@ -8,7 +8,9 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 
 ## Features
 
-* Function/procedure completion for  built in ENVI + IDL routines
+* Function/procedure completion for built in ENVI + IDL routines
+
+* Function/procedure/variable completion for user defined routines in workspaces and opened files
 
 * Go-to definition for functions and procedures (not methods)
 

@@ -46,32 +46,32 @@ export class IDLRoutineHelper {
     // search, map to indices, filter by matches in our array, map to the completion items
     return this.routines.docs
 
-    // search for our matches
-    const matches = fuzzysort.go(query, this.routineKeysSearch, searchOptions);
+    // // search for our matches
+    // const matches = fuzzysort.go(query, this.routineKeysSearch, searchOptions);
 
-    // potentially can be 30% faster method for searching with manual loops
-    // old code is below
-    const items: CompletionItem[] = []
-    for (let idx = 0; idx < matches.length; idx++) {
-      const lc = matches[idx].target.toLowerCase();
-      // handle setting proper information for our data things and such
-      switch (true) {
-        case (lc in this.functions):
-          items.push(this.routines.docs[this.functions[lc]])
-          break;
-        case (lc in this.procedures):
-          items.push(this.routines.docs[this.procedures[lc]])
-          break;
-        case (lc in this.constants):
-          items.push(this.routines.docs[this.constants[lc]])
-          break;
-        case (lc in this.other):
-          items.push(this.routines.docs[this.other[lc]])
-          break;
-        default:
-          return // DO NBOTHING
-      }
-    }
+    // // potentially can be 30% faster method for searching with manual loops
+    // // old code is below
+    // const items: CompletionItem[] = []
+    // for (let idx = 0; idx < matches.length; idx++) {
+    //   const lc = matches[idx].target.toLowerCase();
+    //   // handle setting proper information for our data things and such
+    //   switch (true) {
+    //     case (lc in this.functions):
+    //       items.push(this.routines.docs[this.functions[lc]])
+    //       break;
+    //     case (lc in this.procedures):
+    //       items.push(this.routines.docs[this.procedures[lc]])
+    //       break;
+    //     case (lc in this.constants):
+    //       items.push(this.routines.docs[this.constants[lc]])
+    //       break;
+    //     case (lc in this.other):
+    //       items.push(this.routines.docs[this.other[lc]])
+    //       break;
+    //     default:
+    //       return // DO NBOTHING
+    //   }
+    // }
 
     // method to get our items with maps and filters, can be 8 ms (42 vs 16) slower than below
     // const items =
@@ -98,7 +98,7 @@ export class IDLRoutineHelper {
     //     .filter(idx => idx !== -1)
     //     .map(idx => this.routines.docs[idx]);
 
-    return items
+    // return items
   }
 
   // after we use auto-complete on an item, do anything afterwards to clean it up?

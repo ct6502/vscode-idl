@@ -68,6 +68,10 @@ export class IDLDocumentSymbolManager {
   symbolKeysSearch: any[] = [];
   extractor: IDLDocumentSymbolExtractor;
 
+  // Track constants by file and routines by all files we have opened
+  constantLookup: { [key: string]: CompletionItem[] } = {};
+  routineLookup: { [key: string]: CompletionItem } = {};
+
   constructor(connection: Connection, documents: TextDocuments) {
     this.connection = connection;
     this.documents = documents;
@@ -103,38 +107,60 @@ export class IDLDocumentSymbolManager {
   completion(
     query: string, _textDocumentPosition: TextDocumentPositionParams
   ): CompletionItem[] {
-    // get the keys that match
-    const results = fuzzysort
-      .go(query, this.symbolKeysSearch, searchOptions)
-      .map(match => this.symbols[match.target]);
+    // get the file we are in
+    const uri = _textDocumentPosition.textDocument.uri;
 
-    // make sure we only send one symbol at a time, could get crazy with larger workspaces
-    const foundSymbols = [];
+    // init return value
+    let items: CompletionItem[] = [];
 
-    // get our completion items
-    const items: CompletionItem[] = [];
-    results.forEach(symbols => {
-      symbols.forEach(lookup => {
-        if (foundSymbols.indexOf(lookup.symbol.name) === -1) {
-          let ok = true;
+    // get constants for our file
+    if (uri in this.constantLookup) {
+      items = this.constantLookup[uri];
+    }
 
-          // only show variables within the document we are searching from
-          if (lookup.symbol.kind === SymbolKind.Variable && lookup.uri !== _textDocumentPosition.textDocument.uri) {
-            ok = false;
-          }
+    // merge with all of our symbols if we have user routines
+    if (Object.keys(this.routineLookup).length > 0) {
+      if (items.length === 0) {
+        items = Object.values(this.routineLookup);
+      } else {
+        items = items.concat(Object.values(this.routineLookup));
+      }
+    }
 
-          // check if we can show it
-          if (ok) {
-            foundSymbols.push(lookup.symbol.name)
-            items.push({
-              label: lookup.symbol.name,
-              kind: resolveCompletionItemKind(lookup.symbol.kind)
-            });
-          }
-        }
-      });
-    });
     return items;
+
+    // // get the keys that match
+    // const results = fuzzysort
+    //   .go(query, this.symbolKeysSearch, searchOptions)
+    //   .map(match => this.symbols[match.target]);
+
+    // // make sure we only send one symbol at a time, could get crazy with larger workspaces
+    // const foundSymbols = [];
+
+    // // get our completion items
+    // const items: CompletionItem[] = [];
+    // results.forEach(symbols => {
+    //   symbols.forEach(lookup => {
+    //     if (foundSymbols.indexOf(lookup.symbol.name) === -1) {
+    //       let ok = true;
+
+    //       // only show variables within the document we are searching from
+    //       if (lookup.symbol.kind === SymbolKind.Variable && lookup.uri !== _textDocumentPosition.textDocument.uri) {
+    //         ok = false;
+    //       }
+
+    //       // check if we can show it
+    //       if (ok) {
+    //         foundSymbols.push(lookup.symbol.name)
+    //         items.push({
+    //           label: lookup.symbol.name,
+    //           kind: resolveCompletionItemKind(lookup.symbol.kind)
+    //         });
+    //       }
+    //     }
+    //   });
+    // });
+    // return items;
   }
 
   getSelectedSymbolName(params: TextDocumentPositionParams): string {
@@ -176,38 +202,53 @@ export class IDLDocumentSymbolManager {
 
   // when we remove a document, clean up the symbol lookup information
   private _removeSymbols(uri: string, symbols: DocumentSymbol[]) {
+    // clear constant lookup
+    delete this.constantLookup[uri]
+
+    // process each symbol
     symbols.forEach(symbol => {
       // get the key
       const key = symbol.name.toLowerCase();
 
-      // clean up a single entry
-      if (this.symbols[key].length === 1) {
-        const idx = this.symbolKeys.indexOf(key);
-        // remove the lookup
-        if (idx !== -1) {
-          this.symbolKeys.splice(idx, 1);
-          this.symbolKeysSearch.splice(idx, 1);
-        }
-        delete this.symbols[key];
-      } else {
-        // init index
-        let remove: number[] = [];
+      // clean up routine lookup for functions and procedures
+      if (key in this.routineLookup) {
+        delete this.routineLookup[key]
+      }
+      if (key + '(' in this.routineLookup) {
+        delete this.routineLookup[key + '(']
+      }
 
-        // TODO: for more than function names, use some rigor for matching symbols
-        // as we can have multiple symbols with the same name that are different entities
-        // compare each document with a match for that symbol
-        this.symbols[key].forEach((docMatch, dIdx) => {
-          if (docMatch.uri === uri) {
-            remove.push(dIdx);
+      // make sure we have symbols to clean up
+      if (key in this.symbols) {
+        // clean up a single entry
+        if (this.symbols[key].length === 1) {
+          const idx = this.symbolKeys.indexOf(key);
+          // remove the lookup
+          if (idx !== -1) {
+            this.symbolKeys.splice(idx, 1);
+            this.symbolKeysSearch.splice(idx, 1);
           }
-        });
+          delete this.symbols[key];
+        } else {
+          // init index
+          let remove: number[] = [];
 
-        // delete if we found a match
-        if (remove.length > 0) {
-          remove.reverse();
-          remove.forEach(idx => {
-            this.symbols[key].splice(idx, 1);
+          // TODO: for more than function names, use some rigor for matching symbols
+          // as we can have multiple symbols with the same name that are different entities
+          // compare each document with a match for that symbol
+          this.symbols[key].forEach((docMatch, dIdx) => {
+            if (docMatch.uri === uri) {
+              remove.push(dIdx);
+            }
           });
+
+          // delete if we found a match
+          if (remove.length > 0) {
+            remove.reverse();
+            remove.forEach(idx => {
+              this.symbols[key].splice(idx, 1);
+            });
+          }
         }
       }
     });
@@ -320,7 +361,58 @@ export class IDLDocumentSymbolManager {
                 this.symbolKeys.push(key);
                 this.symbolKeysSearch.push(fuzzysort.prepare(key));
               }
+
+              // build the completion item for our symbol if it is not a constant
+              if (symbol.kind !== SymbolKind.Variable) {
+                const completionItem: CompletionItem = {
+                  label: symbol.name,
+                  kind: resolveCompletionItemKind(symbol.kind)
+                }
+
+                // check if our name has '::'  and just get the method name
+                const split = symbol.name.split('::');
+                let replaceName = '';
+                if (split.length == 1) {
+                  replaceName = symbol.name
+                } else {
+                  replaceName = split[1];
+                }
+
+                // update name with function, procedure, method
+                switch (true) {
+                  case symbol.detail.includes('Function'):
+                    completionItem.insertText = replaceName.substr(0, replaceName.length - 1)
+                    break;
+                  case symbol.detail.includes('Procedure'):
+                    completionItem.insertText = replaceName + ','
+                    break;
+                  default:// do nothing
+                    completionItem.insertText = replaceName;
+                }
+
+                // save in our routine lookip
+                this.routineLookup[symbol.name.toLowerCase()] = completionItem;
+              }
             });
+
+            // save any constants that we may have found, but only if we have one by that name
+            const constantNames = [];
+            this.constantLookup[uri] = foundSymbols.filter(symbol => {
+              let flag = false;
+              if (symbol.kind === SymbolKind.Variable) {
+                const saveName = symbol.name.toLowerCase();
+                if (constantNames.indexOf(saveName) === -1) {
+                  constantNames.push(saveName);
+                  flag = true;
+                }
+              }
+              return flag;
+            }).map(symbol => {
+              return {
+                label: symbol.name,
+                kind: resolveCompletionItemKind(symbol.kind)
+              }
+            })
 
             resolve(foundSymbols);
           } catch (err) {

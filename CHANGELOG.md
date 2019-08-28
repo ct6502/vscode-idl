@@ -4,6 +4,12 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 1.5.3 - 2019-08-27
+
+Auto complete for variables in-file and all routines that have been discovered for your instance of VScode (from workspace and files you have opened)
+
+Fix for incorrect syntax highlighting of the control statement `end`
+
 ## 1.5.2 - 2019-08-25
 
 Corrected the way to add syntax for IDL + ENVI tasks, ENVI style sheets, and ENVI modeler files.
