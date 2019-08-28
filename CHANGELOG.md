@@ -10,6 +10,8 @@ Auto complete for variables in-file and all routines that have been discovered f
 
 Fix for incorrect syntax highlighting of the control statement `end`
 
+Enhanced (and fixed) go-to definitions for functions, procedures, and methods (procedure and function)
+
 ## 1.5.2 - 2019-08-25
 
 Corrected the way to add syntax for IDL + ENVI tasks, ENVI style sheets, and ENVI modeler files.

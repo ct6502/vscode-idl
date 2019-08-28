@@ -12,7 +12,7 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 
 * Function/procedure/variable completion for user defined routines in workspaces and opened files
 
-* Go-to definition for functions and procedures (not methods)
+* Go-to definition for functions, procedures, and methods from user defined routines
 
 * Search for procedure/function definitions through symbols
 

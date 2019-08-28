@@ -261,9 +261,10 @@ export class IDLDocumentSymbolExtractor {
   }
 
 
-  getSelectedWord(line: string, position: Position): string {
+  getSelectedWord(line: string, position: Position): [string, boolean] {
     // placeholder for the name
     let symbolName = "";
+    let functionFlag = false;
 
     // get the character position - move to the left so that we are in a word
     // otherwise we are outside a word as we are on the next character
@@ -274,13 +275,13 @@ export class IDLDocumentSymbolExtractor {
 
       // check if zero, then just try and return the first character
       if (useChar === 0) {
-        return line.substr(0, 1).trim();
+        return [line.substr(0, 1).trim(), functionFlag];
       }
     }
 
     // split by words to extract our symbol that we may have clicked on
     // TODO: add logic for objects and methods here, func/pro are good for now
-    const wordRegEx = /[a-z_][a-z0-9:_$]*/gim;
+    const wordRegEx = /[a-z_][\.a-z0-9:_$\-\>]*/gim;
     let m: RegExpExecArray;
     while ((m = wordRegEx.exec(line)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -297,6 +298,7 @@ export class IDLDocumentSymbolExtractor {
             idx + m[i].length > useChar
           ) {
             symbolName = m[i];
+            functionFlag = line.substr(idx + m[i].length, 1) === '('
             break;
           }
         }
@@ -306,7 +308,7 @@ export class IDLDocumentSymbolExtractor {
       }
     }
 
-    return symbolName;
+    return [symbolName, functionFlag];
   }
 
 

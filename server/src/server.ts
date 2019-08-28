@@ -214,7 +214,7 @@ connection.onCompletion(
     // get the word that we are trying to complete
     // do this here just so we dont have to split larger files more than once
     // because we need the strings, split, and regex to find our work
-    const query = symbolProvider.getSelectedSymbolName(_textDocumentPosition)
+    const query = symbolProvider.getSelectedSymbolName(_textDocumentPosition)[0]
 
     // get docs matches
     // const start1: any = new Date();
@@ -253,7 +253,7 @@ connection.onWorkspaceSymbol(
 // handle when we want the definition of a symbol
 connection.onDefinition(
   (params: TextDocumentPositionParams): Definition => {
-    const res = symbolProvider.searchByLine(params);
+    const res = symbolProvider.searchByLine(params, true);
     return res;
   }
 );
@@ -272,7 +272,7 @@ connection.onDocumentSymbol(
   ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
     return (await symbolProvider.get.documentSymbols(
       params.textDocument.uri
-    )).filter(symbol => { return symbol.kind !== SymbolKind.Constant }).map(symbol => {
+    )).filter(symbol => { return symbol.kind !== SymbolKind.Variable }).map(symbol => {
       return {
         name: symbol.displayName,
         detail: symbol.detail,

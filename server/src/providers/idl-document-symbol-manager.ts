@@ -69,8 +69,9 @@ export class IDLDocumentSymbolManager {
   extractor: IDLDocumentSymbolExtractor;
 
   // Track constants by file and routines by all files we have opened
-  constantLookup: { [key: string]: CompletionItem[] } = {};
-  routineLookup: { [key: string]: CompletionItem } = {};
+  constantCompletionLookup: { [key: string]: CompletionItem[] } = {};
+  routineCompletionLookup: { [key: string]: CompletionItem } = {};
+  routineSymbolLookup: { [key: string]: DocumentSymbol } = {};
 
   constructor(connection: Connection, documents: TextDocuments) {
     this.connection = connection;
@@ -114,16 +115,16 @@ export class IDLDocumentSymbolManager {
     let items: CompletionItem[] = [];
 
     // get constants for our file
-    if (uri in this.constantLookup) {
-      items = this.constantLookup[uri];
+    if (uri in this.constantCompletionLookup) {
+      items = this.constantCompletionLookup[uri];
     }
 
     // merge with all of our symbols if we have user routines
-    if (Object.keys(this.routineLookup).length > 0) {
+    if (Object.keys(this.routineCompletionLookup).length > 0) {
       if (items.length === 0) {
-        items = Object.values(this.routineLookup);
+        items = Object.values(this.routineCompletionLookup);
       } else {
-        items = items.concat(Object.values(this.routineLookup));
+        items = items.concat(Object.values(this.routineCompletionLookup));
       }
     }
 
@@ -163,7 +164,7 @@ export class IDLDocumentSymbolManager {
     // return items;
   }
 
-  getSelectedSymbolName(params: TextDocumentPositionParams): string {
+  getSelectedSymbolName(params: TextDocumentPositionParams): [string, boolean] {
     // read the strings from our text document
     const line = this._getStrings(params.textDocument.uri).split("\n")[
       params.position.line
@@ -176,7 +177,20 @@ export class IDLDocumentSymbolManager {
   // search for symbols by line
   searchByLine(params: TextDocumentPositionParams, limit = true): Definition {
     // get the highlighted symbol name
-    const symbolName = this.getSelectedSymbolName(params);
+    const res = this.getSelectedSymbolName(params);
+    let symbolName = res[0].toLowerCase();
+    const functionFlag = res[1];
+
+    // check if we need to clean up the name
+    switch (true) {
+      case symbolName.includes('.'):
+        symbolName = '::' + symbolName.split('.')[1]
+        break;
+      case symbolName.includes('->'):
+        symbolName = '::' + symbolName.split('->')[1]
+        break;
+      default:// do nothing
+    }
 
     // create a placeholder to return
     let placeholder: Definition = null;
@@ -189,8 +203,24 @@ export class IDLDocumentSymbolManager {
       if (symbols.length > 0) {
         // are we limiting results and being strict, or loosey goosey?
         if (limit) {
-          if (symbols[0].name.toLowerCase() === symbolName.toLowerCase()) {
-            placeholder = symbols[0].location;
+          switch (true) {
+            // function method
+            case symbolName.includes('::') && symbols[0].name.toLowerCase().endsWith(symbolName + '()') && functionFlag:
+              placeholder = symbols[0].location;
+              break;
+            // procedure method
+            case symbolName.includes('::') && symbols[0].name.toLowerCase().endsWith(symbolName):
+              placeholder = symbols[0].location;
+              break;
+            // function
+            case symbols[0].name.toLowerCase() === symbolName + '()' && functionFlag:
+              placeholder = symbols[0].location;
+              break;
+            // procedure
+            case symbols[0].name.toLowerCase() === symbolName:
+              placeholder = symbols[0].location;
+              break;
+            default: // do nothing
           }
         } else {
           placeholder = symbols[0].location;
@@ -203,7 +233,7 @@ export class IDLDocumentSymbolManager {
   // when we remove a document, clean up the symbol lookup information
   private _removeSymbols(uri: string, symbols: DocumentSymbol[]) {
     // clear constant lookup
-    delete this.constantLookup[uri]
+    delete this.constantCompletionLookup[uri]
 
     // process each symbol
     symbols.forEach(symbol => {
@@ -211,11 +241,14 @@ export class IDLDocumentSymbolManager {
       const key = symbol.name.toLowerCase();
 
       // clean up routine lookup for functions and procedures
-      if (key in this.routineLookup) {
-        delete this.routineLookup[key]
+      if (key in this.routineCompletionLookup) {
+        delete this.routineCompletionLookup[key]
       }
-      if (key + '(' in this.routineLookup) {
-        delete this.routineLookup[key + '(']
+      if (key + '(' in this.routineCompletionLookup) {
+        delete this.routineCompletionLookup[key + '(']
+      }
+      if (key in this.routineSymbolLookup) {
+        delete this.routineSymbolLookup[key]
       }
 
       // make sure we have symbols to clean up
@@ -344,26 +377,30 @@ export class IDLDocumentSymbolManager {
 
             // process all of the symbols that we found
             foundSymbols.forEach(symbol => {
-              // make our symbol lookup information
-              const info: ISymbolLookup = {
-                uri: uri,
-                symbol: symbol
-              };
-
-              // get the key
-              const key = symbol.name.toLowerCase();
-
-              // save in our lookup table
-              if (this.symbols[key]) {
-                this.symbols[key].push(info);
-              } else {
-                this.symbols[key] = [info];
-                this.symbolKeys.push(key);
-                this.symbolKeysSearch.push(fuzzysort.prepare(key));
-              }
-
               // build the completion item for our symbol if it is not a constant
               if (symbol.kind !== SymbolKind.Variable) {
+                // make our symbol lookup information
+                const info: ISymbolLookup = {
+                  uri: uri,
+                  symbol: symbol
+                };
+
+                // get the key
+                const key = symbol.name.toLowerCase();
+
+                // save in our lookup table
+                if (this.symbols[key]) {
+                  this.symbols[key].push(info);
+                } else {
+                  this.symbols[key] = [info];
+                  this.symbolKeys.push(key);
+                  this.symbolKeysSearch.push(fuzzysort.prepare(key));
+                }
+
+                // save our routine symbol lookup
+                this.routineSymbolLookup[key] = symbol;
+
+                // save compeltion information
                 const completionItem: CompletionItem = {
                   label: symbol.name,
                   kind: resolveCompletionItemKind(symbol.kind)
@@ -390,14 +427,14 @@ export class IDLDocumentSymbolManager {
                     completionItem.insertText = replaceName;
                 }
 
-                // save in our routine lookip
-                this.routineLookup[symbol.name.toLowerCase()] = completionItem;
+                // save in our routine lookup
+                this.routineCompletionLookup[key] = completionItem;
               }
             });
 
             // save any constants that we may have found, but only if we have one by that name
             const constantNames = [];
-            this.constantLookup[uri] = foundSymbols.filter(symbol => {
+            this.constantCompletionLookup[uri] = foundSymbols.filter(symbol => {
               let flag = false;
               if (symbol.kind === SymbolKind.Variable) {
                 const saveName = symbol.name.toLowerCase();
