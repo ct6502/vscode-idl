@@ -215,7 +215,7 @@ export class IDLDocumentSymbolExtractor {
 
     // find all procedure definitions
     // (skip if line continuation)(dont use if continue, begin, or endif is ahead)(ok for start or in if statements)
-    const proRegex = /(?<!\$.*\n^\s*)(?!continue|begin|endif)(?<=^\s*|then |else )[a-z_][a-z_$0-9\s]*(?=\b\s*\=)/gmi;
+    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(?=\s*=)/gmi;
     let m: RegExpExecArray;
     while ((m = proRegex.exec(text)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
