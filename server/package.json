@@ -13,7 +13,7 @@
 		"node": "*"
 	},
 	"scripts": {
-		"test": "ava",
+		"test": "npm run clean && ava",
 		"clean": "rimraf dist",
 		"compile": "tsc -b",
 		"webpack": "npm run clean && webpack --mode production --watch",

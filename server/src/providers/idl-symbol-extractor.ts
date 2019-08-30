@@ -265,7 +265,7 @@ export class IDLSymbolExtractor {
   }
 
 
-  getSelectedWord(line: string, position: Position): [string, boolean] {
+  getSelectedWord(line: string, position: Position): { name: string, isFunction: boolean } {
     // placeholder for the name
     let symbolName = "";
     let functionFlag = false;
@@ -279,7 +279,7 @@ export class IDLSymbolExtractor {
 
       // check if zero, then just try and return the first character
       if (useChar === 0) {
-        return [line.substr(0, 1).trim(), functionFlag];
+        return { name: line.substr(0, 1).trim(), isFunction: functionFlag };
       }
     }
 
@@ -312,7 +312,7 @@ export class IDLSymbolExtractor {
       }
     }
 
-    return [symbolName, functionFlag];
+    return { name: symbolName, isFunction: functionFlag };
   }
 
   symbolizeAsDocumentSymbols(text: string): IDLDocumentSymbol[] {

@@ -74,20 +74,6 @@ export class IDLRoutineHelper {
     }
   }
 
-  // after we use auto-complete on an item, do anything afterwards to clean it up?
-  postCompletion(item: CompletionItem): CompletionItem {
-    // // get the id
-    // const key = item.data.toString();
-
-    // // check if function or procedure
-    // switch (true) {
-    // 	default:
-    // 		// do nothing
-    // }
-    return item;
-  }
-
-
   // method for loading all of our routines into memory from the JSON file on disk
   private _parseRoutines(): IRoutines {
     // load our different routines

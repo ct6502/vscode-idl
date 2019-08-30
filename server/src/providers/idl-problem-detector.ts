@@ -172,6 +172,12 @@ export class IDLProblemDetector {
   }
 
   // detect problems and send to the client
+  detectProblems() {
+    // detect problems
+    this._detectProblems();
+  }
+
+  // detect problems and send to the client
   detectAndSendProblems() {
     // detect problems
     this._detectProblems();

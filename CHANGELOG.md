@@ -4,6 +4,12 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+
+Abstracted providers and created parent object to wrap all the connected apis in preparation for testing
+
+Added ava as the tester
+
 ## [1.5.4] - 2019-08-29
 
 Fixed regex for variables, it was picking up multi-line statements.

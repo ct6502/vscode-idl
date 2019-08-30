@@ -16,8 +16,7 @@ import {
   DocumentSymbolParams,
   DocumentFilter,
   DocumentSymbol,
-  Definition,
-  SymbolKind
+  Definition
 } from "vscode-languageserver";
 import { IDL } from "./providers/idl";
 
@@ -88,11 +87,7 @@ connection.onInitialized(async () => {
       .getWorkspaceFolders()
       .then(
         async folders => {
-          // refresh our index and detect problems on success
-          await idl.manager.indexWorkspaces(folders)
-
-          // find problems
-          idl.problems.detectAndSendProblems();
+          await idl.indexWorkspace(folders, true);
         },
         rejected => {
           connection.console.log(JSON.stringify(rejected));
@@ -102,17 +97,15 @@ connection.onInitialized(async () => {
         connection.console.log(JSON.stringify(rejected));
       });
 
-    connection.workspace.connection.workspace // listen for new workspaces
+    // listen for new workspaces
+    connection.workspace.connection.workspace
       .onDidChangeWorkspaceFolders(async _event => {
         connection.console.log(
           "Workspace folder change event received. " + JSON.stringify(_event)
         );
 
-        // refresh our index and detect problems on success
-        await idl.manager.indexWorkspaces(_event.added)
-
-        // find problems
-        idl.problems.detectAndSendProblems();
+        // index/change folders!
+        await idl.indexWorkspace(_event.added, true);
       });
   }
 });
@@ -142,7 +135,7 @@ connection.onDidChangeConfiguration(change => {
   }
 
   // Revalidate all open text documents
-  idl.problems.detectAndSendProblems();
+  idl.detectProblems(true);
 });
 
 function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
@@ -167,22 +160,8 @@ connection.onDidChangeWatchedFiles(_change => {
 
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
-  (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    // get the word that we are trying to complete
-    // do this here just so we dont have to split larger files more than once
-    // because we need the strings, split, and regex to find our work
-    const query = idl.manager.getSelectedSymbolName(_textDocumentPosition)[0]
-
-    // get docs matches
-    let docsMatches = idl.helper.completion(query)
-
-    // get symbol matches
-    const symMatches = idl.manager.completion(query, _textDocumentPosition)
-    if (symMatches.length > 0) {
-      docsMatches = docsMatches.concat(symMatches)
-    }
-
-    return docsMatches
+  (position: TextDocumentPositionParams): CompletionItem[] => {
+    return idl.getCompletionItems(position)
   }
 );
 
@@ -190,22 +169,21 @@ connection.onCompletion(
 // request gets back to the client
 connection.onCompletionResolve(
   (item: CompletionItem): CompletionItem => {
-    return idl.helper.postCompletion(item);
+    return idl.postCompletion(item);
   }
 );
 
 // handle when a user searches for a symbol
 connection.onWorkspaceSymbol(
   (params: WorkspaceSymbolParams): SymbolInformation[] => {
-    return idl.manager.searchByName(params.query);
+    return idl.findSymbolsByName(params.query);
   }
 );
 
 // handle when we want the definition of a symbol
 connection.onDefinition(
   (params: TextDocumentPositionParams): Definition => {
-    const res = idl.manager.searchByLine(params, true);
-    return res;
+    return idl.findSymbolDefinition(params, true);
   }
 );
 
@@ -218,21 +196,8 @@ connection.onDefinition(
 
 // handle when we request document symbols
 connection.onDocumentSymbol(
-  async (
-    params: DocumentSymbolParams
-  ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
-    return (await idl.manager.get.documentSymbols(
-      params.textDocument.uri
-    )).filter(symbol => { return symbol.kind !== SymbolKind.Variable }).map(symbol => {
-      return {
-        name: symbol.displayName,
-        detail: symbol.detail,
-        kind: symbol.kind,
-        range: symbol.range,
-        selectionRange: symbol.selectionRange,
-        children: symbol.children
-      };
-    });
+  async (params: DocumentSymbolParams): Promise<SymbolInformation[] | DocumentSymbol[]> => {
+    return await idl.getDocumentOutline(params);
   }
 );
 
@@ -266,18 +231,11 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(async change => {
-  // generate new symbols with the update, seems to magically sync when there are changes?
-  const newSymbols = await idl.manager.update(change.document.uri);
-
-  // detect problems because we had change
-  idl.problems.detectAndSendProblems();
+  await idl.updateDocumentSymbols(change, true);
 });
 
-documents.onDidOpen(async event => {
-  await idl.manager.get.documentSymbols(event.document.uri);
-
-  // detect problems because we had change
-  idl.problems.detectAndSendProblems();
+documents.onDidOpen(async opened => {
+  await idl.getDocumentSymbols(opened, true);
 });
 
 // Make the text document manager listen on the connection

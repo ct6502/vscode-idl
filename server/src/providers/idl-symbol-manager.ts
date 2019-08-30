@@ -70,7 +70,7 @@ export class IDLSymbolManager {
   }
 
   // search all of our symbols by name to find what we have
-  searchByName(query: string): SymbolInformation[] {
+  findSymbolsByName(query: string): SymbolInformation[] {
     // get the keys that match
     const results = fuzzysort
       .go(query, this.symbolKeysSearch, searchOptions)
@@ -163,7 +163,7 @@ export class IDLSymbolManager {
     return items;
   }
 
-  getSelectedSymbolName(params: TextDocumentPositionParams): [string, boolean] {
+  getSelectedSymbol(params: TextDocumentPositionParams): { name: string, isFunction: boolean } {
     // read the strings from our text document
     const line = this._getStrings(params.textDocument.uri).split("\n")[
       params.position.line
@@ -174,11 +174,11 @@ export class IDLSymbolManager {
   }
 
   // search for symbols by line
-  searchByLine(params: TextDocumentPositionParams, limit = true): Definition {
+  findSymbolDefinition(params: TextDocumentPositionParams, limit = true): Definition {
     // get the highlighted symbol name
-    const res = this.getSelectedSymbolName(params);
-    let symbolName = res[0].toLowerCase();
-    const functionFlag = res[1];
+    const res = this.getSelectedSymbol(params);
+    let symbolName = res.name.toLowerCase();
+    const functionFlag = res.isFunction;
 
     // check if we need to clean up the name
     switch (true) {
@@ -196,7 +196,7 @@ export class IDLSymbolManager {
 
     // make sure that we only have one match, no idea why we wouldn't have a match here
     if (symbolName !== "") {
-      const symbols = this.searchByName(symbolName);
+      const symbols = this.findSymbolsByName(symbolName);
 
       // make sure that we have only one match
       if (symbols.length > 0) {
@@ -321,7 +321,7 @@ export class IDLSymbolManager {
     // process each folder
     folders.forEach(folder => {
       // get path as actual folder, fix windows symbols from HTML
-      const folderPath = Uri.parse(folders[0].uri).fsPath;
+      const folderPath = Uri.parse(folder.uri).fsPath;
 
       process.chdir(folderPath);
       const files: string[] = glob.readdirSync("**/*.pro");
