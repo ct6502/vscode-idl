@@ -19,9 +19,7 @@ import {
   Definition,
   SymbolKind
 } from "vscode-languageserver";
-import { IDLRoutineHelper } from "./providers/idl-routine-helper";
-import { IDLDocumentSymbolManager } from "./providers/idl-document-symbol-manager";
-import { IDLProblemDetector } from "./providers/idl-problem-detector";
+import { IDL } from "./providers/idl";
 
 const IDL_MODE: DocumentFilter = { language: "idl", scheme: "file" };
 
@@ -33,15 +31,9 @@ let connection = createConnection(ProposedFeatures.all);
 // supports full document sync only
 let documents: TextDocuments = new TextDocuments();
 
-// create all of our helper objects for different requests
-const symbolProvider = new IDLDocumentSymbolManager(connection, documents);
-const routineHelper = new IDLRoutineHelper(connection, documents, symbolProvider);
-const problemDetector = new IDLProblemDetector(
-  connection,
-  documents,
-  symbolProvider,
-  routineHelper
-);
+// create our IDL provider object, which is the object-entry for everything so
+// we can test functionality with object methods rather than APIs
+const idl = new IDL(documents, connection)
 
 // flags for configuration
 let hasConfigurationCapability: boolean = false;
@@ -50,8 +42,6 @@ let hasDiagnosticRelatedInformationCapability: boolean = false;
 
 connection.onInitialize((params: InitializeParams) => {
   let capabilities = params.capabilities;
-
-  // params.workspaceFolders.
 
   // Does the client support the `workspace/configuration` request?
   // If not, we will fall back using global settings
@@ -97,17 +87,12 @@ connection.onInitialized(async () => {
     connection.workspace
       .getWorkspaceFolders()
       .then(
-        folders => {
+        async folders => {
           // refresh our index and detect problems on success
-          symbolProvider
-            .indexWorkspaces(folders)
-            .then(() => {
-              // detect problems because we had change
-              problemDetector.detectAndSendProblems();
-            })
-            .catch(err => {
-              connection.console.log(JSON.stringify(err));
-            });
+          await idl.manager.indexWorkspaces(folders)
+
+          // find problems
+          idl.problems.detectAndSendProblems();
         },
         rejected => {
           connection.console.log(JSON.stringify(rejected));
@@ -124,15 +109,10 @@ connection.onInitialized(async () => {
         );
 
         // refresh our index and detect problems on success
-        await symbolProvider
-          .indexWorkspaces(_event.added)
-          .then(() => {
-            // detect problems because we had change
-            problemDetector.detectAndSendProblems();
-          })
-          .catch(err => {
-            connection.console.log(JSON.stringify(err));
-          });
+        await idl.manager.indexWorkspaces(_event.added)
+
+        // find problems
+        idl.problems.detectAndSendProblems();
       });
   }
 });
@@ -162,7 +142,7 @@ connection.onDidChangeConfiguration(change => {
   }
 
   // Revalidate all open text documents
-  problemDetector.detectAndSendProblems();
+  idl.problems.detectAndSendProblems();
 });
 
 function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
@@ -180,29 +160,6 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
   return result;
 }
 
-// Only keep settings for open documents
-documents.onDidClose(e => {
-  documentSettings.delete(e.document.uri);
-});
-
-// TODO: work with just the changed parts of a document
-// The content of a text document has changed. This event is emitted
-// when the text document first opened or when its content has changed.
-documents.onDidChangeContent(async change => {
-  // generate new symbols with the update, seems to magically sync when there are changes?
-  const newSymbols = await symbolProvider.update(change.document.uri);
-
-  // detect problems because we had change
-  problemDetector.detectAndSendProblems();
-});
-
-documents.onDidOpen(async event => {
-  await symbolProvider.get.documentSymbols(event.document.uri);
-
-  // detect problems because we had change
-  problemDetector.detectAndSendProblems();
-});
-
 connection.onDidChangeWatchedFiles(_change => {
   // Monitored files have change in VSCode
   connection.console.log("We received an file change event");
@@ -214,19 +171,13 @@ connection.onCompletion(
     // get the word that we are trying to complete
     // do this here just so we dont have to split larger files more than once
     // because we need the strings, split, and regex to find our work
-    const query = symbolProvider.getSelectedSymbolName(_textDocumentPosition)[0]
+    const query = idl.manager.getSelectedSymbolName(_textDocumentPosition)[0]
 
     // get docs matches
-    // const start1: any = new Date();
-    let docsMatches = routineHelper.completion(query)
-    // const end1: any = new Date();
-    // connection.console.log(JSON.stringify(end1 - start1));
+    let docsMatches = idl.helper.completion(query)
 
     // get symbol matches
-    // const start2: any = new Date();
-    const symMatches = symbolProvider.completion(query, _textDocumentPosition)
-    // const end2: any = new Date();
-    // connection.console.log(JSON.stringify(end2 - start2));
+    const symMatches = idl.manager.completion(query, _textDocumentPosition)
     if (symMatches.length > 0) {
       docsMatches = docsMatches.concat(symMatches)
     }
@@ -239,28 +190,28 @@ connection.onCompletion(
 // request gets back to the client
 connection.onCompletionResolve(
   (item: CompletionItem): CompletionItem => {
-    return routineHelper.postCompletion(item);
+    return idl.helper.postCompletion(item);
   }
 );
 
 // handle when a user searches for a symbol
 connection.onWorkspaceSymbol(
   (params: WorkspaceSymbolParams): SymbolInformation[] => {
-    return symbolProvider.searchByName(params.query);
+    return idl.manager.searchByName(params.query);
   }
 );
 
 // handle when we want the definition of a symbol
 connection.onDefinition(
   (params: TextDocumentPositionParams): Definition => {
-    const res = symbolProvider.searchByLine(params, true);
+    const res = idl.manager.searchByLine(params, true);
     return res;
   }
 );
 
 // connection.onHover(
 //   (params: TextDocumentPositionParams): Hover => {
-//     const res = symbolProvider.searchByLine(params);
+//     const res = idl.manager.searchByLine(params);
 //     return res;
 //   }
 // )
@@ -270,7 +221,7 @@ connection.onDocumentSymbol(
   async (
     params: DocumentSymbolParams
   ): Promise<SymbolInformation[] | DocumentSymbol[]> => {
-    return (await symbolProvider.get.documentSymbols(
+    return (await idl.manager.get.documentSymbols(
       params.textDocument.uri
     )).filter(symbol => { return symbol.kind !== SymbolKind.Variable }).map(symbol => {
       return {
@@ -304,6 +255,30 @@ connection.onDidCloseTextDocument((params) => {
 	connection.console.log(`${params.textDocument.uri} closed.`);
 });
 */
+
+// listen for changing documents
+// Only keep settings for open documents
+documents.onDidClose(e => {
+  documentSettings.delete(e.document.uri);
+});
+
+// TODO: work with just the changed parts of a document
+// The content of a text document has changed. This event is emitted
+// when the text document first opened or when its content has changed.
+documents.onDidChangeContent(async change => {
+  // generate new symbols with the update, seems to magically sync when there are changes?
+  const newSymbols = await idl.manager.update(change.document.uri);
+
+  // detect problems because we had change
+  idl.problems.detectAndSendProblems();
+});
+
+documents.onDidOpen(async event => {
+  await idl.manager.get.documentSymbols(event.document.uri);
+
+  // detect problems because we had change
+  idl.problems.detectAndSendProblems();
+});
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events

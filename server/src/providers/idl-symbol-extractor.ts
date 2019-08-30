@@ -7,6 +7,7 @@ import {
   Position,
   CompletionItemKind
 } from "vscode-languageserver";
+import { IDL } from "./idl";
 
 export interface IDLDocumentSymbol extends DocumentSymbol {
   displayName?: string;
@@ -60,8 +61,11 @@ export function resolveCompletionItemKind(symbol: SymbolKind): CompletionItemKin
   }
 }
 
-export class IDLDocumentSymbolExtractor {
-  constructor() { }
+export class IDLSymbolExtractor {
+  idl: IDL;
+  constructor(idl: IDL) {
+    this.idl = idl;
+  }
 
   private _extractFunctions(
     text: string,
@@ -311,36 +315,7 @@ export class IDLDocumentSymbolExtractor {
     return [symbolName, functionFlag];
   }
 
-
-  getClosestWord(line: string, position: Position): string {
-    // get the character position - move to the left so that we are in a word
-    // otherwise we are outside a word as we are on the next character
-    // which is usuallya  space
-    let useChar = position.character
-    if (position.character > 0) {
-      useChar = useChar - 1;
-    }
-
-    // https://ourcodeworld.com/articles/read/223/how-to-retrieve-the-closest-word-in-a-string-with-a-given-index-in-javascript
-    // Perform type conversions.
-    const str = String(line);
-    const pos = Number(useChar) >>> 0;
-
-    // Search for the word's beginning and end.
-    var left = str.slice(0, pos + 1).search(/\S+$/),
-      right = str.slice(pos).search(/\s/);
-
-    // The last word in the string is a special case.
-    if (right < 0) {
-      return str.slice(left);
-    }
-
-    // Return the word, using the located bounds to extract it from the string.
-    return str.slice(left, right + pos);
-  }
-
-
-  symbolizeAsDocumentSymbols(text: string, uri: string): IDLDocumentSymbol[] {
+  symbolizeAsDocumentSymbols(text: string): IDLDocumentSymbol[] {
     // init array of symbols
     let symbols: IDLDocumentSymbol[] = [];
     const objects: string[] = [];
@@ -363,7 +338,7 @@ export class IDLDocumentSymbolExtractor {
     const outSymbols: SymbolInformation[] = [];
 
     // process our document symbols
-    this.symbolizeAsDocumentSymbols(text, uri).forEach(symbol => {
+    this.symbolizeAsDocumentSymbols(text).forEach(symbol => {
       // create the location information
       outSymbols.push({
         name: symbol.name,

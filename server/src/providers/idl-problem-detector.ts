@@ -1,36 +1,23 @@
 import {
-  Connection,
-  TextDocuments,
-  Diagnostic,
   DiagnosticSeverity,
   SymbolKind
 } from "vscode-languageserver";
-import { IDLDocumentSymbolManager } from "./idl-document-symbol-manager";
 import { IProblems } from "../core/problems.interface";
-import { IDLRoutineHelper } from "./idl-routine-helper";
+import { IDL } from "./idl";
 
 export class IDLProblemDetector {
-  connection: Connection;
-  documents: TextDocuments;
-  manager: IDLDocumentSymbolManager;
-  helper: IDLRoutineHelper;
+  idl: IDL;
   problems: IProblems = {};
+  previousProblems: string[] = []; // previous problems that we have to cleanif they are no longer problems
 
-  constructor(
-    connection: Connection,
-    documents: TextDocuments,
-    manager: IDLDocumentSymbolManager,
-    helper: IDLRoutineHelper
-  ) {
-    this.connection = connection;
-    this.documents = documents;
-    this.manager = manager;
-    this.helper = helper;
+  constructor(idl: IDL) {
+    this.idl = idl;
+    this.problems = {};
   }
 
-  private _resolveRoutineProblems() {
+  private _detectRoutineNameProblems() {
     // get all of our symbols
-    const symbols = this.manager.symbols;
+    const symbols = this.idl.manager.symbols;
 
     // process each symbol
     Object.keys(symbols).forEach(symbolKey => {
@@ -52,7 +39,7 @@ export class IDLProblemDetector {
           switch (true) {
             // validate class definitions
             case ref.symbol.detail.includes("(class definition)"):
-              if (this.helper.procedures[ref.symbol.name.toLowerCase()]) {
+              if (this.idl.helper.procedures[ref.symbol.name.toLowerCase()]) {
                 if (!this.problems[ref.uri]) {
                   this.problems[ref.uri] = [];
                 }
@@ -68,7 +55,7 @@ export class IDLProblemDetector {
               break;
             // validate function definitions
             case ref.symbol.detail.includes("Function"):
-              if (this.helper.functions[ref.symbol.name.toLowerCase()]) {
+              if (this.idl.helper.functions[ref.symbol.name.toLowerCase()]) {
                 if (!this.problems[ref.uri]) {
                   this.problems[ref.uri] = [];
                 }
@@ -84,7 +71,7 @@ export class IDLProblemDetector {
               break;
             // validate procedure definitions
             case ref.symbol.detail.includes("Procedure"):
-              if (this.helper.procedures[ref.symbol.name.toLowerCase()]) {
+              if (this.idl.helper.procedures[ref.symbol.name.toLowerCase()]) {
                 if (!this.problems[ref.uri]) {
                   this.problems[ref.uri] = [];
                 }
@@ -144,35 +131,52 @@ export class IDLProblemDetector {
     });
   }
 
-  // detect problems and send to the client
-  detectAndSendProblems() {
-    // get existing problem URIs and check if we need to remove problems that
-    // have been fixed
-    const existing = Object.keys(this.problems);
+  // detect all problems, calls the specific methods above
+  _detectProblems() {
+    // save existing problem keys, or add to existing lookup
+    // here just in case we call this twice, dont want to lose problem iniformation
+    // cleared when we send problems
+    if (this.previousProblems.length === 0) {
+      this.previousProblems = Object.keys(this.problems);
+    } else {
+      this.previousProblems = this.previousProblems.concat(Object.keys(this.problems));
+    }
 
-    // clear problems
-    this.problems = {};
+    // detect name conflicts
+    this._detectRoutineNameProblems()
+  }
 
-    // resolve all problems
-    this._resolveRoutineProblems();
-
+  // wrapper to send problems to our connection
+  _sendProblems() {
     // send all problems
     Object.keys(this.problems).forEach(uri => {
-      this.connection.sendDiagnostics({
+      this.idl.connection.sendDiagnostics({
         uri: uri,
         diagnostics: this.problems[uri]
       });
     });
 
-    // if we have files that the problems have been fixed for
-    // then we should clear our the issues so we send empty array
-    existing.forEach(uri => {
+    // check if previous problems have been fixed and, if so, then 
+    // let our connection know it is good to go
+    this.previousProblems.forEach(uri => {
       if (!this.problems[uri]) {
-        this.connection.sendDiagnostics({
+        this.idl.connection.sendDiagnostics({
           uri: uri,
           diagnostics: []
         });
       }
     });
+
+    // clear previous problems as we have sent all of them already
+    this.previousProblems = [];
+  }
+
+  // detect problems and send to the client
+  detectAndSendProblems() {
+    // detect problems
+    this._detectProblems();
+
+    // send the problems, yo
+    this._sendProblems();
   }
 }

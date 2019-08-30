@@ -1,14 +1,8 @@
 import {
   SymbolInformation,
-  TextDocument,
   DocumentSymbol,
   SymbolKind,
   Location,
-  Range,
-  Position,
-  Connection,
-  WorkspaceSymbolParams,
-  TextDocuments,
   WorkspaceFolder,
   TextDocumentPositionParams,
   Definition,
@@ -16,10 +10,9 @@ import {
 } from "vscode-languageserver";
 import moize from "moize";
 import {
-  IDLDocumentSymbolExtractor,
   IDLDocumentSymbol,
   resolveCompletionItemKind
-} from "./idl-document-symbol-extractor";
+} from "./idl-symbol-extractor";
 
 // get our globby code
 const glob = require("glob-fs")({ gitignore: true }); // file searching
@@ -27,6 +20,7 @@ import Uri from "vscode-uri"; // handle URI to file system and back
 import path = require("path"); // path separator
 import fuzzysort = require("fuzzysort"); // search through the symbols
 import { readFileSync } from "fs"; // read text file from disk
+import { IDL } from "./idl";
 
 // options for controlling search performance
 const searchOptions = {
@@ -60,23 +54,19 @@ interface ISymbolLookup {
   symbol: DocumentSymbol;
 }
 
-export class IDLDocumentSymbolManager {
-  connection: Connection;
-  documents: TextDocuments;
+export class IDLSymbolManager {
+  idl: IDL;
   symbols: { [key: string]: ISymbolLookup[] } = {};
   symbolKeys: string[] = [];
   symbolKeysSearch: any[] = [];
-  extractor: IDLDocumentSymbolExtractor;
 
   // Track constants by file and routines by all files we have opened
   constantCompletionLookup: { [key: string]: CompletionItem[] } = {};
   routineCompletionLookup: { [key: string]: CompletionItem } = {};
   routineSymbolLookup: { [key: string]: DocumentSymbol } = {};
 
-  constructor(connection: Connection, documents: TextDocuments) {
-    this.connection = connection;
-    this.documents = documents;
-    this.extractor = new IDLDocumentSymbolExtractor();
+  constructor(idl: IDL) {
+    this.idl = idl;
   }
 
   // search all of our symbols by name to find what we have
@@ -106,7 +96,7 @@ export class IDLDocumentSymbolManager {
   // handle completion items
   // return items from the docs for completion
   completion(
-    query: string, _textDocumentPosition: TextDocumentPositionParams
+    query: string, _textDocumentPosition: TextDocumentPositionParams, optimized = false
   ): CompletionItem[] {
     // get the file we are in
     const uri = _textDocumentPosition.textDocument.uri;
@@ -121,47 +111,56 @@ export class IDLDocumentSymbolManager {
 
     // merge with all of our symbols if we have user routines
     if (Object.keys(this.routineCompletionLookup).length > 0) {
-      if (items.length === 0) {
-        items = Object.values(this.routineCompletionLookup);
+      let add: CompletionItem[] = [];
+
+      // are we searching, or just returning everything that we have?
+      if (!optimized) {
+        // not optimized, so return everything we have
+        add = Object.values(this.routineCompletionLookup);
       } else {
-        items = items.concat(Object.values(this.routineCompletionLookup));
+        // search for symbols, dont just return everything
+        const results = fuzzysort
+          .go(query, this.symbolKeysSearch, searchOptions)
+          .map(match => this.symbols[match.target]);
+
+        // make sure we only send one symbol with the same name at a time, could get crazy with larger workspaces
+        const foundSymbols = [];
+
+        // get our completion items
+        const items: CompletionItem[] = [];
+        results.forEach(symbols => {
+          symbols.forEach(lookup => {
+            // make sure we dont have another sy,bol with this name, should allow for functions and procedures through
+            if (foundSymbols.indexOf(lookup.symbol.name) === -1) {
+              let ok = true;
+
+              // only show variables within the document we are searching from
+              if (lookup.symbol.kind === SymbolKind.Variable && lookup.uri !== _textDocumentPosition.textDocument.uri) {
+                ok = false;
+              }
+
+              // check if we can show it
+              if (ok) {
+                foundSymbols.push(lookup.symbol.name)
+                add.push({
+                  label: lookup.symbol.name,
+                  kind: resolveCompletionItemKind(lookup.symbol.kind)
+                });
+              }
+            }
+          });
+        });
+      }
+
+      // check howwe need to include our additional symbols
+      if (items.length === 0) {
+        items = add
+      } else {
+        items = items.concat(add);
       }
     }
 
     return items;
-
-    // // get the keys that match
-    // const results = fuzzysort
-    //   .go(query, this.symbolKeysSearch, searchOptions)
-    //   .map(match => this.symbols[match.target]);
-
-    // // make sure we only send one symbol at a time, could get crazy with larger workspaces
-    // const foundSymbols = [];
-
-    // // get our completion items
-    // const items: CompletionItem[] = [];
-    // results.forEach(symbols => {
-    //   symbols.forEach(lookup => {
-    //     if (foundSymbols.indexOf(lookup.symbol.name) === -1) {
-    //       let ok = true;
-
-    //       // only show variables within the document we are searching from
-    //       if (lookup.symbol.kind === SymbolKind.Variable && lookup.uri !== _textDocumentPosition.textDocument.uri) {
-    //         ok = false;
-    //       }
-
-    //       // check if we can show it
-    //       if (ok) {
-    //         foundSymbols.push(lookup.symbol.name)
-    //         items.push({
-    //           label: lookup.symbol.name,
-    //           kind: resolveCompletionItemKind(lookup.symbol.kind)
-    //         });
-    //       }
-    //     }
-    //   });
-    // });
-    // return items;
   }
 
   getSelectedSymbolName(params: TextDocumentPositionParams): [string, boolean] {
@@ -171,7 +170,7 @@ export class IDLDocumentSymbolManager {
     ];
 
     // get the symbol highlighted
-    return this.extractor.getSelectedWord(line, params.position);
+    return this.idl.extractor.getSelectedWord(line, params.position);
   }
 
   // search for symbols by line
@@ -323,7 +322,6 @@ export class IDLDocumentSymbolManager {
     folders.forEach(folder => {
       // get path as actual folder, fix windows symbols from HTML
       const folderPath = Uri.parse(folders[0].uri).fsPath;
-      // this.connection.console.log(folderPath);
 
       process.chdir(folderPath);
       const files: string[] = glob.readdirSync("**/*.pro");
@@ -349,7 +347,7 @@ export class IDLDocumentSymbolManager {
     let strings = "";
 
     // get the document we are processing
-    const doc = this.documents.get(uri);
+    const doc = this.idl.documents.get(uri);
     if (doc !== undefined) {
       strings = doc.getText();
     } else {
@@ -370,10 +368,7 @@ export class IDLDocumentSymbolManager {
             const text = this._getStrings(uri);
 
             // extract symbols
-            const foundSymbols = this.extractor.symbolizeAsDocumentSymbols(
-              text,
-              uri
-            );
+            const foundSymbols = this.idl.extractor.symbolizeAsDocumentSymbols(text);
 
             // process all of the symbols that we found
             foundSymbols.forEach(symbol => {
@@ -418,7 +413,7 @@ export class IDLDocumentSymbolManager {
                 // update name with function, procedure, method
                 switch (true) {
                   case symbol.detail.includes('Function'):
-                    completionItem.insertText = replaceName.substr(0, replaceName.length - 1)
+                    completionItem.insertText = replaceName.substr(0, replaceName.length - 1);
                     break;
                   case symbol.detail.includes('Procedure'):
                     completionItem.insertText = replaceName + ','
@@ -464,7 +459,7 @@ export class IDLDocumentSymbolManager {
         return new Promise(async (resolve, reject) => {
           try {
             const text = this._getStrings(uri);
-            resolve(this.extractor.symbolizeAsSymbolInformation(text, uri));
+            resolve(this.idl.extractor.symbolizeAsSymbolInformation(text, uri));
           } catch (err) {
             reject(err);
           }
