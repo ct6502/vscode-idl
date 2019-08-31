@@ -10,7 +10,7 @@
     "url": "https://github.com/chris-torrence/vscode-idl"
   },
   "scripts": {
-    "vscode:prepublish": "cd client && npm run update-vscode && npm run build && cd .. && cd server && npm run webpack-deploy",
+    "vscode:prepublish": "cd client && npm run build && cd .. && cd server && npm run webpack-deploy",
     "compile": "tsc -b",
     "compile-webpack": "cd client && npm run webpack-deploy && cd ../server && npm run webpack-deploy && cd ..",
     "watch": "tsc -b -w",
@@ -22,14 +22,12 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/mocha": "^5.2.0",
     "@types/node": "^8.0.0",
     "all-contributors-cli": "^4.11.1",
     "merge-options": "^1.0.1",
     "ts-loader": "^6.0.4",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5",
-    "vscode": "^1.1.36",
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.7"
   },
