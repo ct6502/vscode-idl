@@ -70,8 +70,6 @@ export function activate(ctx: ExtensionContext) {
   treeView.onDidChangeSelection(event => {
     // handle our click event
     clickHandler.clickedItem(event.selection[0]);
-    // treeView.reveal(event.selection[0], { select: false, focus: false });
-
     idlTreeProvider
       .getChildren()
       .then(

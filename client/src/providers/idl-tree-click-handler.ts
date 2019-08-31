@@ -86,7 +86,7 @@ export class IDLTreeClickHandler {
           const newTerminal = vscode.window.createTerminal();
           newTerminal.sendText("cd " + idlDir + " && idl");
           newTerminal.show();
-          this.registerTerminalForCapture(newTerminal);
+          // this.registerTerminalForCapture(newTerminal);
 
           // newTerminal.sendText = (
           //   text: string,
