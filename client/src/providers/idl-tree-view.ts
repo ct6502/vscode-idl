@@ -67,8 +67,8 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
   private _onDidChangeTreeData: vscode.EventEmitter<
     IDLAction | undefined
   > = new vscode.EventEmitter<IDLAction | undefined>();
-  readonly onDidChangeTreeData: vscode.Event<IDLAction | undefined> = this
-    ._onDidChangeTreeData.event;
+  readonly onDidChangeTreeData: vscode.Event<IDLAction | undefined> = this._onDidChangeTreeData
+    .event;
 
   parents: { [key: string]: IDLAction };
   tree: { [key: string]: IDLAction[] };
@@ -111,9 +111,7 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
     } else {
       const parents = Object.keys(this.tree);
       for (let i = 0; i < parents.length; i++) {
-        const idx = this.tree[parents[i]]
-          .map(c => c.label)
-          .indexOf(element.label);
+        const idx = this.tree[parents[i]].map(c => c.label).indexOf(element.label);
         if (idx !== -1) {
           return this.parents[parents[i]];
         }

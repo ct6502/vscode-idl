@@ -67,10 +67,7 @@ export class IDLSymbolExtractor {
     this.idl = idl;
   }
 
-  private _extractFunctions(
-    text: string,
-    objects: string[]
-  ): IDLDocumentSymbol[] {
+  private _extractFunctions(text: string, objects: string[]): IDLDocumentSymbol[] {
     // init symbols
     const symbols: IDLDocumentSymbol[] = [];
 
@@ -127,9 +124,7 @@ export class IDLSymbolExtractor {
         const lowName = symbol.displayName.toLowerCase();
         if (lowName.includes(objects[0]) && lowName.includes(":")) {
           // update name
-          symbol.displayName = symbol.displayName.substr(
-            symbol.displayName.indexOf(":")
-          );
+          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
         }
       });
     }
@@ -138,10 +133,7 @@ export class IDLSymbolExtractor {
     return symbols;
   }
 
-  private _extractProcedures(
-    text: string,
-    objects: string[]
-  ): IDLDocumentSymbol[] {
+  private _extractProcedures(text: string, objects: string[]): IDLDocumentSymbol[] {
     // init symbols
     const symbols: IDLDocumentSymbol[] = [];
 
@@ -199,9 +191,7 @@ export class IDLSymbolExtractor {
         const lowName = symbol.displayName.toLowerCase();
         if (lowName.includes(objects[0]) && lowName.includes(":")) {
           // update name
-          symbol.displayName = symbol.displayName.substr(
-            symbol.displayName.indexOf(":")
-          );
+          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
         }
       });
     }
@@ -211,15 +201,13 @@ export class IDLSymbolExtractor {
   }
 
   // grab variables, not perfect but a happy fix for losing this functionality
-  private _extractVariables(
-    text: string
-  ): IDLDocumentSymbol[] {
+  private _extractVariables(text: string): IDLDocumentSymbol[] {
     // init symbols
     const symbols: IDLDocumentSymbol[] = [];
 
     // find all procedure definitions
     // (skip if line continuation)(dont use if continue, begin, or endif is ahead)(ok for start or in if statements)
-    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(?=\s*=)/gmi;
+    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(?=\s*=)/gim;
     let m: RegExpExecArray;
     while ((m = proRegex.exec(text)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -264,8 +252,7 @@ export class IDLSymbolExtractor {
     return symbols;
   }
 
-
-  getSelectedWord(line: string, position: Position): { name: string, isFunction: boolean } {
+  getSelectedWord(line: string, position: Position): { name: string; isFunction: boolean } {
     // placeholder for the name
     let symbolName = "";
     let functionFlag = false;
@@ -273,7 +260,7 @@ export class IDLSymbolExtractor {
     // get the character position - move to the left so that we are in a word
     // otherwise we are outside a word as we are on the next character
     // which is usuallya  space
-    let useChar = position.character
+    let useChar = position.character;
     if (position.character > 0) {
       useChar = useChar - 1;
 
@@ -297,12 +284,9 @@ export class IDLSymbolExtractor {
         const idx = line.indexOf(m[i]);
         if (idx !== -1) {
           // check if we have a match
-          if (
-            idx < useChar &&
-            idx + m[i].length > useChar
-          ) {
+          if (idx < useChar && idx + m[i].length > useChar) {
             symbolName = m[i];
-            functionFlag = line.substr(idx + m[i].length, 1) === '('
+            functionFlag = line.substr(idx + m[i].length, 1) === "(";
             break;
           }
         }
@@ -327,7 +311,7 @@ export class IDLSymbolExtractor {
     symbols = symbols.concat(this._extractFunctions(text, objects));
 
     // get variable definitions
-    symbols = symbols.concat(this._extractVariables(text))
+    symbols = symbols.concat(this._extractVariables(text));
 
     // return our symbols
     return symbols;

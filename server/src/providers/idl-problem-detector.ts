@@ -1,7 +1,4 @@
-import {
-  DiagnosticSeverity,
-  SymbolKind
-} from "vscode-languageserver";
+import { DiagnosticSeverity, SymbolKind } from "vscode-languageserver";
 import { IProblems } from "../core/problems.interface";
 import { IDL } from "./idl";
 
@@ -32,7 +29,7 @@ export class IDLProblemDetector {
 
           // check skip conditions
           if (ref.symbol.kind === SymbolKind.Variable) {
-            continue
+            continue;
           }
 
           // check if we are a conflict for ENVI or IDL routines
@@ -143,7 +140,7 @@ export class IDLProblemDetector {
     }
 
     // detect name conflicts
-    this._detectRoutineNameProblems()
+    this._detectRoutineNameProblems();
   }
 
   // wrapper to send problems to our connection
@@ -156,7 +153,7 @@ export class IDLProblemDetector {
       });
     });
 
-    // check if previous problems have been fixed and, if so, then 
+    // check if previous problems have been fixed and, if so, then
     // let our connection know it is good to go
     this.previousProblems.forEach(uri => {
       if (!this.problems[uri]) {

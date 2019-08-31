@@ -1,4 +1,16 @@
-import { Connection, TextDocuments, Definition, TextDocumentPositionParams, SymbolInformation, WorkspaceFolder, SymbolKind, DocumentSymbolParams, DocumentSymbol, TextDocumentChangeEvent, CompletionItem } from "vscode-languageserver";
+import {
+  Connection,
+  TextDocuments,
+  Definition,
+  TextDocumentPositionParams,
+  SymbolInformation,
+  WorkspaceFolder,
+  SymbolKind,
+  DocumentSymbolParams,
+  DocumentSymbol,
+  TextDocumentChangeEvent,
+  CompletionItem
+} from "vscode-languageserver";
 import { IDLSymbolExtractor } from "./idl-symbol-extractor";
 import { IDLRoutineHelper } from "./idl-routine-helper";
 import { IDLProblemDetector } from "./idl-problem-detector";
@@ -10,14 +22,16 @@ export class IDL {
   connection: Connection;
 
   // all of our IDL helper objects
-  helper: IDLRoutineHelper;                // internal routine helper
-  problems: IDLProblemDetector;     // problems
-  manager: IDLSymbolManager;            // manage all symbols from all docs and workspaces
-  extractor: IDLSymbolExtractor         // load symbols from a file
+  helper: IDLRoutineHelper; // internal routine helper
+  problems: IDLProblemDetector; // problems
+  manager: IDLSymbolManager; // manage all symbols from all docs and workspaces
+  extractor: IDLSymbolExtractor; // load symbols from a file
 
   constructor(documents: TextDocuments, connection?: Connection) {
     this.documents = documents;
-    if (connection) { this.connection = connection };
+    if (connection) {
+      this.connection = connection;
+    }
 
     // create all of our child objects
     this.helper = new IDLRoutineHelper(this);
@@ -80,21 +94,26 @@ export class IDL {
 
   // get document outline which filters out variables
   async getDocumentOutline(params: DocumentSymbolParams): Promise<DocumentSymbol[]> {
-    return (await this.manager.get.documentSymbols(
-      params.textDocument.uri
-    )).filter(symbol => { return symbol.kind !== SymbolKind.Variable }).map(symbol => {
-      return {
-        name: symbol.displayName,
-        detail: symbol.detail,
-        kind: symbol.kind,
-        range: symbol.range,
-        selectionRange: symbol.selectionRange,
-        children: symbol.children
-      };
-    });
+    return (await this.manager.get.documentSymbols(params.textDocument.uri))
+      .filter(symbol => {
+        return symbol.kind !== SymbolKind.Variable;
+      })
+      .map(symbol => {
+        return {
+          name: symbol.displayName,
+          detail: symbol.detail,
+          kind: symbol.kind,
+          range: symbol.range,
+          selectionRange: symbol.selectionRange,
+          children: symbol.children
+        };
+      });
   }
 
-  async getDocumentSymbols(opened: TextDocumentChangeEvent, sendProblems = false): Promise<DocumentSymbol[]> {
+  async getDocumentSymbols(
+    opened: TextDocumentChangeEvent,
+    sendProblems = false
+  ): Promise<DocumentSymbol[]> {
     // generate new symbols with the update, seems to magically sync when there are changes?
     const syms = await this.manager.get.documentSymbols(opened.document.uri);
 
@@ -109,7 +128,10 @@ export class IDL {
     return syms;
   }
 
-  async updateDocumentSymbols(changed: TextDocumentChangeEvent, sendProblems = false): Promise<DocumentSymbol[]> {
+  async updateDocumentSymbols(
+    changed: TextDocumentChangeEvent,
+    sendProblems = false
+  ): Promise<DocumentSymbol[]> {
     // generate new symbols with the update, seems to magically sync when there are changes?
     const syms = await this.manager.update(changed.document.uri);
 

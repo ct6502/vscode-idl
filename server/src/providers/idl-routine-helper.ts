@@ -1,8 +1,5 @@
 import { IRoutines } from "../core/routines.interface";
-import {
-  CompletionItemKind,
-  CompletionItem
-} from "vscode-languageserver";
+import { CompletionItemKind, CompletionItem } from "vscode-languageserver";
 import fuzzysort = require("fuzzysort"); // search through the symbols
 import { IDL } from "./idl";
 
@@ -35,42 +32,40 @@ export class IDLRoutineHelper {
   }
 
   // return items from the docs for completion
-  completion(
-    query: string, optimized = false
-  ): CompletionItem[] {
+  completion(query: string, optimized = false): CompletionItem[] {
     // search, map to indices, filter by matches in our array, map to the completion items
     // check how we return our results
     if (!optimized) {
-      return this.routines.docs
+      return this.routines.docs;
     } else {
       // search for our matches
       const matches = fuzzysort.go(query, this.routineKeysSearch, searchOptions);
 
       // potentially can be 30% faster method for searching with manual loops
       // old code is below
-      const items: CompletionItem[] = []
+      const items: CompletionItem[] = [];
       for (let idx = 0; idx < matches.length; idx++) {
         const lc = matches[idx].target.toLowerCase();
         // handle setting proper information for our data things and such
         switch (true) {
-          case (lc in this.functions):
-            items.push(this.routines.docs[this.functions[lc]])
+          case lc in this.functions:
+            items.push(this.routines.docs[this.functions[lc]]);
             break;
-          case (lc in this.procedures):
-            items.push(this.routines.docs[this.procedures[lc]])
+          case lc in this.procedures:
+            items.push(this.routines.docs[this.procedures[lc]]);
             break;
-          case (lc in this.constants):
-            items.push(this.routines.docs[this.constants[lc]])
+          case lc in this.constants:
+            items.push(this.routines.docs[this.constants[lc]]);
             break;
-          case (lc in this.other):
-            items.push(this.routines.docs[this.other[lc]])
+          case lc in this.other:
+            items.push(this.routines.docs[this.other[lc]]);
             break;
           default:
-            return // DO NBOTHING
+            return; // DO NBOTHING
         }
       }
 
-      return items
+      return items;
     }
   }
 
@@ -117,17 +112,13 @@ export class IDLRoutineHelper {
       // check if we are an ENVI task, replace with ENVITask('TaskName')
       if (item.label.startsWith("ENVI") && item.label.endsWith("Task")) {
         item.insertText =
-          "ENVITask('" +
-          item.label.substr(0, item.label.length - 4).substr(4) +
-          "')";
+          "ENVITask('" + item.label.substr(0, item.label.length - 4).substr(4) + "')";
       }
 
       // check if we are an IDL task, replace with ENVITask('TaskName')
       if (item.label.startsWith("IDL") && item.label.endsWith("Task")) {
         item.insertText =
-          "IDLTask('" +
-          item.label.substr(0, item.label.length - 4).substr(3) +
-          "')";
+          "IDLTask('" + item.label.substr(0, item.label.length - 4).substr(3) + "')";
       }
 
       // save change

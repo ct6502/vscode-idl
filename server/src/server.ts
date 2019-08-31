@@ -32,7 +32,7 @@ let documents: TextDocuments = new TextDocuments();
 
 // create our IDL provider object, which is the object-entry for everything so
 // we can test functionality with object methods rather than APIs
-const idl = new IDL(documents, connection)
+const idl = new IDL(documents, connection);
 
 // flags for configuration
 let hasConfigurationCapability: boolean = false;
@@ -44,9 +44,7 @@ connection.onInitialize((params: InitializeParams) => {
 
   // Does the client support the `workspace/configuration` request?
   // If not, we will fall back using global settings
-  hasConfigurationCapability = !!(
-    capabilities.workspace && !!capabilities.workspace.configuration
-  );
+  hasConfigurationCapability = !!(capabilities.workspace && !!capabilities.workspace.configuration);
   hasWorkspaceFolderCapability = !!(
     capabilities.workspace && !!capabilities.workspace.workspaceFolders
   );
@@ -73,10 +71,7 @@ connection.onInitialize((params: InitializeParams) => {
 connection.onInitialized(async () => {
   if (hasConfigurationCapability) {
     // Register for all configuration changes.
-    connection.client.register(
-      DidChangeConfigurationNotification.type,
-      undefined
-    );
+    connection.client.register(DidChangeConfigurationNotification.type, undefined);
   }
 
   // listen for workspace folder event changes and update our serve-side cache
@@ -98,15 +93,12 @@ connection.onInitialized(async () => {
       });
 
     // listen for new workspaces
-    connection.workspace.connection.workspace
-      .onDidChangeWorkspaceFolders(async _event => {
-        connection.console.log(
-          "Workspace folder change event received. " + JSON.stringify(_event)
-        );
+    connection.workspace.connection.workspace.onDidChangeWorkspaceFolders(async _event => {
+      connection.console.log("Workspace folder change event received. " + JSON.stringify(_event));
 
-        // index/change folders!
-        await idl.indexWorkspace(_event.added, true);
-      });
+      // index/change folders!
+      await idl.indexWorkspace(_event.added, true);
+    });
   }
 });
 
@@ -129,9 +121,7 @@ connection.onDidChangeConfiguration(change => {
     // Reset all cached document settings
     documentSettings.clear();
   } else {
-    globalSettings = <ExampleSettings>(
-      (change.settings.languageServerExample || defaultSettings)
-    );
+    globalSettings = <ExampleSettings>(change.settings.languageServerExample || defaultSettings);
   }
 
   // Revalidate all open text documents
@@ -159,11 +149,9 @@ connection.onDidChangeWatchedFiles(_change => {
 });
 
 // This handler provides the initial list of the completion items.
-connection.onCompletion(
-  (position: TextDocumentPositionParams): CompletionItem[] => {
-    return idl.getCompletionItems(position)
-  }
-);
+connection.onCompletion((position: TextDocumentPositionParams): CompletionItem[] => {
+  return idl.getCompletionItems(position);
+});
 
 // when we auto complete, do any custom adjustments to the data before the auto-complete
 // request gets back to the client
@@ -174,11 +162,9 @@ connection.onCompletionResolve(
 );
 
 // handle when a user searches for a symbol
-connection.onWorkspaceSymbol(
-  (params: WorkspaceSymbolParams): SymbolInformation[] => {
-    return idl.findSymbolsByName(params.query);
-  }
-);
+connection.onWorkspaceSymbol((params: WorkspaceSymbolParams): SymbolInformation[] => {
+  return idl.findSymbolsByName(params.query);
+});
 
 // handle when we want the definition of a symbol
 connection.onDefinition(
@@ -214,6 +200,7 @@ connection.onDidChangeTextDocument((params) => {
 	// params.contentChanges describe the content changes to the document.
 	connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
 });
+
 connection.onDidCloseTextDocument((params) => {
 	// A text document got closed in VSCode.
 	// params.uri uniquely identifies the document.

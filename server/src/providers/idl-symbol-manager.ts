@@ -9,10 +9,7 @@ import {
   CompletionItem
 } from "vscode-languageserver";
 import moize from "moize";
-import {
-  IDLDocumentSymbol,
-  resolveCompletionItemKind
-} from "./idl-symbol-extractor";
+import { IDLDocumentSymbol, resolveCompletionItemKind } from "./idl-symbol-extractor";
 
 // get our globby code
 const glob = require("glob-fs")({ gitignore: true }); // file searching
@@ -96,7 +93,9 @@ export class IDLSymbolManager {
   // handle completion items
   // return items from the docs for completion
   completion(
-    query: string, _textDocumentPosition: TextDocumentPositionParams, optimized = false
+    query: string,
+    _textDocumentPosition: TextDocumentPositionParams,
+    optimized = false
   ): CompletionItem[] {
     // get the file we are in
     const uri = _textDocumentPosition.textDocument.uri;
@@ -135,13 +134,16 @@ export class IDLSymbolManager {
               let ok = true;
 
               // only show variables within the document we are searching from
-              if (lookup.symbol.kind === SymbolKind.Variable && lookup.uri !== _textDocumentPosition.textDocument.uri) {
+              if (
+                lookup.symbol.kind === SymbolKind.Variable &&
+                lookup.uri !== _textDocumentPosition.textDocument.uri
+              ) {
                 ok = false;
               }
 
               // check if we can show it
               if (ok) {
-                foundSymbols.push(lookup.symbol.name)
+                foundSymbols.push(lookup.symbol.name);
                 add.push({
                   label: lookup.symbol.name,
                   kind: resolveCompletionItemKind(lookup.symbol.kind)
@@ -154,7 +156,7 @@ export class IDLSymbolManager {
 
       // check howwe need to include our additional symbols
       if (items.length === 0) {
-        items = add
+        items = add;
       } else {
         items = items.concat(add);
       }
@@ -163,11 +165,9 @@ export class IDLSymbolManager {
     return items;
   }
 
-  getSelectedSymbol(params: TextDocumentPositionParams): { name: string, isFunction: boolean } {
+  getSelectedSymbol(params: TextDocumentPositionParams): { name: string; isFunction: boolean } {
     // read the strings from our text document
-    const line = this._getStrings(params.textDocument.uri).split("\n")[
-      params.position.line
-    ];
+    const line = this._getStrings(params.textDocument.uri).split("\n")[params.position.line];
 
     // get the symbol highlighted
     return this.idl.extractor.getSelectedWord(line, params.position);
@@ -182,13 +182,13 @@ export class IDLSymbolManager {
 
     // check if we need to clean up the name
     switch (true) {
-      case symbolName.includes('.'):
-        symbolName = '::' + symbolName.split('.')[1]
+      case symbolName.includes("."):
+        symbolName = "::" + symbolName.split(".")[1];
         break;
-      case symbolName.includes('->'):
-        symbolName = '::' + symbolName.split('->')[1]
+      case symbolName.includes("->"):
+        symbolName = "::" + symbolName.split("->")[1];
         break;
-      default:// do nothing
+      default: // do nothing
     }
 
     // create a placeholder to return
@@ -204,15 +204,17 @@ export class IDLSymbolManager {
         if (limit) {
           switch (true) {
             // function method
-            case symbolName.includes('::') && symbols[0].name.toLowerCase().endsWith(symbolName + '()') && functionFlag:
+            case symbolName.includes("::") &&
+              symbols[0].name.toLowerCase().endsWith(symbolName + "()") &&
+              functionFlag:
               placeholder = symbols[0].location;
               break;
             // procedure method
-            case symbolName.includes('::') && symbols[0].name.toLowerCase().endsWith(symbolName):
+            case symbolName.includes("::") && symbols[0].name.toLowerCase().endsWith(symbolName):
               placeholder = symbols[0].location;
               break;
             // function
-            case symbols[0].name.toLowerCase() === symbolName + '()' && functionFlag:
+            case symbols[0].name.toLowerCase() === symbolName + "()" && functionFlag:
               placeholder = symbols[0].location;
               break;
             // procedure
@@ -232,7 +234,7 @@ export class IDLSymbolManager {
   // when we remove a document, clean up the symbol lookup information
   private _removeSymbols(uri: string, symbols: DocumentSymbol[]) {
     // clear constant lookup
-    delete this.constantCompletionLookup[uri]
+    delete this.constantCompletionLookup[uri];
 
     // process each symbol
     symbols.forEach(symbol => {
@@ -241,13 +243,13 @@ export class IDLSymbolManager {
 
       // clean up routine lookup for functions and procedures
       if (key in this.routineCompletionLookup) {
-        delete this.routineCompletionLookup[key]
+        delete this.routineCompletionLookup[key];
       }
-      if (key + '(' in this.routineCompletionLookup) {
-        delete this.routineCompletionLookup[key + '(']
+      if (key + "(" in this.routineCompletionLookup) {
+        delete this.routineCompletionLookup[key + "("];
       }
       if (key in this.routineSymbolLookup) {
-        delete this.routineSymbolLookup[key]
+        delete this.routineSymbolLookup[key];
       }
 
       // make sure we have symbols to clean up
@@ -399,26 +401,27 @@ export class IDLSymbolManager {
                 const completionItem: CompletionItem = {
                   label: symbol.name,
                   kind: resolveCompletionItemKind(symbol.kind)
-                }
+                };
 
                 // check if our name has '::'  and just get the method name
-                const split = symbol.name.split('::');
-                let replaceName = '';
+                const split = symbol.name.split("::");
+                let replaceName = "";
                 if (split.length == 1) {
-                  replaceName = symbol.name
+                  replaceName = symbol.name;
                 } else {
                   replaceName = split[1];
                 }
 
                 // update name with function, procedure, method
                 switch (true) {
-                  case symbol.detail.includes('Function'):
+                  case symbol.detail.includes("Function"):
                     completionItem.insertText = replaceName.substr(0, replaceName.length - 1);
                     break;
-                  case symbol.detail.includes('Procedure'):
-                    completionItem.insertText = replaceName + ','
+                  case symbol.detail.includes("Procedure"):
+                    completionItem.insertText = replaceName + ",";
                     break;
-                  default:// do nothing
+                  default:
+                    // do nothing
                     completionItem.insertText = replaceName;
                 }
 
@@ -429,22 +432,24 @@ export class IDLSymbolManager {
 
             // save any constants that we may have found, but only if we have one by that name
             const constantNames = [];
-            this.constantCompletionLookup[uri] = foundSymbols.filter(symbol => {
-              let flag = false;
-              if (symbol.kind === SymbolKind.Variable) {
-                const saveName = symbol.name.toLowerCase();
-                if (constantNames.indexOf(saveName) === -1) {
-                  constantNames.push(saveName);
-                  flag = true;
+            this.constantCompletionLookup[uri] = foundSymbols
+              .filter(symbol => {
+                let flag = false;
+                if (symbol.kind === SymbolKind.Variable) {
+                  const saveName = symbol.name.toLowerCase();
+                  if (constantNames.indexOf(saveName) === -1) {
+                    constantNames.push(saveName);
+                    flag = true;
+                  }
                 }
-              }
-              return flag;
-            }).map(symbol => {
-              return {
-                label: symbol.name,
-                kind: resolveCompletionItemKind(symbol.kind)
-              }
-            })
+                return flag;
+              })
+              .map(symbol => {
+                return {
+                  label: symbol.name,
+                  kind: resolveCompletionItemKind(symbol.kind)
+                };
+              });
 
             resolve(foundSymbols);
           } catch (err) {

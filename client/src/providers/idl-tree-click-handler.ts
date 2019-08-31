@@ -39,9 +39,7 @@ export class IDLTreeClickHandler {
   constructor() {}
 
   private _getIDLTerminal(): vscode.Terminal[] {
-    return vscode.window.terminals.filter(
-      terminal => terminal.name.toLowerCase() === "idl"
-    );
+    return vscode.window.terminals.filter(terminal => terminal.name.toLowerCase() === "idl");
   }
 
   private _getActivePROCode(): vscode.TextDocument | null {
@@ -138,9 +136,7 @@ export class IDLTreeClickHandler {
     } else {
       // make sure we have IDL open
       if (terminals.length === 0) {
-        vscode.window.showInformationMessage(
-          `IDL has not been started from a terminal window.`
-        );
+        vscode.window.showInformationMessage(`IDL has not been started from a terminal window.`);
       } else {
         // get our IDL terminal and show
         const idl = terminals[0];

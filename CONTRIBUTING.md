@@ -4,13 +4,37 @@ This contains information about how to get set up for development with the tools
 
 ## Setup
 
-1. From the main folder, run `npm install`
+From the main folder, run `npm install`, this will install the dependencies for the client and the server
 
-2. Once the dependencies have been installed, which will be installed for this folder, the client, and the language server, you will need to recompile everything into single JS files.
+Make sure `vsce` is installed globally. Use `npm i --g vsce`.
 
-    Do this with `npm run compile`
+Additionally, this uses the [Prettier - Code Formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension for maintaining a consistent syntax for all files. This is requried for development.
 
-3. To package, you need the `vsce` package installed globally with NPM
+## Development
+
+Start watching for changes with the TS files and have them get automatically compiled into JS with the following command from the root folder:
+
+```
+npm run watch
+```
+
+Once running, press `F5` to open a development session of VSCode that will have the extension up and running in.
+
+## Package and Publish
+
+**When publishing releases you should**:
+
+1. Increment the version in `package.json` to the next desired version
+2. Verify that you can pacakge everything, as noted below
+3. Publish
+4. Document changes in **CHANGELOG.md**
+5. Push all changes to GitHub
+6. Make release on GitHub
+7. Attach `.vsix` file to GitHub release, you may need to repackage the extension to generate this file again
+
+Here are the steps for how to package and publish.
+
+1. To package, you need the `vsce` package installed globally with NPM
 
     ```
     npm i -g vsce
@@ -19,7 +43,7 @@ This contains information about how to get set up for development with the tools
 
     The second command with execute the `vsce:prepublish` script in the main `package.json` file and then collect all of the items and make a `.vsix` file. You can then test this out locally and, once you verify it works correctly, then you can go to the next step.
 
-4. Publishing changes
+2. Publishing changes
 
     ```
     vsce publish
