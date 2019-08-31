@@ -1,5 +1,6 @@
 .vscode/**
 .vscode-test/**
+.all-contributorsrc
 .gitignore
 vsc-extension-quickstart.md
 **/*.ts
@@ -8,4 +9,13 @@ vsc-extension-quickstart.md
 test/**
 idl/**
 node_modules/**
+tests/**
+client/README.md
+client/package.json
+client/package-lock.json
+client/src/**
+server/README.md
+server/package.json
+server/package-lock.json
+server/src/**
 server/node_modules/**
