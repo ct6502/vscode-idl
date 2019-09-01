@@ -22,7 +22,8 @@
     "vscode-languageclient": "^4.1.4"
   },
   "devDependencies": {
-    "rimraf": "^3.0.0",
-    "@types/vscode": "^1.1.36"
+    "@types/node": "^12.7.3",
+    "@types/vscode": "^1.1.36",
+    "rimraf": "^3.0.0"
   }
 }
