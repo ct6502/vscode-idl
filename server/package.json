@@ -13,9 +13,9 @@
     "node": "*"
   },
   "scripts": {
-    "test": "npm run clean && ava",
     "clean": "rimraf dist",
-    "compile": "tsc -b",
+    "compile": "npm run clean && tsc -b",
+    "test": "npm run clean && ava",
     "webpack": "npm run clean && webpack --mode production --watch",
     "webpack-deploy": "npm run clean && webpack --mode production"
   },

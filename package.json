@@ -10,15 +10,17 @@
     "url": "https://github.com/chris-torrence/vscode-idl"
   },
   "scripts": {
-    "vscode:prepublish": "cd client && npm run build && cd .. && cd server && npm run webpack-deploy",
-    "compile": "tsc -b",
-    "compile-webpack": "cd client && npm run webpack-deploy && cd ../server && npm run webpack-deploy && cd ..",
-    "watch": "tsc -b -w",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "test": "node ./client/dist/test/run-tests.js",
     "contributors:init": "all-contributors init",
     "contributors:add": "all-contributors add",
-    "contributors:generate": "all-contributors generate"
+    "contributors:generate": "all-contributors generate",
+    "compile": "tsc -b",
+    "deploy": "cd client && npm run compile && cd .. && cd server && npm run webpack-deploy",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "test": "npm run compile && npm run test-client && npm run test-server",
+    "test-client": "node ./client/dist/test/run-tests.js",
+    "test-server": "cd server && npm test",
+    "vscode:prepublish": "npm run test && npm run deploy",
+    "watch": "tsc -b -w"
   },
   "dependencies": {},
   "devDependencies": {

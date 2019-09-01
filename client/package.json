@@ -14,9 +14,9 @@
   },
   "scripts": {
     "clean": "rimraf dist",
+    "compile": "npm run clean && tsc -b",
     "webpack": "npm run clean && webpack --watch",
-    "webpack-deploy": "npm run clean && webpack --mode development",
-    "build": "npm run clean && tsc -b"
+    "webpack-deploy": "npm run clean && webpack --mode development"
   },
   "dependencies": {
     "vscode-languageclient": "^4.1.4"
