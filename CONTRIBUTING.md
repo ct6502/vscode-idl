@@ -60,21 +60,24 @@ Testing the actual extension for VSCode is pretty straightforward. For this, jus
 
 ### Language Server Testing
 
-For the language server, using AVA allows the typescript files to be compiled on the fly. While this is a super-handy feature, you have to be aware of what javascript files may have been precompiled and already exist in the `dist` subdirectory. Ideally you are running the rte
+For the language server, using AVA allows the typescript files to be compiled on the fly. While this is a super-handy feature, you have to be aware of what javascript files may have been precompiled and already exist in the `dist` subdirectory which can make things act goofy and sometimes call the JS and TS versions of compiled tests. Ideally you are running the the tests. So, do one of the following steps to test the server:
 
-Helpful links:
+1. From the main directory run `npm run test-server`
+
+OR
+
+2. Navigate to the `server` folder and run `npm test`
+
+OR
+
+3. Navigate to the server` folder and run `npm run watch:test` which will live-reload and re-run tests as they are updated. How neat is that!?
+
+Here are some helpful links if you aren't familiar with AVA:
 
 - [AVA](https://github.com/avajs/ava)
 
 - [AVA Documentation](https://github.com/avajs/ava#documentation)
 
-To run the tests either:
-
-1. From the main directory run `npm run test-server`
-
-    - OR -
-
-2. Navigate to the `server` folder and run `npm test`
 
 ## Package and Publish
 

@@ -16,6 +16,7 @@
     "clean": "rimraf dist",
     "compile": "npm run clean && tsc -b",
     "test": "npm run clean && ava",
+    "watch:test": "npm run clean && ava --watch",
     "webpack": "npm run clean && webpack --mode production --watch",
     "webpack-deploy": "npm run clean && webpack --mode production"
   },

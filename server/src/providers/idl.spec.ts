@@ -5,10 +5,27 @@ import { ReturnTestFile, FileToDocumentSymbolParams } from "../test/helper.spec"
 
 const documents: TextDocuments = new TextDocuments();
 
-test("object creation", async t => {
-  const idl = new IDL(documents);
+// placeholder for variable
+let idl: IDL;
+
+test("IDL object creation", t => {
+  // get start time, to check how long it takes
+  const start = process.hrtime();
+
+  // make the object
+  idl = new IDL(documents);
+
+  // get how long it took
+  const finish = process.hrtime(start);
+
+  // verify that we made an object
   t.assert(idl);
 
+  // alert user how long it took
+  t.log("Creation time (ms):", finish[1] / 1000000);
+});
+
+test("Simple document outline", async t => {
   const res: any = await idl.getDocumentOutline(
     FileToDocumentSymbolParams(ReturnTestFile("addition.pro"))
   );
