@@ -43,7 +43,7 @@
   },
   "activationEvents": [
     "onLanguage:idl",
-    "workspaceContains:**/.pro",
+    "workspaceContains:**/*.pro",
     "onView:idlTree"
   ],
   "main": "./client/dist/extension",

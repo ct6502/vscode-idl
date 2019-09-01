@@ -326,13 +326,14 @@ export class IDLSymbolManager {
       const folderPath = Uri.parse(folder.uri).fsPath;
 
       process.chdir(folderPath);
-      const files: string[] = glob.readdirSync("**/*.pro");
+      const files: string[] = glob
+        .readdirSync("**/*.pro")
+        .filter(files => !files.toLowerCase().endsWith(".spec.pro"));
 
       // process each file
       files.forEach(file => {
         // get the URI as a string
         const uriStr = Uri.file(folderPath + path.sep + file).toString();
-
         promises.push(this.get.documentSymbols(uriStr));
       });
     });
