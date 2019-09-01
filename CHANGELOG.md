@@ -4,6 +4,34 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+
+These features are mostly development updates and not super exciting, new features.
+
+Server: abstracted providers/helpers and wrapped in single API for being able to test
+
+Added testing to the extension:
+
+    - Use mocha for testing the extension **client**
+
+    - Use AVA for testing the extension **server**
+
+    - NPM script from main folder to run all tests
+
+When publishing/packaging the extension, unit tests are automatically executed which also builds the extension.
+
+    - **BREAKING CHANGE FOR DEVELOPMENT:** You can no longer publish from a terminal in vscode and no terminals can be active. This is because of the vscode examples followed for how tests are executed.
+
+Bundle size is about 700kb compared to previous size of 2.8mb.
+
+    - Number of files is ~160 compared to ~1k
+
+    - Reductions came from using `@types/vscode` instead of `vscode`and manually excluded some node modules used just for development.
+
+Linting with prettier added back in
+
+    - **BREAKING CHANGE FOR DEVELOPMENT**: Required VSCode and the [Prettier - Code Formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension. Settings are saved in this repository.
+
 ## [1.5.4] - 2019-08-29
 
 Fixed regex for variables, it was picking up multi-line statements.

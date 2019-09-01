@@ -1,30 +1,29 @@
 {
-	"name": "idl-language-server-client",
-	"description": "Client for IDL Language Server",
-	"author": "Zachary Norman",
-	"version": "0.0.1",
-	"publisher": "CT6502",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/chris-torrence/vscode-idl"
-	},
-	"engines": {
-		"vscode": "^1.36.0"
-	},
-	"scripts": {
-		"update-vscode": "vscode-install",
-		"postinstall": "vscode-install",
-		"clean": "rimraf dist",
-		"webpack": "npm run clean && webpack --watch",
-		"webpack-deploy": "npm run clean && webpack --mode production",
-		"build": "npm run clean && tsc -b"
-	},
-	"dependencies": {
-		"vscode-languageclient": "^4.1.4"
-	},
-	"devDependencies": {
-		"rimraf": "^3.0.0",
-		"vscode": "^1.1.36"
-	}
+  "name": "idl-language-server-client",
+  "description": "Client for IDL Language Server",
+  "author": "Zachary Norman",
+  "version": "0.0.1",
+  "publisher": "CT6502",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chris-torrence/vscode-idl"
+  },
+  "engines": {
+    "vscode": "^1.36.0"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "compile": "npm run clean && tsc -b",
+    "webpack": "npm run clean && webpack --watch",
+    "webpack-deploy": "npm run clean && webpack --mode development"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^4.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.3",
+    "@types/vscode": "^1.1.36",
+    "rimraf": "^3.0.0"
+  }
 }

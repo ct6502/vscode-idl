@@ -7,6 +7,7 @@ import {
   Position,
   CompletionItemKind
 } from "vscode-languageserver";
+import { IDL } from "./idl";
 
 export interface IDLDocumentSymbol extends DocumentSymbol {
   displayName?: string;
@@ -60,13 +61,13 @@ export function resolveCompletionItemKind(symbol: SymbolKind): CompletionItemKin
   }
 }
 
-export class IDLDocumentSymbolExtractor {
-  constructor() { }
+export class IDLSymbolExtractor {
+  idl: IDL;
+  constructor(idl: IDL) {
+    this.idl = idl;
+  }
 
-  private _extractFunctions(
-    text: string,
-    objects: string[]
-  ): IDLDocumentSymbol[] {
+  private _extractFunctions(text: string, objects: string[]): IDLDocumentSymbol[] {
     // init symbols
     const symbols: IDLDocumentSymbol[] = [];
 
@@ -123,9 +124,7 @@ export class IDLDocumentSymbolExtractor {
         const lowName = symbol.displayName.toLowerCase();
         if (lowName.includes(objects[0]) && lowName.includes(":")) {
           // update name
-          symbol.displayName = symbol.displayName.substr(
-            symbol.displayName.indexOf(":")
-          );
+          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
         }
       });
     }
@@ -134,10 +133,7 @@ export class IDLDocumentSymbolExtractor {
     return symbols;
   }
 
-  private _extractProcedures(
-    text: string,
-    objects: string[]
-  ): IDLDocumentSymbol[] {
+  private _extractProcedures(text: string, objects: string[]): IDLDocumentSymbol[] {
     // init symbols
     const symbols: IDLDocumentSymbol[] = [];
 
@@ -195,9 +191,7 @@ export class IDLDocumentSymbolExtractor {
         const lowName = symbol.displayName.toLowerCase();
         if (lowName.includes(objects[0]) && lowName.includes(":")) {
           // update name
-          symbol.displayName = symbol.displayName.substr(
-            symbol.displayName.indexOf(":")
-          );
+          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
         }
       });
     }
@@ -207,15 +201,13 @@ export class IDLDocumentSymbolExtractor {
   }
 
   // grab variables, not perfect but a happy fix for losing this functionality
-  private _extractVariables(
-    text: string
-  ): IDLDocumentSymbol[] {
+  private _extractVariables(text: string): IDLDocumentSymbol[] {
     // init symbols
     const symbols: IDLDocumentSymbol[] = [];
 
     // find all procedure definitions
     // (skip if line continuation)(dont use if continue, begin, or endif is ahead)(ok for start or in if statements)
-    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(?=\s*=)/gmi;
+    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(?=\s*=)/gim;
     let m: RegExpExecArray;
     while ((m = proRegex.exec(text)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -260,8 +252,7 @@ export class IDLDocumentSymbolExtractor {
     return symbols;
   }
 
-
-  getSelectedWord(line: string, position: Position): [string, boolean] {
+  getSelectedWord(line: string, position: Position): { name: string; isFunction: boolean } {
     // placeholder for the name
     let symbolName = "";
     let functionFlag = false;
@@ -269,13 +260,13 @@ export class IDLDocumentSymbolExtractor {
     // get the character position - move to the left so that we are in a word
     // otherwise we are outside a word as we are on the next character
     // which is usuallya  space
-    let useChar = position.character
+    let useChar = position.character;
     if (position.character > 0) {
       useChar = useChar - 1;
 
       // check if zero, then just try and return the first character
       if (useChar === 0) {
-        return [line.substr(0, 1).trim(), functionFlag];
+        return { name: line.substr(0, 1).trim(), isFunction: functionFlag };
       }
     }
 
@@ -293,12 +284,9 @@ export class IDLDocumentSymbolExtractor {
         const idx = line.indexOf(m[i]);
         if (idx !== -1) {
           // check if we have a match
-          if (
-            idx < useChar &&
-            idx + m[i].length > useChar
-          ) {
+          if (idx < useChar && idx + m[i].length > useChar) {
             symbolName = m[i];
-            functionFlag = line.substr(idx + m[i].length, 1) === '('
+            functionFlag = line.substr(idx + m[i].length, 1) === "(";
             break;
           }
         }
@@ -308,39 +296,10 @@ export class IDLDocumentSymbolExtractor {
       }
     }
 
-    return [symbolName, functionFlag];
+    return { name: symbolName, isFunction: functionFlag };
   }
 
-
-  getClosestWord(line: string, position: Position): string {
-    // get the character position - move to the left so that we are in a word
-    // otherwise we are outside a word as we are on the next character
-    // which is usuallya  space
-    let useChar = position.character
-    if (position.character > 0) {
-      useChar = useChar - 1;
-    }
-
-    // https://ourcodeworld.com/articles/read/223/how-to-retrieve-the-closest-word-in-a-string-with-a-given-index-in-javascript
-    // Perform type conversions.
-    const str = String(line);
-    const pos = Number(useChar) >>> 0;
-
-    // Search for the word's beginning and end.
-    var left = str.slice(0, pos + 1).search(/\S+$/),
-      right = str.slice(pos).search(/\s/);
-
-    // The last word in the string is a special case.
-    if (right < 0) {
-      return str.slice(left);
-    }
-
-    // Return the word, using the located bounds to extract it from the string.
-    return str.slice(left, right + pos);
-  }
-
-
-  symbolizeAsDocumentSymbols(text: string, uri: string): IDLDocumentSymbol[] {
+  symbolizeAsDocumentSymbols(text: string): IDLDocumentSymbol[] {
     // init array of symbols
     let symbols: IDLDocumentSymbol[] = [];
     const objects: string[] = [];
@@ -352,7 +311,7 @@ export class IDLDocumentSymbolExtractor {
     symbols = symbols.concat(this._extractFunctions(text, objects));
 
     // get variable definitions
-    symbols = symbols.concat(this._extractVariables(text))
+    symbols = symbols.concat(this._extractVariables(text));
 
     // return our symbols
     return symbols;
@@ -363,7 +322,7 @@ export class IDLDocumentSymbolExtractor {
     const outSymbols: SymbolInformation[] = [];
 
     // process our document symbols
-    this.symbolizeAsDocumentSymbols(text, uri).forEach(symbol => {
+    this.symbolizeAsDocumentSymbols(text).forEach(symbol => {
       // create the location information
       outSymbols.push({
         name: symbol.name,
