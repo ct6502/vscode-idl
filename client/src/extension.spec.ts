@@ -83,7 +83,12 @@ suite("Verify we can start the client and language server", () => {
   // STUPID MOCHA https://github.com/mochajs/mocha/issues/2738
   it("Verify the extension activates", async function() {
     this.timeout(5000);
-    assert.equal(await activate(uri), true);
+    const ext = vscode.extensions.getExtension("ct6502.idl");
+    console.log(ext);
+    // verify we got an extension
+    assert.notEqual(ext, undefined);
+    await ext.activate();
+    assert.equal(true, true);
   });
 });
 
@@ -104,7 +109,7 @@ suite("Second test suite", () => {
 
   // DONT USE DONE WITH ASYNC FUNCTIONS
   // STUPID MOCHA https://github.com/mochajs/mocha/issues/2738
-  it("Dummy test to see if it passes/failsf rom above", function() {
+  it("Dummy test to see if it passes/fails from above", function() {
     assert.equal(true, true);
   });
 });

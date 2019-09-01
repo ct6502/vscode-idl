@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+
+## [1.5.5] - 2019-09-01
+
 These features are mostly development updates and not super exciting, new features.
 
 Server: abstracted providers/helpers and wrapped in single API for being able to test

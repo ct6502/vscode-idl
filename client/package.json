@@ -15,6 +15,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "compile": "npm run clean && tsc -b",
+    "test": "npm run compile && node ./dist/test/run-tests.js",
     "webpack": "npm run clean && webpack --watch",
     "webpack-deploy": "npm run clean && webpack --mode development"
   },

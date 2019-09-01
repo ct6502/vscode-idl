@@ -2,7 +2,7 @@
   "name": "idl",
   "displayName": "IDL Interactive Data Language",
   "description": "IDL syntax highlighting and code snippets",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "publisher": "CT6502",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
@@ -17,7 +17,7 @@
     "deploy": "cd client && npm run compile && cd .. && cd server && npm run webpack-deploy",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
     "test": "npm run compile && npm run test-client && npm run test-server",
-    "test-client": "node ./client/dist/test/run-tests.js",
+    "test-client": "cd client && npm test",
     "test-server": "cd server && npm test",
     "vscode:prepublish": "npm run test && npm run deploy",
     "watch": "tsc -b -w"
