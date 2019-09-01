@@ -3,7 +3,11 @@
 .all-contributorsrc
 .gitignore
 vsc-extension-quickstart.md
+shared.webpack.config.js
+tslint.json
 **/*.ts
+**/*spec.js
+**/*spec.js.map
 **/tsconfig.json
 **/webpack.config.js
 test/**
@@ -14,6 +18,11 @@ client/README.md
 client/package.json
 client/package-lock.json
 client/src/**
+client/dist/test/**
+client/node_modules/@types/**
+client/node_modules/.bin/**
+client/node_modules/.cache/**
+client/node_modules/rimraf/**
 server/README.md
 server/package.json
 server/package-lock.json
