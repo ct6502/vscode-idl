@@ -15,6 +15,7 @@ import { IDLSymbolExtractor } from "./idl-symbol-extractor";
 import { IDLRoutineHelper } from "./idl-routine-helper";
 import { IDLProblemDetector } from "./idl-problem-detector";
 import { IDLSymbolManager } from "./idl-symbol-manager";
+import { IDLFileHelper } from "./idl-file-helper";
 
 export class IDL {
   // connection specific properties for vscode lang server
@@ -26,6 +27,7 @@ export class IDL {
   problems: IDLProblemDetector; // problems
   manager: IDLSymbolManager; // manage all symbols from all docs and workspaces
   extractor: IDLSymbolExtractor; // load symbols from a file
+  files: IDLFileHelper; // clean strings for analysis
 
   constructor(documents: TextDocuments, connection?: Connection) {
     this.documents = documents;
@@ -38,6 +40,7 @@ export class IDL {
     this.problems = new IDLProblemDetector(this);
     this.manager = new IDLSymbolManager(this);
     this.extractor = new IDLSymbolExtractor(this);
+    this.files = new IDLFileHelper(this);
   }
 
   // find the definition of a selected symbol

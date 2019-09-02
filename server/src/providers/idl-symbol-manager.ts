@@ -16,7 +16,6 @@ const glob = require("glob-fs")({ gitignore: true }); // file searching
 import Uri from "vscode-uri"; // handle URI to file system and back
 import path = require("path"); // path separator
 import fuzzysort = require("fuzzysort"); // search through the symbols
-import { readFileSync } from "fs"; // read text file from disk
 import { IDL } from "./idl";
 
 // options for controlling search performance
@@ -56,6 +55,8 @@ export class IDLSymbolManager {
   symbols: { [key: string]: ISymbolLookup[] } = {};
   symbolKeys: string[] = [];
   symbolKeysSearch: any[] = [];
+  strings: { [key: string]: string } = {}; // save strings for all files
+  cleanStrings: { [key: string]: string[] } = {}; // array of strings without comments and empty lines
 
   // Track constants by file and routines by all files we have opened
   constantCompletionLookup: { [key: string]: CompletionItem[] } = {};
@@ -167,7 +168,9 @@ export class IDLSymbolManager {
 
   getSelectedSymbol(params: TextDocumentPositionParams): { name: string; isFunction: boolean } {
     // read the strings from our text document
-    const line = this._getStrings(params.textDocument.uri).split("\n")[params.position.line];
+    const line = this.idl.files.getStrings(params.textDocument.uri).split("\n")[
+      params.position.line
+    ];
 
     // get the symbol highlighted
     return this.idl.extractor.getSelectedWord(line, params.position);
@@ -345,22 +348,6 @@ export class IDLSymbolManager {
     await Promise.all(promises);
   }
 
-  private _getStrings(uri: string): string {
-    // init return value
-    let strings = "";
-
-    // get the document we are processing
-    const doc = this.idl.documents.get(uri);
-    if (doc !== undefined) {
-      strings = doc.getText();
-    } else {
-      const parsed = Uri.parse(uri);
-      strings = readFileSync(parsed.fsPath, "utf8");
-    }
-
-    return strings;
-  }
-
   // define our getters for extracting document information
   get: ISearches = {
     documentSymbols: moize(
@@ -368,7 +355,7 @@ export class IDLSymbolManager {
         return new Promise(async (resolve, reject) => {
           try {
             // get the strings we are processing
-            const text = this._getStrings(uri);
+            const text = this.idl.files.getStrings(uri);
 
             // extract symbols
             const foundSymbols = this.idl.extractor.symbolizeAsDocumentSymbols(text);
@@ -464,7 +451,7 @@ export class IDLSymbolManager {
       async (uri: string): Promise<SymbolInformation[]> => {
         return new Promise(async (resolve, reject) => {
           try {
-            const text = this._getStrings(uri);
+            const text = this.idl.files.getStrings(uri);
             resolve(this.idl.extractor.symbolizeAsSymbolInformation(text, uri));
           } catch (err) {
             reject(err);
