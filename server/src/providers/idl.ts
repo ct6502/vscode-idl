@@ -9,7 +9,8 @@ import {
   DocumentSymbolParams,
   DocumentSymbol,
   TextDocumentChangeEvent,
-  CompletionItem
+  CompletionItem,
+  Hover
 } from "vscode-languageserver";
 import { IDLSymbolExtractor } from "./idl-symbol-extractor";
 import { IDLRoutineHelper } from "./idl-routine-helper";
@@ -43,6 +44,10 @@ export class IDL {
     this.files = new IDLFileHelper(this);
   }
 
+  consoleLog(thing: any) {
+    this.connection.console.log(JSON.stringify(thing));
+  }
+
   // find the definition of a selected symbol
   findSymbolDefinition(params: TextDocumentPositionParams, limit: boolean): Definition {
     return this.manager.findSymbolDefinition(params, limit);
@@ -51,6 +56,25 @@ export class IDL {
   // search for symbol definitions based on name
   findSymbolsByName(query: string): SymbolInformation[] {
     return this.manager.findSymbolsByName(query);
+  }
+
+  getHoverHelp(position: TextDocumentPositionParams): Hover {
+    // get the word that we are trying to complete
+    // do this here just so we dont have to split larger files more than once
+    // because we need the strings, split, and regex to find our work
+    const query = this.manager.getSelectedSymbol(position).name;
+    // this.consoleLog(query);
+    const res = this.helper.completion(query, true);
+    // this.consoleLog(res);
+    if (res.length > 0) {
+      if (res[0].label === query) {
+        return { contents: res[0].documentation };
+      } else {
+        return { contents: "" };
+      }
+    } else {
+      return { contents: "" };
+    }
   }
 
   // get our completion items when typing

@@ -128,10 +128,32 @@ export class IDLFileHelper {
     this.cleanStrings[uri] = strings;
   }
 
-  // public methods for gettings strings
-  public getStrings(uri: string): string {
-    const strings = this._getStrings(uri);
-    this._cleanStrings(uri, strings);
+  public remove(uri: string) {
+    delete this.strings[uri];
+    delete this.regexString[uri];
+    delete this.regexStrings[uri];
+    delete this.cleanStrings[uri];
+  }
+
+  // public get single line string, faster fror regex
+  public getFileString(uri: string, updating = false): string {
+    // check if we are updating or not
+    const ok = uri in this.regexString;
+    if (!ok || updating) {
+      const strings = this._getStrings(uri);
+      this._cleanStrings(uri, strings);
+    }
     return this.regexString[uri];
+  }
+
+  // public get array of strings for file, used for searching
+  public getFileStrings(uri: string, updating = false): string[] {
+    // check if we are updating or not
+    const ok = uri in this.regexString;
+    if (!ok || updating) {
+      const strings = this._getStrings(uri);
+      this._cleanStrings(uri, strings);
+    }
+    return this.regexStrings[uri];
   }
 }

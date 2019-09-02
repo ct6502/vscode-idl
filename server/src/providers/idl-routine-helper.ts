@@ -1,5 +1,5 @@
 import { IRoutines } from "../core/routines.interface";
-import { CompletionItemKind, CompletionItem } from "vscode-languageserver";
+import { CompletionItemKind, CompletionItem, MarkupKind } from "vscode-languageserver";
 import fuzzysort = require("fuzzysort"); // search through the symbols
 import { IDL } from "./idl";
 
@@ -107,6 +107,29 @@ export class IDLRoutineHelper {
         default:
           this.other[item.label.toLowerCase()] = idx;
           item.kind = CompletionItemKind.Text;
+      }
+
+      // // clean up/build documentation information
+      const docs: any = item.documentation;
+      if (docs.length > 0) {
+        const docsLink =
+          "https://www.harrisgeospatial.com/docs/" + idlRoutines.links[idx.toString()];
+        const docsStart =
+          [
+            "### Documentation",
+            "[" + docsLink + "](" + docsLink + ")",
+            "",
+            "### Syntax",
+            "",
+            "```idl"
+          ].join("\n") + "\n";
+
+        item.documentation = {
+          kind: MarkupKind.Markdown,
+          value: docsStart + docs.join("\n") + "\n```"
+        };
+      } else {
+        item.documentation = "No documentation";
       }
 
       // check if we are an ENVI task, replace with ENVITask('TaskName')

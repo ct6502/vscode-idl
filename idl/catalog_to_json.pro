@@ -10,7 +10,11 @@
 ;-
 
 
+; get this deirectory
+thisDir = file_dirname(routine_filepath())
 
+; build the output directory
+outDir = strjoin([file_dirname(thisdir), 'server', 'routines'], path_sep())
 
 ;init data structures for filtered information
 condensed = orderedhash()
@@ -55,7 +59,7 @@ nProcessed = 0
 foreach file, files do begin
   ;did we parse the file already?
   if ~parsedFiles.hasKey(file) then begin
-    print, 'Parsing XML:' +  file
+    print, 'Parsing XML: ' +  file
     parsedFiles[file] = xml_parse(file)
   endif
   
@@ -104,7 +108,8 @@ foreach file, files do begin
       
       ;make sure we have a link that is a non-empty string
       if item.hasKey('%link') then begin
-        if item['%link'] then condensed['links', strtrim(nProcessed,2)] = item['%link']
+        ; make sure to add the 'l', for some reason they just end in .htm and not .html
+        if item['%link'] then condensed['links', strtrim(nProcessed,2)] = item['%link'] + 'l'
       endif
 
       ;check if we have a description
@@ -120,14 +125,17 @@ foreach file, files do begin
         ;check if we have a stupid list and we need to get the first
         if ~isa(syntaxes, 'list') then syntaxes = list(syntaxes)
 
+        ; store information about the different syntaxes that we can use
+        docsExamples = list()
+
         ;process each potential syntax
         foreach syntax, syntaxes, sIdx do begin
+          ; save syntax ifnormation
+          docsExamples.add, syntax['%name']
+          
           ;TODO: how to handle more syntax information?
           ;check if a function or procedure, only do the first one
           if (sIdx eq 0) then begin
-            ;save the name
-            info['documentation'] = syntax['%name']
-
             if syntax['%type'] eq 'pro' then begin
               condensed['procedures', strtrim(nProcessed,2)] = !true
             endif else begin
@@ -135,6 +143,9 @@ foreach file, files do begin
             endelse
           endif
         endforeach
+        
+        ; save the documentation
+        info['documentation'] = docsExamples
       endif
 
       ;check if we have property information, exclude when an object property
@@ -170,7 +181,7 @@ print, 'exporting to disk'
 tic
 str = json_serialize(condensed)
 toc
-openw, lun, 'C:\Users\Traininglead\Documents\github\vscode-idl\server\routines\idl.json', lun, /GET_LUN
+openw, lun, outDir + path_sep() + 'idl.json', lun, /GET_LUN
 printf, lun, str
 free_lun, lun
 

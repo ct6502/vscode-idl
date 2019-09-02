@@ -36,7 +36,7 @@ test("Strip comments from strings", t => {
 
 test("Cleaned: no comments or traling whitespace, but same lines", t => {
   // get our strings, also makes clean strings
-  idl.files.getStrings(uri);
+  idl.files.getFileStrings(uri);
 
   const expected = [
     "pro addition, A=a, $",
@@ -94,5 +94,5 @@ test("Cleaned: no empty lines or comments", t => {
     "end"
   ];
 
-  t.is(idl.files.getStrings(uri), expected.join("\n"));
+  t.is(idl.files.getFileString(uri), expected.join("\n"));
 });

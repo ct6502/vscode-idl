@@ -16,7 +16,8 @@ import {
   DocumentSymbolParams,
   DocumentFilter,
   DocumentSymbol,
-  Definition
+  Definition,
+  Hover
 } from "vscode-languageserver";
 import { IDL } from "./providers/idl";
 
@@ -63,7 +64,8 @@ connection.onInitialize((params: InitializeParams) => {
       },
       definitionProvider: true,
       workspaceSymbolProvider: true,
-      documentSymbolProvider: true
+      documentSymbolProvider: true,
+      hoverProvider: true
     }
   };
 });
@@ -173,12 +175,11 @@ connection.onDefinition(
   }
 );
 
-// connection.onHover(
-//   (params: TextDocumentPositionParams): Hover => {
-//     const res = idl.manager.searchByLine(params);
-//     return res;
-//   }
-// )
+connection.onHover(
+  (params: TextDocumentPositionParams): Hover => {
+    return idl.getHoverHelp(params);
+  }
+);
 
 // handle when we request document symbols
 connection.onDocumentSymbol(

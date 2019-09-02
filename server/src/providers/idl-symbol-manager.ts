@@ -168,9 +168,7 @@ export class IDLSymbolManager {
 
   getSelectedSymbol(params: TextDocumentPositionParams): { name: string; isFunction: boolean } {
     // read the strings from our text document
-    const line = this.idl.files.getStrings(params.textDocument.uri).split("\n")[
-      params.position.line
-    ];
+    const line = this.idl.files.getFileStrings(params.textDocument.uri)[params.position.line];
 
     // get the symbol highlighted
     return this.idl.extractor.getSelectedWord(line, params.position);
@@ -293,9 +291,12 @@ export class IDLSymbolManager {
 
   // wrapper for removing a document
   async remove(uri: string) {
+    // remove from our file tracker
+    this.idl.files.remove(uri);
+
     // check if we need to remove it from the symbol list
     if (this.moizes.documentSymbols.has([uri])) {
-      // get our symbols and clean up
+      // get our symbols
       const symbols = await this.get.documentSymbols(uri);
 
       // clean up our symbol information
@@ -351,11 +352,11 @@ export class IDLSymbolManager {
   // define our getters for extracting document information
   get: ISearches = {
     documentSymbols: moize(
-      async (uri: string): Promise<IDLDocumentSymbol[]> => {
+      async (uri: string, updating = false): Promise<IDLDocumentSymbol[]> => {
         return new Promise(async (resolve, reject) => {
           try {
             // get the strings we are processing
-            const text = this.idl.files.getStrings(uri);
+            const text = this.idl.files.getFileString(uri);
 
             // extract symbols
             const foundSymbols = this.idl.extractor.symbolizeAsDocumentSymbols(text);
@@ -451,7 +452,7 @@ export class IDLSymbolManager {
       async (uri: string): Promise<SymbolInformation[]> => {
         return new Promise(async (resolve, reject) => {
           try {
-            const text = this.idl.files.getStrings(uri);
+            const text = this.idl.files.getFileString(uri);
             resolve(this.idl.extractor.symbolizeAsSymbolInformation(text, uri));
           } catch (err) {
             reject(err);
