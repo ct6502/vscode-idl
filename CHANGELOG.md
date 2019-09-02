@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+Small syntax fix for control statements in keywords
+
+New feature with hover help for built-in routines in IDL. Returns first match found if the  names are the same as the symbol being extracted.
 
 ## [1.5.5] - 2019-09-01
 
