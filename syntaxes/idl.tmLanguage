@@ -451,7 +451,7 @@
 					<key>comment</key>
 					<string>Control keywords</string>
 					<key>match</key>
-					<string>(?i)(?&lt;!\.)\b(begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|function|goto|if|inherits|of|on_ioerror|pro|repeat|switch|then|until|while)\b</string>
+					<string>(?i)(?&lt;!\.|\/)\b(begin|break|case|common|compile_opt|continue|do|else|end|endcase|endelse|endfor|endforeach|endif|endrep|endswitch|endwhile|for|foreach|forward_function|function|goto|if|inherits|of|on_ioerror|pro|repeat|switch|then|until|while)\b</string>
 					<key>name</key>
 					<string>keyword.control.idl</string>
 				</dict>
