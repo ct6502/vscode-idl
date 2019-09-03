@@ -53,17 +53,22 @@ export class IDLRoutineHelper {
     // check how we return our results
     if (!optimized) {
       switch (true) {
+        case (query.isMethod && query.equalBefore) || (query.isMethod && query.isFunction):
+          this.idl.consoleLog("Function method results");
+          return this.quickLookup.functionMethods;
         // function or potential function (equal sign on the left)
         case query.equalBefore || query.isFunction:
+          this.idl.consoleLog("Function results");
           return this.quickLookup.functions;
         // nothing typed, so just return everything
         case query.name === "":
+          this.idl.consoleLog("all docs");
           return this.routines.docs;
-        case query.isMethod && query.equalBefore:
-          return this.quickLookup.functionMethods;
         case query.isMethod && !query.equalBefore:
+          this.idl.consoleLog("Procedure method results");
           return this.quickLookup.procedureMethods;
         default:
+          this.idl.consoleLog("procedure results");
           return this.quickLookup.procedures;
       }
     } else {
@@ -71,7 +76,8 @@ export class IDLRoutineHelper {
       let matches: any;
       switch (true) {
         // function method
-        case query.isMethod && query.equalBefore:
+        case (query.isMethod && query.equalBefore) || (query.isMethod && query.isFunction):
+          this.idl.consoleLog("Function method results");
           matches = fuzzysort.go(
             query.searchName,
             this.quickSearchLookup.functionMethods,
@@ -80,6 +86,7 @@ export class IDLRoutineHelper {
           break;
         // procedure method
         case query.isMethod && !query.equalBefore:
+          this.idl.consoleLog("Procedure method results");
           matches = fuzzysort.go(
             query.searchName,
             this.quickSearchLookup.procedureMethods,
@@ -88,10 +95,12 @@ export class IDLRoutineHelper {
           break;
         // functions
         case query.equalBefore || query.isFunction:
+          this.idl.consoleLog("Function results");
           matches = fuzzysort.go(query.searchName, this.quickSearchLookup.functions, searchOptions);
           break;
         // default to procedures
         default:
+          this.idl.consoleLog("Procedure results");
           matches = fuzzysort.go(
             query.searchName,
             this.quickSearchLookup.procedures,

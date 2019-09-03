@@ -203,8 +203,13 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
 
       ;process each potential syntax
       foreach syntax, syntaxes, sIdx do begin
-        ; save syntax ifnormation
-        docsExamples.add, syntax['%name']
+        ; make sure that our syntax is valid
+        example = syntax['%name']
+        
+        ; save syntax ifnormation if it makes sense
+        if (stregex(example, '[a-z_$0-9]\.[a-z_]', /FOLD_CASE) ge 0) OR example.contains(':') OR example.contains('->') OR example.contains('=') OR example.contains('=') OR example.contains(',') then begin
+          docsExamples.add, syntax['%name']
+        endif
         
         ;check if a function or procedure
         ; if we have pro, then we need to keep checking if we have a func syntax

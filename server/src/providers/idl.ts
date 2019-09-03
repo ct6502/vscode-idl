@@ -64,10 +64,17 @@ export class IDL {
     // because we need the strings, split, and regex to find our work
     const query = this.manager.getSelectedSymbol(position);
 
-    const res = this.helper.completion(query, true);
+    // dont search if empty string
+    if (query.name === "") {
+      return { contents: "" };
+    }
+    this.consoleLog(query);
 
+    const res = this.helper.completion(query, true);
+    this.consoleLog(res);
     if (res.length > 0) {
-      if (res[0].label === query.name) {
+      // take first if the end matches
+      if (res[0].label.toLowerCase().endsWith(query.searchName.toLowerCase())) {
         return { contents: res[0].documentation };
       } else {
         return { contents: "" };

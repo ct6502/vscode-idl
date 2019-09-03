@@ -309,16 +309,24 @@ export class IDLSymbolExtractor {
     // split by words to extract our symbol that we may have clicked on
     // TODO: add logic for objects and methods here, func/pro are good for now
     let m: RegExpExecArray;
+    let previous = 0;
     while ((m = wordRegEx.exec(line)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
       if (m.index === wordRegEx.lastIndex) {
         wordRegEx.lastIndex++;
       }
 
+      // process each match
       for (let i = 0; i < m.length; i++) {
-        const idx = line.indexOf(m[i]);
+        // get our match
+        const idx = line.indexOf(m[i], previous);
+
+        // sanity check that we found the match in our string
         if (idx !== -1) {
-          // check if we have a match
+          // scoot the search start, in case we have more than one
+          previous = idx;
+
+          // check if our expression contains our charater
           if (idx <= useChar && idx + m[i].length >= useChar) {
             symbolName = m[i];
             functionFlag = line.substr(idx + m[i].length, 1) === "(";
