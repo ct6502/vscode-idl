@@ -113,3 +113,17 @@ Here are some helpful links if you aren't familiar with AVA:
     This will repackage the extension which will re-run all of the tests as well.
 
     This will also prompt you for a personal access token for the `CT6502` group. If you are a member, paste your key and then it will automatically upload.
+
+### Errors with Testing
+
+If you are packaging the extension, make sure that you have VSCode closed before starting and that you are on a command prompt.
+
+When testing, if you have VSCode hang with this message:
+
+```
+[main 2019-09-03T15:29:47.100Z] update#setState idle
+[main 2019-09-03T15:30:17.103Z] update#setState checking for updates
+[main 2019-09-03T15:30:17.485Z] update#setState idle
+```
+
+Then you need to launch the tests from VSCode first which seems to get it out of a bad state. Not quite sure what is going on there, but that is how we fix it.
