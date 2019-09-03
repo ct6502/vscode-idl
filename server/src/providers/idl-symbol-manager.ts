@@ -9,7 +9,11 @@ import {
   CompletionItem
 } from "vscode-languageserver";
 import moize from "moize";
-import { IDLDocumentSymbol, resolveCompletionItemKind } from "./idl-symbol-extractor";
+import {
+  IDLDocumentSymbol,
+  resolveCompletionItemKind,
+  ISelectedWord
+} from "./idl-symbol-extractor";
 
 // get our globby code
 const glob = require("glob-fs")({ gitignore: true }); // file searching
@@ -17,6 +21,7 @@ import Uri from "vscode-uri"; // handle URI to file system and back
 import path = require("path"); // path separator
 import fuzzysort = require("fuzzysort"); // search through the symbols
 import { IDL } from "./idl";
+import { IQuickLookup, IQuickSearchLookup } from "../core/search.interface";
 
 // options for controlling search performance
 const searchOptions = {
@@ -60,8 +65,26 @@ export class IDLSymbolManager {
 
   // Track constants by file and routines by all files we have opened
   constantCompletionLookup: { [key: string]: CompletionItem[] } = {};
+
+  // track routines that we extract
   routineCompletionLookup: { [key: string]: CompletionItem } = {};
   routineSymbolLookup: { [key: string]: DocumentSymbol } = {};
+
+  // qtore a quick lookup object with just arrays of routines and methods
+  quickLookup: IQuickLookup = {
+    functions: [],
+    procedures: [],
+    functionMethods: [],
+    procedureMethods: []
+  };
+
+  // qtore a quick lookup object with just arrays of routines and methods
+  quickSearchLookup: IQuickSearchLookup = {
+    functions: [],
+    procedures: [],
+    functionMethods: [],
+    procedureMethods: []
+  };
 
   constructor(idl: IDL) {
     this.idl = idl;
@@ -91,10 +114,80 @@ export class IDLSymbolManager {
     return symbolInfo;
   }
 
+  _searchRoutines(query: ISelectedWord, optimized = false): CompletionItem[] {
+    // search, map to indices, filter by matches in our array, map to the completion items
+    // check how we return our results
+    if (!optimized) {
+      switch (true) {
+        // function or potential function (equal sign on the left)
+        case query.equalBefore || query.isFunction:
+          return this.quickLookup.functions;
+        // nothing typed, so just return everything
+        case query.name === "":
+          return Object.values(this.routineCompletionLookup);
+        case query.isMethod && query.equalBefore:
+          return this.quickLookup.functionMethods;
+        case query.isMethod && !query.equalBefore:
+          return this.quickLookup.procedureMethods;
+        default:
+          return this.quickLookup.procedures;
+      }
+    } else {
+      // check how we should search
+      let matches: any;
+      switch (true) {
+        // function method
+        case query.isMethod && query.equalBefore:
+          matches = fuzzysort.go(
+            query.searchName,
+            this.quickSearchLookup.functionMethods,
+            searchOptions
+          );
+          break;
+        // procedure method
+        case query.isMethod && !query.equalBefore:
+          matches = fuzzysort.go(
+            query.searchName,
+            this.quickSearchLookup.procedureMethods,
+            searchOptions
+          );
+          break;
+        // functions
+        case query.equalBefore || query.isFunction:
+          matches = fuzzysort.go(query.searchName, this.quickSearchLookup.functions, searchOptions);
+          break;
+        // default to procedures
+        default:
+          matches = fuzzysort.go(
+            query.searchName,
+            this.quickSearchLookup.procedures,
+            searchOptions
+          );
+      }
+
+      // potentially can be 30% faster method for searching with manual loops
+      // old code is below
+      const items: CompletionItem[] = [];
+      for (let idx = 0; idx < matches.length; idx++) {
+        const lc = matches[idx].target.toLowerCase();
+        // handle what lookup our item comes from, based on how parsed when laoded
+        switch (true) {
+          // verify the symbol is still present
+          case lc in this.routineCompletionLookup:
+            items.push(this.routineCompletionLookup[lc]);
+            break;
+          default: // DO NBOTHING
+        }
+      }
+
+      return items;
+    }
+  }
+
   // handle completion items
   // return items from the docs for completion
   completion(
-    query: string,
+    query: ISelectedWord,
     _textDocumentPosition: TextDocumentPositionParams,
     optimized = false
   ): CompletionItem[] {
@@ -110,63 +203,19 @@ export class IDLSymbolManager {
     }
 
     // merge with all of our symbols if we have user routines
-    if (Object.keys(this.routineCompletionLookup).length > 0) {
-      let add: CompletionItem[] = [];
+    const add = this._searchRoutines(query, optimized);
 
-      // are we searching, or just returning everything that we have?
-      if (!optimized) {
-        // not optimized, so return everything we have
-        add = Object.values(this.routineCompletionLookup);
-      } else {
-        // search for symbols, dont just return everything
-        const results = fuzzysort
-          .go(query, this.symbolKeysSearch, searchOptions)
-          .map(match => this.symbols[match.target]);
-
-        // make sure we only send one symbol with the same name at a time, could get crazy with larger workspaces
-        const foundSymbols = [];
-
-        // get our completion items
-        const items: CompletionItem[] = [];
-        results.forEach(symbols => {
-          symbols.forEach(lookup => {
-            // make sure we dont have another sy,bol with this name, should allow for functions and procedures through
-            if (foundSymbols.indexOf(lookup.symbol.name) === -1) {
-              let ok = true;
-
-              // only show variables within the document we are searching from
-              if (
-                lookup.symbol.kind === SymbolKind.Variable &&
-                lookup.uri !== _textDocumentPosition.textDocument.uri
-              ) {
-                ok = false;
-              }
-
-              // check if we can show it
-              if (ok) {
-                foundSymbols.push(lookup.symbol.name);
-                add.push({
-                  label: lookup.symbol.name,
-                  kind: resolveCompletionItemKind(lookup.symbol.kind)
-                });
-              }
-            }
-          });
-        });
-      }
-
-      // check howwe need to include our additional symbols
-      if (items.length === 0) {
-        items = add;
-      } else {
-        items = items.concat(add);
-      }
+    // check howwe need to include our additional symbols
+    if (items.length === 0) {
+      items = add;
+    } else {
+      items = items.concat(add);
     }
 
     return items;
   }
 
-  getSelectedSymbol(params: TextDocumentPositionParams): { name: string; isFunction: boolean } {
+  getSelectedSymbol(params: TextDocumentPositionParams): ISelectedWord {
     // read the strings from our text document
     const line = this.idl.files.getFileStrings(params.textDocument.uri)[params.position.line];
 
@@ -242,13 +291,46 @@ export class IDLSymbolManager {
       // get the key
       const key = symbol.name.toLowerCase();
 
-      // clean up routine lookup for functions and procedures
       if (key in this.routineCompletionLookup) {
-        delete this.routineCompletionLookup[key];
-      }
-      if (key + "(" in this.routineCompletionLookup) {
         delete this.routineCompletionLookup[key + "("];
+
+        // clean up functions
+        const funcNames = this.quickLookup.functions.map(func => func.label.toLowerCase());
+        const f1Idx = funcNames.indexOf(key + "()");
+        if (f1Idx !== -1) {
+          this.quickLookup.functions.splice(f1Idx, 0);
+          this.quickSearchLookup.functions.splice(f1Idx, 0);
+        }
+
+        // clean up function methods
+        const funcMethodNames = this.quickLookup.functionMethods.map(funcMeth =>
+          funcMeth.label.toLowerCase()
+        );
+        const f2Idx = funcMethodNames.indexOf(key);
+        if (f2Idx !== -1) {
+          this.quickLookup.functionMethods.splice(f2Idx, 0);
+          this.quickSearchLookup.functionMethods.splice(f2Idx, 0);
+        }
+
+        // clean up procedures
+        const proNames = this.quickLookup.procedures.map(pro => pro.label.toLowerCase());
+        const p1Idx = proNames.indexOf(key + "()");
+        if (p1Idx !== -1) {
+          this.quickLookup.procedures.splice(p1Idx, 0);
+          this.quickSearchLookup.procedures.splice(p1Idx, 0);
+        }
+
+        // clean up procedure methods
+        const proMethodNames = this.quickLookup.procedureMethods.map(proMeth =>
+          proMeth.label.toLowerCase()
+        );
+        const p2Idx = proMethodNames.indexOf(key);
+        if (p2Idx !== -1) {
+          this.quickLookup.procedureMethods.splice(p2Idx, 0);
+          this.quickSearchLookup.procedureMethods.splice(p2Idx, 0);
+        }
       }
+
       if (key in this.routineSymbolLookup) {
         delete this.routineSymbolLookup[key];
       }
@@ -371,8 +453,11 @@ export class IDLSymbolManager {
                   symbol: symbol
                 };
 
-                // get the key
+                // get the key - if it is a function, there is a '()' tacked onto the end
                 const key = symbol.name.toLowerCase();
+
+                // get the prepped key
+                const prepped = fuzzysort.prepare(key);
 
                 // save in our lookup table
                 if (this.symbols[key]) {
@@ -380,7 +465,7 @@ export class IDLSymbolManager {
                 } else {
                   this.symbols[key] = [info];
                   this.symbolKeys.push(key);
-                  this.symbolKeysSearch.push(fuzzysort.prepare(key));
+                  this.symbolKeysSearch.push(prepped);
                 }
 
                 // save our routine symbol lookup
@@ -394,19 +479,35 @@ export class IDLSymbolManager {
 
                 // check if our name has '::'  and just get the method name
                 const split = symbol.name.split("::");
+                let isMethod = false;
                 let replaceName = "";
                 if (split.length == 1) {
                   replaceName = symbol.name;
                 } else {
                   replaceName = split[1];
+                  isMethod = true;
                 }
 
                 // update name with function, procedure, method
                 switch (true) {
+                  case symbol.detail.includes("Function") && isMethod:
+                    this.quickLookup.functionMethods.push(completionItem);
+                    this.quickSearchLookup.functionMethods.push(prepped);
+                    completionItem.insertText = replaceName.substr(0, replaceName.length - 1); // replace with  open paren, not closed
+                    break;
                   case symbol.detail.includes("Function"):
-                    completionItem.insertText = replaceName.substr(0, replaceName.length - 1);
+                    this.quickLookup.functions.push(completionItem);
+                    this.quickSearchLookup.functions.push(prepped);
+                    completionItem.insertText = replaceName.substr(0, replaceName.length - 1); // replace with  open paren, not closed
+                    break;
+                  case symbol.detail.includes("Procedure") && isMethod:
+                    this.quickLookup.procedureMethods.push(completionItem);
+                    this.quickSearchLookup.procedureMethods.push(prepped);
+                    completionItem.insertText = replaceName + ",";
                     break;
                   case symbol.detail.includes("Procedure"):
+                    this.quickLookup.procedures.push(completionItem);
+                    this.quickSearchLookup.procedures.push(prepped);
                     completionItem.insertText = replaceName + ",";
                     break;
                   default:

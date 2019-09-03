@@ -13,6 +13,16 @@ export interface IDLDocumentSymbol extends DocumentSymbol {
   displayName?: string;
 }
 
+export interface ISelectedWord {
+  name: string; // full word (including method accessors) that we have selected
+  searchName: string; // if method, includes '::' and the method name for searching
+  objName: string; // if method, the variable name we came from
+  methodName: string; // if method, the method that we are calling
+  isFunction: boolean; // indicates if we are a function or not
+  isMethod: boolean; // indicates  if we are a method or not
+  equalBefore: boolean; // if there is an equal sign on the line before our symbol that we found
+}
+
 // if we have a method, make it clear we have that in the document description string
 function resolveRoutineNameAdd(match: string): string {
   switch (true) {
@@ -252,27 +262,52 @@ export class IDLSymbolExtractor {
     return symbols;
   }
 
-  getSelectedWord(line: string, position: Position): { name: string; isFunction: boolean } {
+  getSelectedWord(line: string, position: Position): ISelectedWord {
     // placeholder for the name
     let symbolName = "";
     let functionFlag = false;
+
+    // check for an qual sign
+    let equalBefore = false;
+    let equalPos = line.indexOf("=");
+    if (equalPos !== -1) {
+      equalBefore = equalPos < position.character;
+    }
+
+    // regex for valid character to be before
+    // const wordRegEx = /[a-z_][\.a-z0-9:_$\-\>]*/gim;
+    const wordRegEx = /[\.a-z0-9:_$\-\>][\.a-z0-9:_$\-\>]*/gim;
 
     // get the character position - move to the left so that we are in a word
     // otherwise we are outside a word as we are on the next character
     // which is usuallya  space
     let useChar = position.character;
     if (position.character > 0) {
+      // check if we can get a character before our cursor or not
       useChar = useChar - 1;
-
-      // check if zero, then just try and return the first character
-      if (useChar === 0) {
-        return { name: line.substr(0, 1).trim(), isFunction: functionFlag };
+      switch (true) {
+        case useChar === 0:
+          const name = line.substr(0, 1).trim();
+          return {
+            name: name,
+            searchName: name,
+            objName: "",
+            methodName: "",
+            isMethod: false,
+            isFunction: false,
+            equalBefore: equalBefore
+          };
+        // character before is not a word, space or something we cant split up
+        // so move back to where our cursor is
+        case !wordRegEx.test(line.substr(useChar, 1)):
+          useChar += 1;
+          break;
+        default: // do nothing
       }
     }
 
     // split by words to extract our symbol that we may have clicked on
     // TODO: add logic for objects and methods here, func/pro are good for now
-    const wordRegEx = /[a-z_][\.a-z0-9:_$\-\>]*/gim;
     let m: RegExpExecArray;
     while ((m = wordRegEx.exec(line)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -284,7 +319,7 @@ export class IDLSymbolExtractor {
         const idx = line.indexOf(m[i]);
         if (idx !== -1) {
           // check if we have a match
-          if (idx < useChar && idx + m[i].length > useChar) {
+          if (idx <= useChar && idx + m[i].length >= useChar) {
             symbolName = m[i];
             functionFlag = line.substr(idx + m[i].length, 1) === "(";
             break;
@@ -296,7 +331,42 @@ export class IDLSymbolExtractor {
       }
     }
 
-    return { name: symbolName, isFunction: functionFlag };
+    // check if we need to clean up the name
+    let split: string[];
+    let isMethod = false;
+    let searchName: string, objName: string, methodName: string;
+    switch (true) {
+      case symbolName.includes("."):
+        split = symbolName.split(".");
+        searchName = "::" + split[1];
+        objName = split[0];
+        methodName = split[1];
+        isMethod = true;
+        break;
+      case symbolName.includes("->"):
+        split = symbolName.split("->");
+        searchName = "::" + split[1];
+        objName = split[0];
+        methodName = split[1];
+        isMethod = true;
+        break;
+      default:
+        // do nothing
+        searchName = symbolName;
+        objName = "";
+        methodName = "";
+        break;
+    }
+
+    return {
+      name: symbolName,
+      searchName: searchName,
+      objName: objName,
+      methodName: methodName,
+      isMethod: isMethod,
+      isFunction: functionFlag,
+      equalBefore: equalBefore
+    };
   }
 
   symbolizeAsDocumentSymbols(text: string): IDLDocumentSymbol[] {

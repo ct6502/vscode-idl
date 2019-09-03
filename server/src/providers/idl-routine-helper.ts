@@ -2,6 +2,8 @@ import { IRoutines } from "../core/routines.interface";
 import { CompletionItemKind, CompletionItem, MarkupKind } from "vscode-languageserver";
 import fuzzysort = require("fuzzysort"); // search through the symbols
 import { IDL } from "./idl";
+import { ISelectedWord } from "./idl-symbol-extractor";
+import { IQuickLookup, IQuickSearchLookup } from "../core/search.interface";
 
 // options for controlling search performance
 const searchOptions = {
@@ -20,33 +22,89 @@ export class IDLRoutineHelper {
   constants: { [key: string]: number } = {};
   other: { [key: string]: number } = {};
   routineKeys = [];
-  routineKeysSearch: any[] = [];
+  routineKeysSearch: Fuzzysort.Prepared[] = [];
+
+  // qtore a quick lookup object with just arrays of routines and methods
+  quickLookup: IQuickLookup = {
+    functions: [],
+    procedures: [],
+    functionMethods: [],
+    procedureMethods: []
+  };
+
+  // qtore a quick lookup object with just arrays of routines and methods
+  quickSearchLookup: IQuickSearchLookup = {
+    functions: [],
+    procedures: [],
+    functionMethods: [],
+    procedureMethods: []
+  };
 
   constructor(idl: IDL) {
     this.idl = idl;
 
     // init properties
-    this.routineKeys = [];
-    this.routineKeysSearch = [];
     this.routines = this._parseRoutines();
   }
 
   // return items from the docs for completion
-  completion(query: string, optimized = false): CompletionItem[] {
+  completion(query: ISelectedWord, optimized = false): CompletionItem[] {
     // search, map to indices, filter by matches in our array, map to the completion items
     // check how we return our results
     if (!optimized) {
-      return this.routines.docs;
+      switch (true) {
+        // function or potential function (equal sign on the left)
+        case query.equalBefore || query.isFunction:
+          return this.quickLookup.functions;
+        // nothing typed, so just return everything
+        case query.name === "":
+          return this.routines.docs;
+        case query.isMethod && query.equalBefore:
+          return this.quickLookup.functionMethods;
+        case query.isMethod && !query.equalBefore:
+          return this.quickLookup.procedureMethods;
+        default:
+          return this.quickLookup.procedures;
+      }
     } else {
-      // search for our matches
-      const matches = fuzzysort.go(query, this.routineKeysSearch, searchOptions);
+      // check how we should search
+      let matches: any;
+      switch (true) {
+        // function method
+        case query.isMethod && query.equalBefore:
+          matches = fuzzysort.go(
+            query.searchName,
+            this.quickSearchLookup.functionMethods,
+            searchOptions
+          );
+          break;
+        // procedure method
+        case query.isMethod && !query.equalBefore:
+          matches = fuzzysort.go(
+            query.searchName,
+            this.quickSearchLookup.procedureMethods,
+            searchOptions
+          );
+          break;
+        // functions
+        case query.equalBefore || query.isFunction:
+          matches = fuzzysort.go(query.searchName, this.quickSearchLookup.functions, searchOptions);
+          break;
+        // default to procedures
+        default:
+          matches = fuzzysort.go(
+            query.searchName,
+            this.quickSearchLookup.procedures,
+            searchOptions
+          );
+      }
 
       // potentially can be 30% faster method for searching with manual loops
       // old code is below
       const items: CompletionItem[] = [];
       for (let idx = 0; idx < matches.length; idx++) {
         const lc = matches[idx].target.toLowerCase();
-        // handle setting proper information for our data things and such
+        // handle what lookup our item comes from, based on how parsed when laoded
         switch (true) {
           case lc in this.functions:
             items.push(this.routines.docs[this.functions[lc]]);
@@ -60,8 +118,7 @@ export class IDLRoutineHelper {
           case lc in this.other:
             items.push(this.routines.docs[this.other[lc]]);
             break;
-          default:
-            return; // DO NBOTHING
+          default: // DO NBOTHING
         }
       }
 
@@ -86,19 +143,43 @@ export class IDLRoutineHelper {
 
       // save our label information
       this.routineKeys.push(item.label);
-      this.routineKeysSearch.push(fuzzysort.prepare(item.label));
+      const prepped = fuzzysort.prepare(item.label);
+      this.routineKeysSearch.push(prepped);
 
       // handle setting proper information for our data things and such
+      let split: string[];
       switch (true) {
+        case idlRoutines.functions[str] && idlRoutines.methods[str]:
+          split = item.label.split("::");
+          item.insertText = split[1] + "(";
+          item.filterText = split[1];
+          item.kind = CompletionItemKind.Method;
+          this.functions[item.label.toLowerCase()] = idx;
+          this.quickLookup.functionMethods.push(item);
+          this.quickSearchLookup.functionMethods.push(prepped);
+          break;
+        case idlRoutines.procedures[str] && idlRoutines.methods[str]:
+          split = item.label.split("::");
+          item.insertText = split[1] + ",";
+          item.label = split[1]; //+ " (" + split[0] + " method)";
+          item.kind = CompletionItemKind.Function;
+          this.procedures[item.label.toLowerCase()] = idx;
+          this.quickLookup.procedureMethods.push(item);
+          this.quickSearchLookup.procedureMethods.push(prepped);
+          break;
         case idlRoutines.functions[str]:
           item.insertText = item.label + "(";
           item.kind = CompletionItemKind.Function;
           this.functions[item.label.toLowerCase()] = idx;
+          this.quickLookup.functions.push(item);
+          this.quickSearchLookup.functions.push(prepped);
           break;
         case idlRoutines.procedures[str]:
           item.insertText = item.label + ",";
           item.kind = CompletionItemKind.Function;
           this.procedures[item.label.toLowerCase()] = idx;
+          this.quickLookup.procedures.push(item);
+          this.quickSearchLookup.procedures.push(prepped);
           break;
         case item.label.startsWith("!"):
           item.kind = CompletionItemKind.Constant;
@@ -115,18 +196,12 @@ export class IDLRoutineHelper {
         const docsLink =
           "https://www.harrisgeospatial.com/docs/" + idlRoutines.links[idx.toString()];
         const docsStart =
-          [
-            "### Documentation",
-            "[" + docsLink + "](" + docsLink + ")",
-            "",
-            "### Syntax",
-            "",
-            "```idl"
-          ].join("\n") + "\n";
+          ["### [Documentation](" + docsLink + ")", "", "### Syntax", "", "```idl"].join("\n") +
+          "\n";
 
         item.documentation = {
           kind: MarkupKind.Markdown,
-          value: docsStart + docs.join("\n") + "\n```"
+          value: docsStart + docs.join("\n") + "\n```\n \n \n"
         };
       } else {
         item.documentation = "No documentation";

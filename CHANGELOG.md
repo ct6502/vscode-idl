@@ -10,6 +10,18 @@ Small syntax fix for control statements in keywords
 
 New feature with hover help for built-in routines in IDL. Returns first match found if the  names are the same as the symbol being extracted.
 
+Hover help returns markdown with link to the official docs for built-in routines
+
+Logic for detecting symbols for hover and auto-complete
+
+- Aware of function, procedure, and method
+
+- Completion results are then returned based on what symbol is extracted, so we have situational-appropriate results. For example, function auto-completes when we have a `(` in our name or an equal sign on the left hand side. This also helps speed things up.
+
+- Added in all ENVI + IDL object methods, so that is why we needed search filtering. Our total went from about 1300 to 4000 docs entries
+
+- Refactored the storage and addition of symbols for user-defined routines
+
 ## [1.5.5] - 2019-09-01
 
 These features are mostly development updates and not super exciting, new features.

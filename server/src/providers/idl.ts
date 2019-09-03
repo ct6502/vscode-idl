@@ -62,12 +62,12 @@ export class IDL {
     // get the word that we are trying to complete
     // do this here just so we dont have to split larger files more than once
     // because we need the strings, split, and regex to find our work
-    const query = this.manager.getSelectedSymbol(position).name;
-    // this.consoleLog(query);
+    const query = this.manager.getSelectedSymbol(position);
+
     const res = this.helper.completion(query, true);
-    // this.consoleLog(res);
+
     if (res.length > 0) {
-      if (res[0].label === query) {
+      if (res[0].label === query.name) {
         return { contents: res[0].documentation };
       } else {
         return { contents: "" };
@@ -82,10 +82,10 @@ export class IDL {
     // get the word that we are trying to complete
     // do this here just so we dont have to split larger files more than once
     // because we need the strings, split, and regex to find our work
-    const query = this.manager.getSelectedSymbol(position).name;
+    const query = this.manager.getSelectedSymbol(position);
 
     // get docs matches
-    let docsMatches = this.helper.completion(query);
+    let docsMatches = this.helper.completion(query, true);
 
     // get symbol matches
     const symMatches = this.manager.completion(query, position);
