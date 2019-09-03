@@ -85,7 +85,7 @@ export class IDL {
     const query = this.manager.getSelectedSymbol(position);
 
     // get docs matches
-    let docsMatches = this.helper.completion(query, true);
+    let docsMatches = this.helper.completion(query, false);
 
     // get symbol matches
     const symMatches = this.manager.completion(query, position);

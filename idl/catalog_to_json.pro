@@ -10,7 +10,7 @@
 ;-
 
 
-pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allNames, METHOD = method
+pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allNames, METHOD = method, TYPE = type
   compile_opt idl2, hidden
   
   ;flag if we can use this routine or not
@@ -46,11 +46,13 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
   ; skip if ENVI task
 ;  if lowName.startsWith('envi') AND lowName.endsWith('task') then flag = !false
 
-  ; skip if eniv task parameter
+  ; skip if envi task parameter, no need for these right now
   if lowName.startsWith('enviparameter') then flag = !false
   if lowName.startsWith('idlparameter') then flag = !false
 
 ;  if lowName eq strlowcase('ENVIDeepLearningRaster::CreateTileIterator') then stop
+
+if (lowName eq 'idl_idlbridge') then stop
 
   ;only process this item if we can
   if flag then begin
@@ -94,27 +96,43 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
 
       ; store information about the different syntaxes that we can use
       docsExamples = list()
+      
+      ; placeholder for the type
+      if ~keyword_set(type) then type = ''
 
       ;process each potential syntax
       foreach syntax, syntaxes, sIdx do begin
         ; save syntax ifnormation
         docsExamples.add, syntax['%name']
-
-        ;TODO: how to handle more syntax information?
-        ;check if a function or procedure, only do the first one
-        if (sIdx eq 0) then begin
-          if syntax['%type'] eq 'pro' then begin
-            condensed['procedures', strtrim(nProcessed,2)] = !true
+        
+        ;check if a function or procedure
+        ; if we have pro, then we need to keep checking if we have a func syntax
+        ; no idea why the help is so confusing and mix + matches the func/pro
+        if (type eq 'pro') or (sIdx eq 0) then begin
+          ; get the trimmed syntax
+          trimmed = strlowcase(strcompress(syntax['%name'], /REMOVE_ALL))
+          if (syntax['%type'] eq 'pro') AND (type ne 'func') then begin
+            ; cant revert from function
+            type = 'pro'
           endif else begin
-            condensed['functions', strtrim(nProcessed,2)] = !true
+            type = 'func'
           endelse
-          
-          ; check if we are a method
-          if keyword_set(method) then begin
-            condensed['methods', strtrim(nProcessed,2)] = !true
-          endif
         endif
       endforeach
+
+      ; check if we are a method
+      if keyword_set(method) AND ~item.hasKey('%object creation') then begin
+        condensed['methods', strtrim(nProcessed,2)] = !true
+      endif
+
+      ;save the things and stuff
+      if keyword_set(type) then begin
+        if (type eq 'pro') then begin
+          condensed['procedures', strtrim(nProcessed,2)] = !true
+        endif else begin
+          condensed['functions', strtrim(nProcessed,2)] = !true
+        endelse
+      endif
 
       ; save the documentation
       info['documentation'] = docsExamples
@@ -133,7 +151,7 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
         endif
         properties[property['%name']] = property['%description']
       endforeach
-      condensed['properties', strtrim(nProcessed,2)] = properties
+      condensed['properties', lowname] = properties
     endif
 
     ; check if we have a class that we inherit from
@@ -152,14 +170,28 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
       condensed['inherits', strtrim(nProcessed,2)] = parents
     endif
 
-    ;save the information
-    condensed['docs'].add, info
+    ; ony save if we are not a class and a method
+    if (mainKey ne 'CLASS') OR keyword_set(method) then begin
+      ;save the information
+      condensed['docs'].add, info
 
-    ;save that we processed this name
-    allNames[name] = !true
+      ;save that we processed this name
+      allNames[name] = !true
 
-    ;increment counter
-    nProcessed++
+      ;increment counter
+      nProcessed++
+    endif
+
+    ; check if we have an object init method and need to re-run with a function placeholder
+    if lowName.endswith('::init') then begin
+      ; copy our item and make a new name as a function call
+      init_method = json_parse(json_serialize(item))
+      init_method['%name'] = (init_method['%name'].split('::'))[0]
+      init_method['%object creation'] = !true
+      
+      ; add new item for this
+      catalog_to_json_extract_items, mainKey, init_method, nProcessed, condensed, allNames, TYPE = 'func', METHOD = method
+    endif
   endif
   
   ;check if we have methods to process, we can have a class with a routine of the same name, but still need to save information about the routine

@@ -395,7 +395,7 @@ export class IDLSymbolManager {
       const files: string[] = glob
         .readdirSync("**/*.pro")
         .filter(files => !files.toLowerCase().endsWith(".spec.pro"));
-      this.idl.consoleLog(files);
+
       // process each file
       files.forEach(file => {
         // get the URI as a string
