@@ -2,7 +2,7 @@
   "name": "idl",
   "displayName": "IDL Interactive Data Language",
   "description": "IDL syntax highlighting and code snippets",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "publisher": "CT6502",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {

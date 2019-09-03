@@ -13,3 +13,17 @@ export interface IQuickSearchLookup {
   functionMethods: Fuzzysort.Prepared[];
   procedureMethods: Fuzzysort.Prepared[];
 }
+
+export interface IQuickLookupObj {
+  functions: { [key: string]: CompletionItem };
+  procedures: { [key: string]: CompletionItem };
+  functionMethods: { [key: string]: CompletionItem };
+  procedureMethods: { [key: string]: CompletionItem };
+}
+
+export interface IQuickSearchLookupObj {
+  functions: { [key: string]: Fuzzysort.Prepared };
+  procedures: { [key: string]: Fuzzysort.Prepared };
+  functionMethods: { [key: string]: Fuzzysort.Prepared };
+  procedureMethods: { [key: string]: Fuzzysort.Prepared };
+}

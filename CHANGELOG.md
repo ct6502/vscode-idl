@@ -4,11 +4,11 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.6.0] - 2019-09-03
 
 Small syntax fix for control statements in keywords
 
-New feature with hover help for built-in routines in IDL. Returns first match found if the  names are the same as the symbol being extracted.
+New feature with hover help for built-in routines in IDL. Returns first match found if the names are the same as the symbol being extracted.
 
 Hover help returns markdown with link to the official docs for built-in routines
 
@@ -20,7 +20,7 @@ Logic for detecting symbols for hover and auto-complete
 
 - Added in all ENVI + IDL object methods, so that is why we needed search filtering. Our total went from about 1300 to 4000 docs entries
 
-- Refactored the storage and addition of symbols for user-defined routines
+- Refactored the storage and addition of symbols for user-defined routines for faster access and easier cleanup when closing documents
 
 ## [1.5.5] - 2019-09-01
 
@@ -73,7 +73,6 @@ Added basic task schema validation for:
 - ENVI Tasks after ENVI 5.3
 
 - IDL Tasks, which were introduced in IDL 8.5.2
-
 
 ## [1.5.1] - 2019-08-23
 
@@ -147,7 +146,7 @@ A lot of changes have been made to improve the colorization of IDL's procedures 
 
 - There is code for colorizing structure tag names, but it has too many false positives when accessing arrays with syntax like `arr[start:finish]` so it has been commented out.
 
-- .task files are now colored as JSON thanks to [VSCode](https://github.com/Microsoft/vscode-JSON.tmLanguage) 
+- .task files are now colored as JSON thanks to [VSCode](https://github.com/Microsoft/vscode-JSON.tmLanguage)
 
 ## [1.0.0] - 2018-01-08
 

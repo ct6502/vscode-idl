@@ -16,6 +16,8 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 
 * Function/procedure/variable completion for user defined routines in workspaces and opened files
 
+* Hover help for core ENVI and IDL routines, includng links to the official documentation
+
 * Go-to definition for functions, procedures, and methods from user defined routines
 
 * Search for procedure/function definitions through symbols
@@ -37,6 +39,8 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 * Schema validation for all versions of ENVI and IDL tasks to simplify development.
 
 ## Notes
+
+- File searching in indexed workspaces honors your `.gitignore` files, so if you don't see routines that you expect, that may be why. If you don't like this behavior, make an issue on github and we can make a preference for this.
 
 - For task schema validation, the JSON in the `.task` file must contain a `"schema"` tag which indicates the rulesets for which parameters are required. For older ENVI Tasks, you need `"version"`.
 

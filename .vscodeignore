@@ -2,6 +2,7 @@
 .vscode-test/**
 .all-contributorsrc
 .gitignore
+regex.md
 vsc-extension-quickstart.md
 shared.webpack.config.js
 tslint.json
