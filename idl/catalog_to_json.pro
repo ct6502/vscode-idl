@@ -10,7 +10,105 @@
 ;-
 
 
-pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allNames, METHOD = method, TYPE = type
+;+
+; :Private:
+;
+; :Description:
+;    Updates the contents of the IDL SAVE file that
+;    contains the routines for tooltips and documentation
+;    by reading from a file called idl_routines.csv in this
+;    directory.
+;
+;
+;
+;-
+function catalog_to_json_get_tooltips
+  compile_opt idl2, hidden
+
+  ;get the current directory
+  thisdir = file_dirname(routine_filepath())
+
+  ;check for the CSV file
+  routines = thisdir + path_sep() + 'idl_routines.csv'
+
+  ; read in the strings
+  nLines = file_lines(routines)
+  toolDatabase = strarr(nLines)
+  openr, lun, routines, /GET_LUN
+  readf, lun, toolDatabase
+  free_lun, lun
+
+  ;track duplicate objects
+  duplicates = list()
+
+  ;create a hash with our tooltips
+  tooltips = orderedhash(/FOLD_CASE)
+
+  ;process and validate we can ingest
+  foreach line, toolDatabase, idx do begin
+    ;split our line
+    split = strsplit(line, ';', /EXTRACT)
+
+    ;skip if not enough splits for routines
+    if (n_elements(split) ne 6) then continue
+
+    ;extract our information
+    name = strlowcase(strmid(split[1], 1, strlen(split[1])-2))
+    tt = strmid(split[2], 1, strlen(split[2])-2)
+    link = strmid(split[4], 1, strlen(split[4])-2)
+
+    ;create our hash lookup
+    lookup = {tooltip: tt, link: link}
+
+    ;save to our hash
+    tooltips[name] = lookup
+
+    ;check if we have an object name
+    pos = strpos(name, '::')
+    if (pos ne -1) then begin
+      ;get our method name
+      method = strmid(name, pos)
+
+      ;check if we need to skip
+      if (duplicates.where(strlowcase(method)) ne !NULL) then continue
+
+      ;check if we have a key already and remove as there are two methods
+      ;with the same name meaning we cant correctly identify it
+      if tooltips.hasKey(method) then begin
+        ;preserve duplicate tooltips if the tooltips are the same
+        if (strlowcase(tooltips[method].tooltip) eq strlowcase(tt)) then begin
+          ;if two tooltips, blast the method links!
+          if (strlowcase(tooltips[method].tooltip) ne strlowcase(link)) then begin
+            s = tooltips[method]
+            s.link = ''
+            tooltips[method] = s
+          endif
+        endif else begin
+          ;conflicting tooltips, so throw them out
+          duplicates.add, strlowcase(method)
+          tooltips.remove, method
+        endelse
+      endif else begin
+        tooltips[method] = {tooltip: tt, link: link}
+      endelse
+    endif
+
+    ;check if we have a control statement
+    pos = strpos(name, '...')
+    if (pos ne -1) then begin
+      ;extract the start of the control statement
+      control = strmid(name, 0, pos + 3)
+
+      ;make a new entry in our hash
+      tooltips[control] = {tooltip: tt, link: link}
+    endif
+  endforeach
+  
+  ; return the tooltips that we have created
+  return, tooltips
+end
+
+pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allNames, tooltips, METHOD = method, TYPE = type
   compile_opt idl2, hidden
   
   ;flag if we can use this routine or not
@@ -50,9 +148,7 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
   if lowName.startsWith('enviparameter') then flag = !false
   if lowName.startsWith('idlparameter') then flag = !false
 
-;  if lowName eq strlowcase('ENVIDeepLearningRaster::CreateTileIterator') then stop
-
-if (lowName eq 'idl_idlbridge') then stop
+  ; if (lowName eq 'idl_idlbridge') then stop
 
   ;only process this item if we can
   if flag then begin
@@ -62,6 +158,11 @@ if (lowName eq 'idl_idlbridge') then stop
     info['data'] = nProcessed
     info['detail'] = ''
     info['documentation'] = ''
+    
+    ; check if we have a tooltip for the detail
+    if tooltips.hasKey(name) then begin
+      info['detail'] = tooltips[name].tooltip
+    endif
 
     ;make sure we have a link that is a non-empty string
     if item.hasKey('%link') then begin
@@ -190,7 +291,7 @@ if (lowName eq 'idl_idlbridge') then stop
       init_method['%object creation'] = !true
       
       ; add new item for this
-      catalog_to_json_extract_items, mainKey, init_method, nProcessed, condensed, allNames, TYPE = 'func', METHOD = method
+      catalog_to_json_extract_items, mainKey, init_method, nProcessed, condensed, allNames, tooltips, TYPE = 'func', METHOD = method
     endif
   endif
   
@@ -204,7 +305,7 @@ if (lowName eq 'idl_idlbridge') then stop
     
     ; recurse!
     foreach method, methods do begin
-      catalog_to_json_extract_items, mainKey, method, nProcessed, condensed, allNames, METHOD = item
+      catalog_to_json_extract_items, mainKey, method, nProcessed, condensed, allNames, tooltips, METHOD = item
     endforeach
   endif
 end
@@ -254,6 +355,12 @@ if ~isa(parsedFiles, 'hash') then begin
   parsedFiles = orderedhash()
 endif
 
+; load our tooltips
+if ~isa(tooltips, 'orderedhash()') then begin
+  print, 'Loading tooltips...'
+  tooltips = catalog_to_json_get_tooltips()
+endif
+
 ;track number of processed items
 nProcessed = 0
 
@@ -279,7 +386,7 @@ foreach file, files do begin
     ;process each item we have
     foreach item, catalog[mainKey], idx do begin
       ; extract items from our catalog entry
-      catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allNames
+      catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allNames, toolTips
     endforeach
   endforeach
 endforeach

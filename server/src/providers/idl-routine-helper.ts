@@ -7,7 +7,7 @@ import { IQuickLookup, IQuickSearchLookup } from "../core/search.interface";
 
 // options for controlling search performance
 const searchOptions = {
-  limit: 100, // don't return more results than you need!
+  limit: 50, // don't return more results than you need!
   allowTypo: false, // if you don't care about allowing typos
   threshold: -10000 // don't return bad results
 };
@@ -195,9 +195,15 @@ export class IDLRoutineHelper {
       if (docs.length > 0) {
         const docsLink =
           "https://www.harrisgeospatial.com/docs/" + idlRoutines.links[idx.toString()];
-        const docsStart =
-          ["### [Documentation](" + docsLink + ")", "", "### Syntax", "", "```idl"].join("\n") +
-          "\n";
+        let docsStart: string;
+        docsStart =
+          [
+            "#### " + item.label + " - [Documentation Link](" + docsLink + ")",
+            item.detail,
+            "",
+            "#### Syntax",
+            "```idl"
+          ].join("\n") + "\n";
 
         item.documentation = {
           kind: MarkupKind.Markdown,
