@@ -487,27 +487,35 @@ export class IDLSymbolManager {
                   replaceName = split[1];
                   isMethod = true;
                 }
-
+                const searchSaveFlag = key in this.routineCompletionLookup;
                 // update name with function, procedure, method
                 switch (true) {
                   case symbol.detail.includes("Function") && isMethod:
-                    this.quickLookup.functionMethods.push(completionItem);
-                    this.quickSearchLookup.functionMethods.push(prepped);
+                    if (!searchSaveFlag) {
+                      this.quickLookup.functionMethods.push(completionItem);
+                      this.quickSearchLookup.functionMethods.push(prepped);
+                    }
                     completionItem.insertText = replaceName.substr(0, replaceName.length - 1); // replace with  open paren, not closed
                     break;
                   case symbol.detail.includes("Function"):
-                    this.quickLookup.functions.push(completionItem);
-                    this.quickSearchLookup.functions.push(prepped);
+                    if (!searchSaveFlag) {
+                      this.quickLookup.functions.push(completionItem);
+                      this.quickSearchLookup.functions.push(prepped);
+                    }
                     completionItem.insertText = replaceName.substr(0, replaceName.length - 1); // replace with  open paren, not closed
                     break;
                   case symbol.detail.includes("Procedure") && isMethod:
-                    this.quickLookup.procedureMethods.push(completionItem);
-                    this.quickSearchLookup.procedureMethods.push(prepped);
+                    if (!searchSaveFlag) {
+                      this.quickLookup.procedureMethods.push(completionItem);
+                      this.quickSearchLookup.procedureMethods.push(prepped);
+                    }
                     completionItem.insertText = replaceName + ",";
                     break;
                   case symbol.detail.includes("Procedure"):
-                    this.quickLookup.procedures.push(completionItem);
-                    this.quickSearchLookup.procedures.push(prepped);
+                    if (!searchSaveFlag) {
+                      this.quickLookup.procedures.push(completionItem);
+                      this.quickSearchLookup.procedures.push(prepped);
+                    }
                     completionItem.insertText = replaceName + ",";
                     break;
                   default:
