@@ -40,6 +40,8 @@ For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting yo
 
 ## Notes
 
+- Method auto complete has basic variable logic, if there are issues with items not coming up, please submit an issue with a reproduce case on github so that we can make this better.
+
 - File searching in indexed workspaces honors your `.gitignore` files, so if you don't see routines that you expect, that may be why. If you don't like this behavior, make an issue on github and we can make a preference for this.
 
 - For task schema validation, the JSON in the `.task` file must contain a `"schema"` tag which indicates the rulesets for which parameters are required. For older ENVI Tasks, you need `"version"`.

@@ -148,8 +148,6 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
   if lowName.startsWith('enviparameter') then flag = !false
   if lowName.startsWith('idlparameter') then flag = !false
 
-  ; if (lowName eq 'idl_idlbridge') then stop
-
   ;only process this item if we can
   if flag then begin
     ;init data structure and information
@@ -227,7 +225,7 @@ pro catalog_to_json_extract_items, mainKey, item, nProcessed, condensed, allName
       endforeach
 
       ; check if we are a method
-      if keyword_set(method) AND ~item.hasKey('%object creation') then begin
+      if keyword_set(method) AND ~item->hasKey('%object creation') then begin
         condensed['methods', strtrim(nProcessed,2)] = !true
       endif
 
@@ -361,7 +359,7 @@ if ~isa(parsedFiles, 'hash') then begin
 endif
 
 ; load our tooltips
-if ~isa(tooltips, 'orderedhash()') then begin
+if ~isa(tooltips, 'orderedhash') then begin
   print, 'Loading tooltips...'
   tooltips = catalog_to_json_get_tooltips()
 endif

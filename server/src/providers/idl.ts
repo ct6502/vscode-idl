@@ -68,19 +68,24 @@ export class IDL {
     if (query.name === "") {
       return { contents: "" };
     }
-    this.consoleLog(query);
+    // this.consoleLog(query);
 
+    // search for results
     const res = this.helper.completion(query, true);
-    this.consoleLog(res);
-    if (res.length > 0) {
-      // take first if the end matches
-      if (res[0].label.toLowerCase().endsWith(query.searchName.toLowerCase())) {
-        return { contents: res[0].documentation };
-      } else {
+
+    // determine how to proceed
+    switch (true) {
+      // no matches no dice
+      case res.length === 0:
         return { contents: "" };
-      }
-    } else {
-      return { contents: "" };
+      // more than one, but first is an exact match, send
+      case res.length > 1 && res[0].label.toLowerCase() === query.searchName.toLowerCase():
+      // if only one, might as well just send the one
+      case res.length == 1:
+        return { contents: res[0].documentation };
+      // default, don't send anything
+      default:
+        return { contents: "" };
     }
   }
 
@@ -91,8 +96,16 @@ export class IDL {
     // because we need the strings, split, and regex to find our work
     const query = this.manager.getSelectedSymbol(position);
 
-    // get docs matches
-    let docsMatches = this.helper.completion(query, false);
+    // check if we are a method
+    let docsMatches: CompletionItem[];
+    if (query.isMethod) {
+      docsMatches = this.helper.completion(query, true);
+      if (docsMatches.length == 0) {
+        docsMatches = this.helper.completion(query, false);
+      }
+    } else {
+      docsMatches = this.helper.completion(query, false);
+    }
 
     // get symbol matches
     const symMatches = this.manager.completion(query, position);

@@ -5,12 +5,14 @@ import {
   Location,
   Range,
   Position,
-  CompletionItemKind
+  CompletionItemKind,
+  CompletionItem
 } from "vscode-languageserver";
 import { IDL } from "./idl";
 
 export interface IDLDocumentSymbol extends DocumentSymbol {
   displayName?: string;
+  next?: string;
 }
 
 export interface ISelectedWord {
@@ -97,6 +99,10 @@ export class IDLSymbolExtractor {
 
       // The result can be accessed through the `m`-variable.
       m.forEach((match, groupIndex) => {
+        if (groupIndex > 0) {
+          return;
+        }
+
         // check for object
         const lowMatch = match.toLowerCase();
         if (lowMatch.includes("__define")) {
@@ -163,6 +169,10 @@ export class IDLSymbolExtractor {
 
       // The result can be accessed through the `m`-variable.
       m.forEach((match, groupIndex) => {
+        if (groupIndex > 0) {
+          return;
+        }
+
         // check for object
         const lowMatch = match.toLowerCase();
         if (lowMatch.includes("__define")) {
@@ -216,8 +226,8 @@ export class IDLSymbolExtractor {
     const symbols: IDLDocumentSymbol[] = [];
 
     // find all procedure definitions
-    // (skip if line continuation)(dont use if continue, begin, or endif is ahead)(ok for start or in if statements)
-    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(?=\s*=)/gim;
+    // (skip if line continuation)(dont use if continue, begin, or endif is ahead)(ok for start or in if statements)()capture right side
+    const proRegex = /(?<!,\s*\$.*\n^\s*)(?<=^\s*|then |else | else\s*:|:\s*)([a-z_][a-z_$0-9]*)(\s*=\s*)([a-z_][a-z_0-9$]*-\>[a-z_][a-z_0-9.$]*|[a-z_0-9][a-z_0-9.$]*)/gim;
     let m: RegExpExecArray;
     while ((m = proRegex.exec(text)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -226,35 +236,61 @@ export class IDLSymbolExtractor {
       }
 
       // get the line of this character
+      const allSplit = text.split("\n");
       const split = text.substr(0, m.index).split("\n");
       const lineNumber = split.length - 1;
       const start = split[split.length - 1].length; // length of string start
 
+      // track how much farther we moved
+      let startAdd = 0;
+
       // The result can be accessed through the `m`-variable.
       m.forEach((match, groupIndex) => {
-        // get range
-        const range = Range.create(
-          Position.create(lineNumber, start),
-          Position.create(lineNumber, start + match.length)
-        );
+        // determine how to process
+        switch (groupIndex) {
+          case 0: // do nothing for full match
+            break;
+          case 3:
+            // check the thing to our right
+            let right = allSplit[lineNumber].substr(start + startAdd).trim();
 
-        // make our symbol
-        // TODO: figure out how to associate these with a routine so that
-        // we could "catch" errors with redifining variable. but do we need this?
-        // we dont have this in TS so maybe not
-        const symbol: IDLDocumentSymbol = DocumentSymbol.create(
-          match,
-          "Variable",
-          SymbolKind.Variable,
-          range,
-          range
-        );
+            // check for obj_new calls and get the object class
+            const regex = /(?<=obj_new\(\s*['"])([a-z_][a-z_0-9&]*)/gim;
+            if ((m = regex.exec(right)) !== null) {
+              right = m[0] + "()";
+            }
 
-        // save the display name of our symbol, hack to get around custom IDL symbol here
-        symbol.displayName = match;
+            symbols[symbols.length - 1].next = right;
+            break;
+          // first capture group is left of the equal sign
+          case 1:
+            // get range
+            const range = Range.create(
+              Position.create(lineNumber, start),
+              Position.create(lineNumber, start + match.length)
+            );
 
-        // save
-        symbols.push(symbol);
+            // make our symbol
+            // TODO: figure out how to associate these with a routine so that
+            // we could "catch" errors with redifining variable. but do we need this?
+            // we dont have this in TS so maybe not
+            const symbol: IDLDocumentSymbol = DocumentSymbol.create(
+              match,
+              "Variable",
+              SymbolKind.Variable,
+              range,
+              range
+            );
+
+            // save the display name of our symbol, hack to get around custom IDL symbol here
+            symbol.displayName = match;
+
+            // save
+            symbols.push(symbol);
+          default:
+            // bump start if not full match
+            startAdd += match.length;
+        }
       });
     }
 
@@ -262,7 +298,15 @@ export class IDLSymbolExtractor {
     return symbols;
   }
 
-  getSelectedWord(line: string, position: Position): ISelectedWord {
+  getSelectedWord(
+    inLline: string,
+    position: Position,
+    constants: IDLDocumentSymbol[]
+  ): ISelectedWord {
+    // copy our input and buffer with a space to the left, need that for some reason...
+    const line = " " + inLline;
+    position.character += 1;
+
     // placeholder for the name
     let symbolName = "";
     let functionFlag = false;
@@ -276,27 +320,29 @@ export class IDLSymbolExtractor {
 
     // regex for valid character to be before
     // const wordRegEx = /[a-z_][\.a-z0-9:_$\-\>]*/gim;
-    const wordRegEx = /[\.a-z0-9:_$\-\>][\.a-z0-9:_$\-\>]*/gim;
+    const wordRegEx = /[\.a-z0-9:_$\-\>!][\.a-z0-9:_$\-\>]*/gim;
 
     // get the character position - move to the left so that we are in a word
     // otherwise we are outside a word as we are on the next character
     // which is usuallya  space
     let useChar = position.character;
-    if (position.character > 0) {
+    if (useChar > 0 && !wordRegEx.test(line.substr(useChar - 1, 1))) {
       // check if we can get a character before our cursor or not
       useChar = useChar - 1;
       switch (true) {
         case useChar === 0:
           const name = line.substr(0, 1).trim();
-          return {
-            name: name,
-            searchName: name,
-            objName: "",
-            methodName: "",
-            isMethod: false,
-            isFunction: false,
-            equalBefore: equalBefore
-          };
+          if (name === "") {
+            return {
+              name: name,
+              searchName: name,
+              objName: "",
+              methodName: "",
+              isMethod: false,
+              isFunction: false,
+              equalBefore: equalBefore
+            };
+          }
         // character before is not a word, space or something we cant split up
         // so move back to where our cursor is
         case !wordRegEx.test(line.substr(useChar, 1)):
@@ -345,7 +391,14 @@ export class IDLSymbolExtractor {
     let searchName: string, objName: string, methodName: string;
     switch (true) {
       case symbolName.includes("."):
-        split = symbolName.split(".");
+        // get to the end
+        let idxDot = symbolName.indexOf(".");
+        let idxPrev = idxDot;
+        while (idxDot !== -1) {
+          idxPrev = idxDot;
+          idxDot = symbolName.indexOf(".", idxDot + 1);
+        }
+        split = [symbolName.substr(0, idxPrev), symbolName.substr(idxPrev + 1)];
         searchName = "::" + split[1];
         objName = split[0];
         methodName = split[1];
@@ -364,6 +417,38 @@ export class IDLSymbolExtractor {
         objName = "";
         methodName = "";
         break;
+    }
+
+    // filter to find potential constants that we came from
+    if (isMethod) {
+      const above = constants
+        .filter(constant => constant.range.start.line < position.line)
+        .reverse();
+      const wordRegEx = /[a-z_][a-z_$0-9:]*(?=\()/gim;
+
+      // check from closet to highest symbol for match to our object name
+      if (above.length > 0) {
+        for (let idx = 0; idx < above.length; idx++) {
+          // get the thing we might belong to
+          const element = above[idx];
+          // do we have a match?
+          if (objName.toLowerCase() === element.name.toLowerCase()) {
+            // do we have information about what is next
+            if (element.next) {
+              // check for function call
+              if ((m = wordRegEx.exec(element.next)) !== null) {
+                // does it match the start of the line?
+                if (element.next.indexOf(m[0]) === 0) {
+                  searchName = m[0] + searchName;
+                }
+              }
+            }
+
+            // exit loop as we should only check the closest item if we have a match
+            break;
+          }
+        }
+      }
     }
 
     return {

@@ -65,6 +65,7 @@ export class IDLSymbolManager {
 
   // Track constants by file and routines by all files we have opened
   constantCompletionLookup: { [key: string]: CompletionItem[] } = {};
+  constantSymbolLookup: { [key: string]: IDLDocumentSymbol[] } = {};
 
   // track routines that we extract
   routineCompletionLookup: { [key: string]: CompletionItem } = {};
@@ -223,8 +224,11 @@ export class IDLSymbolManager {
     // read the strings from our text document
     const line = this.idl.files.getFileStrings(params.textDocument.uri)[params.position.line];
 
+    // get the constant symbols in our file to cross reference
+    const symbols = this.constantSymbolLookup[params.textDocument.uri];
+
     // get the symbol highlighted
-    return this.idl.extractor.getSelectedWord(line, params.position);
+    return this.idl.extractor.getSelectedWord(line, params.position, symbols);
   }
 
   // search for symbols by line
@@ -289,6 +293,7 @@ export class IDLSymbolManager {
   private _removeSymbols(uri: string, symbols: DocumentSymbol[]) {
     // clear constant lookup
     delete this.constantCompletionLookup[uri];
+    delete this.constantSymbolLookup[uri];
 
     // process each symbol
     symbols.forEach(symbol => {
@@ -502,6 +507,7 @@ export class IDLSymbolManager {
 
             // save any constants that we may have found, but only if we have one by that name
             const constantNames = [];
+            this.constantSymbolLookup[uri] = foundSymbols;
             this.constantCompletionLookup[uri] = foundSymbols
               .filter(symbol => {
                 let flag = false;
