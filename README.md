@@ -1,14 +1,10 @@
 # VS Code IDL (Interactive Data Language) Extension
 
+Created and maintained by current and past members of the IDL + ENVI team.
+
 This extension adds syntax highlighting, code snippets, and much more for the Interactive Data Language (IDL) from Harris Geospatial Solutions (formerly Research Systems, Inc.).
 
-Created and maintained by current and past members of the IDL+ENVI team.
-
-## Credits
-
-The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbundle](https://github.com/mgalloy/idl.tmbundle).
-
-For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting your environment setup.
+If you are looking to contribute, see [CONTRIBUTING.md](./CONTRIBUTING.md) for notes on getting your environment setup.
 
 ## Features
 
@@ -57,6 +53,24 @@ someProcedure,$
 
 This should be something that you are doing in your code anyways, so it shouldn't cause problems for most people. If you do not do this, then procedures will not be colored until your next line with an indentation and no `$` character. If this is an issue, let us know on the GitHub page via an issue and we will take a look at improving this functionality.
 
+## Future Plans
+
+Goals for features to add (not necessarily in this order):
+
+- Go-to definition for variables.
+
+- Hover help for user defined routines.
+
+    Need to decide if this uses the code or code comments - maybe both if no comments, to derive this information.
+
+- Figure out how to have a more "aware" editor, meaning symbol definitions for things like type (objects, numbers, arrays, strings). This is a challaenge because we don't have that information for most of IDL.
+
+    This includes being able to access properties which for user-defined objects, means we need to know the object source, inheritance, and the properties along the chain.
+
+- Linting would be nice - mostly for code formatting more than rule following lilke eslint or tslint.
+
+
+
 ## Known Issues
 
 - Properties will not highlight if being accessed directly from square brackets such as `trace[-3].LINE`. 
@@ -71,6 +85,10 @@ someProcedure,$
 ## Release Notes
 
 See [CHANGELOG](CHANGELOG.md).
+
+## Credits
+
+The TextMate files and code snippets are originally from Mike Galloy's [idl.tmbundle](https://github.com/mgalloy/idl.tmbundle).
 
 ## Contributors
 
