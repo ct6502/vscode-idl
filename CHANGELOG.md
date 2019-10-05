@@ -4,6 +4,12 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.6.1] - 2010-10-05
+
+Fixed a bug with problem detection that didn't properly clear
+
+Updated dependencies to VSCode 1.38
+
 ## [1.6.0] - 2019-09-03
 
 Small syntax fix for control statements in keywords

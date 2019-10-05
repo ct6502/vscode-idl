@@ -73,7 +73,7 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
   parents: { [key: string]: IDLAction };
   tree: { [key: string]: IDLAction[] };
 
-  constructor(private workspaceRoot: string) {
+  constructor() {
     // build our tree
     this.tree = {
       Commands: commandChildren.map(

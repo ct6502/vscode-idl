@@ -10,7 +10,7 @@
     "url": "https://github.com/chris-torrence/vscode-idl"
   },
   "engines": {
-    "vscode": "^1.36.0"
+    "vscode": "^1.38.0"
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -23,8 +23,8 @@
     "vscode-languageclient": "^4.1.4"
   },
   "devDependencies": {
-    "@types/node": "^12.7.3",
-    "@types/vscode": "^1.1.36",
+    "@types/node": "^12.7.11",
+    "@types/vscode": "^1.38.0",
     "rimraf": "^3.0.0"
   }
 }

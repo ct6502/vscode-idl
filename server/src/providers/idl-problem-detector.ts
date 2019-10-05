@@ -139,6 +139,9 @@ export class IDLProblemDetector {
       this.previousProblems = this.previousProblems.concat(Object.keys(this.problems));
     }
 
+    // clear problems
+    this.problems = {};
+
     // detect name conflicts
     this._detectRoutineNameProblems();
   }

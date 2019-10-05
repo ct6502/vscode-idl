@@ -61,7 +61,7 @@ export function activate(ctx: ExtensionContext) {
   const clickHandler = new IDLTreeClickHandler();
 
   // generate our tree provider and get the view for listening to events
-  const idlTreeProvider = new IDLTreeViewProvider(vscode.workspace.rootPath);
+  const idlTreeProvider = new IDLTreeViewProvider();
   const treeView = vscode.window.createTreeView("idlTree", {
     treeDataProvider: idlTreeProvider
   });

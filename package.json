@@ -2,7 +2,7 @@
   "name": "idl",
   "displayName": "IDL Interactive Data Language",
   "description": "IDL syntax highlighting and code snippets",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "publisher": "CT6502",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
@@ -25,21 +25,21 @@
   "dependencies": {},
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "@types/node": "^8.10.53",
+    "@types/node": "^8.10.54",
     "all-contributors-cli": "^4.11.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "merge-options": "^1.0.1",
-    "mocha": "^6.2.0",
-    "ts-loader": "^6.0.4",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5",
+    "mocha": "^6.2.1",
+    "ts-loader": "^6.2.0",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.3",
     "vscode-test": "^1.2.0",
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "engines": {
-    "vscode": "^1.36.0"
+    "vscode": "^1.38.0"
   },
   "activationEvents": [
     "onLanguage:idl",
