@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import * as path from "path";
+import * as vscode from 'vscode';
+import * as path from 'path';
 
 // get all directories for icons
 const thisDir = path.dirname(__filename);
@@ -17,49 +17,49 @@ interface IChild {
 // specify the children for the command parent in the tree view
 export const commandChildren: IChild[] = [
   {
-    name: "Open",
-    descripion: "a new IDL terminal window",
-    icon: "open-new.svg"
+    name: 'Open',
+    descripion: 'a new IDL terminal window',
+    icon: 'open-new.svg'
   },
   {
-    name: "Compile",
-    descripion: "the active PRO file",
-    icon: "settings.svg"
+    name: 'Compile',
+    descripion: 'the active PRO file',
+    icon: 'settings.svg'
   },
   {
-    name: "Run",
-    descripion: "the active PRO file",
-    icon: "play.svg"
+    name: 'Run',
+    descripion: 'the active PRO file',
+    icon: 'play.svg'
   },
   {
-    name: "Stop",
-    descripion: "the IDL interpreter",
-    icon: "stop.svg"
+    name: 'Stop',
+    descripion: 'the IDL interpreter',
+    icon: 'stop.svg'
   },
   {
-    name: "Continue",
-    descripion: "running the IDL interpreter",
-    icon: "play.svg"
+    name: 'Continue',
+    descripion: 'running the IDL interpreter',
+    icon: 'play.svg'
   },
   {
-    name: "In",
-    descripion: "When debugging, step into a routine call",
-    icon: "arrow-down.svg"
+    name: 'In',
+    descripion: 'When debugging, step into a routine call',
+    icon: 'arrow-down.svg'
   },
   {
-    name: "Over",
-    descripion: "When debugging, step over a routine call",
-    icon: "arrow-over.svg"
+    name: 'Over',
+    descripion: 'When debugging, step over a routine call',
+    icon: 'arrow-over.svg'
   },
   {
-    name: "Out",
-    descripion: "When debugging, step out of a routine",
-    icon: "arrow-up.svg"
+    name: 'Out',
+    descripion: 'When debugging, step out of a routine',
+    icon: 'arrow-up.svg'
   },
   {
-    name: "Reset",
-    descripion: "the IDL session",
-    icon: "renew.svg"
+    name: 'Reset',
+    descripion: 'the IDL session',
+    icon: 'renew.svg'
   }
 ];
 
@@ -89,10 +89,10 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
 
     this.parents = {
       Commands: new IDLAction(
-        "Commands",
-        "",
+        'Commands',
+        '',
         vscode.TreeItemCollapsibleState.Expanded,
-        "assessment.svg"
+        'assessment.svg'
       )
     };
   }
@@ -147,24 +147,24 @@ export class IDLAction extends vscode.TreeItem {
 
     // check if we are a parent or child
     if (collapsibleState === vscode.TreeItemCollapsibleState.Expanded) {
-      this.contextValue = "parent";
+      this.contextValue = 'parent';
     } else {
-      this.contextValue = "child";
+      this.contextValue = 'child';
     }
 
     this.iconPath = {
-      light: path.join(extensionDir, "images", "light", iconName),
-      dark: path.join(extensionDir, "images", "dark", iconName)
+      light: path.join(extensionDir, 'images', 'light', iconName),
+      dark: path.join(extensionDir, 'images', 'dark', iconName)
     };
   }
 
   get tooltip(): string {
-    return this.label + " " + this.version;
+    return this.label + ' ' + this.version;
   }
 
   get description(): string {
     return this.version;
   }
 
-  contextValue = "IDLAction";
+  contextValue = 'IDLAction';
 }

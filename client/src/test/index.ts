@@ -1,20 +1,20 @@
-import * as path from "path";
-import * as Mocha from "mocha";
-import * as glob from "glob";
+import * as path from 'path';
+import * as Mocha from 'mocha';
+import * as glob from 'glob';
 
 // this routine is called when we execute tests from within vscode
 // it discovers all of the tests files and runs them with annpoying mocha
 export function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({
-    ui: "tdd"
+    ui: 'tdd'
   });
   mocha.useColors(true);
 
-  const testsRoot = path.resolve(__dirname, "..");
+  const testsRoot = path.resolve(__dirname, '..');
 
   return new Promise((c, e) => {
-    glob("**/**.spec.js", { cwd: testsRoot }, (err, files) => {
+    glob('**/**.spec.js', { cwd: testsRoot }, (err, files) => {
       if (err) {
         return e(err);
       }

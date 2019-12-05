@@ -7,8 +7,8 @@ import {
   Position,
   CompletionItemKind,
   CompletionItem
-} from "vscode-languageserver";
-import { IDL } from "./idl";
+} from 'vscode-languageserver';
+import { IDL } from './idl';
 
 export interface IDLDocumentSymbol extends DocumentSymbol {
   displayName?: string;
@@ -28,24 +28,24 @@ export interface ISelectedWord {
 // if we have a method, make it clear we have that in the document description string
 function resolveRoutineNameAdd(match: string): string {
   switch (true) {
-    case match.includes("::"):
-      return " method";
+    case match.includes('::'):
+      return ' method';
       break;
-    case match.toLowerCase().endsWith("__define"):
-      return " (class definition)";
+    case match.toLowerCase().endsWith('__define'):
+      return ' (class definition)';
       break;
     default:
-      return "";
+      return '';
   }
 }
 
 // get the proper symbol type for what we found, just for routines now
 function resolveRoutineType(match: string): SymbolKind {
   switch (true) {
-    case match.includes("::"):
+    case match.includes('::'):
       return SymbolKind.Method;
       break;
-    case match.toLowerCase().endsWith("__define"):
+    case match.toLowerCase().endsWith('__define'):
       return SymbolKind.Class;
       break;
     default:
@@ -93,7 +93,7 @@ export class IDLSymbolExtractor {
       }
 
       // get the line of this character
-      const split = text.substr(0, m.index).split("\n");
+      const split = text.substr(0, m.index).split('\n');
       const lineNumber = split.length - 1;
       const start = split[split.length - 1].length; // length of string start
 
@@ -105,8 +105,8 @@ export class IDLSymbolExtractor {
 
         // check for object
         const lowMatch = match.toLowerCase();
-        if (lowMatch.includes("__define")) {
-          const objName = lowMatch.replace("__define", "");
+        if (lowMatch.includes('__define')) {
+          const objName = lowMatch.replace('__define', '');
           if (objects.indexOf(objName) == -1) {
             objects.push(objName);
           }
@@ -119,15 +119,15 @@ export class IDLSymbolExtractor {
         );
 
         const symbol: IDLDocumentSymbol = DocumentSymbol.create(
-          match + "()",
-          "Function" + resolveRoutineNameAdd(match),
+          match + '()',
+          'Function' + resolveRoutineNameAdd(match),
           resolveRoutineType(match),
           range,
           range
         );
 
         // save the display name of our symbol, hack to get around custom IDL symbol here
-        symbol.displayName = match + "()";
+        symbol.displayName = match + '()';
 
         // save
         symbols.push(symbol);
@@ -138,9 +138,9 @@ export class IDLSymbolExtractor {
     if (objects.length == 1) {
       symbols.forEach((symbol, idx) => {
         const lowName = symbol.displayName.toLowerCase();
-        if (lowName.includes(objects[0]) && lowName.includes(":")) {
+        if (lowName.includes(objects[0]) && lowName.includes(':')) {
           // update name
-          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
+          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(':'));
         }
       });
     }
@@ -163,7 +163,7 @@ export class IDLSymbolExtractor {
       }
 
       // get the line of this character
-      const split = text.substr(0, m.index).split("\n");
+      const split = text.substr(0, m.index).split('\n');
       const lineNumber = split.length - 1;
       const start = split[split.length - 1].length; // length of string start
 
@@ -175,8 +175,8 @@ export class IDLSymbolExtractor {
 
         // check for object
         const lowMatch = match.toLowerCase();
-        if (lowMatch.includes("__define")) {
-          const objName = lowMatch.replace("__define", "");
+        if (lowMatch.includes('__define')) {
+          const objName = lowMatch.replace('__define', '');
           if (objects.indexOf(objName) == -1) {
             objects.push(objName);
           }
@@ -191,7 +191,7 @@ export class IDLSymbolExtractor {
         // make our symbol
         const symbol: IDLDocumentSymbol = DocumentSymbol.create(
           match,
-          "Procedure" + resolveRoutineNameAdd(match),
+          'Procedure' + resolveRoutineNameAdd(match),
           resolveRoutineType(match),
           range,
           range
@@ -209,9 +209,9 @@ export class IDLSymbolExtractor {
     if (objects.length == 1) {
       symbols.forEach((symbol, idx) => {
         const lowName = symbol.displayName.toLowerCase();
-        if (lowName.includes(objects[0]) && lowName.includes(":")) {
+        if (lowName.includes(objects[0]) && lowName.includes(':')) {
           // update name
-          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(":"));
+          symbol.displayName = symbol.displayName.substr(symbol.displayName.indexOf(':'));
         }
       });
     }
@@ -236,8 +236,8 @@ export class IDLSymbolExtractor {
       }
 
       // get the line of this character
-      const allSplit = text.split("\n");
-      const split = text.substr(0, m.index).split("\n");
+      const allSplit = text.split('\n');
+      const split = text.substr(0, m.index).split('\n');
       const lineNumber = split.length - 1;
       const start = split[split.length - 1].length; // length of string start
 
@@ -257,7 +257,7 @@ export class IDLSymbolExtractor {
             // check for obj_new calls and get the object class
             const regex = /(?<=obj_new\(\s*['"])([a-z_][a-z_0-9&]*)/gim;
             if ((m = regex.exec(right)) !== null) {
-              right = m[0] + "()";
+              right = m[0] + '()';
             }
 
             symbols[symbols.length - 1].next = right;
@@ -276,7 +276,7 @@ export class IDLSymbolExtractor {
             // we dont have this in TS so maybe not
             const symbol: IDLDocumentSymbol = DocumentSymbol.create(
               match,
-              "Variable",
+              'Variable',
               SymbolKind.Variable,
               range,
               range
@@ -304,16 +304,16 @@ export class IDLSymbolExtractor {
     constants: IDLDocumentSymbol[]
   ): ISelectedWord {
     // copy our input and buffer with a space to the left, need that for some reason...
-    const line = " " + inLline;
+    const line = ' ' + inLline;
     position.character += 1;
 
     // placeholder for the name
-    let symbolName = "";
+    let symbolName = '';
     let functionFlag = false;
 
     // check for an qual sign
     let equalBefore = false;
-    let equalPos = line.indexOf("=");
+    let equalPos = line.indexOf('=');
     if (equalPos !== -1) {
       equalBefore = equalPos < position.character;
     }
@@ -332,12 +332,12 @@ export class IDLSymbolExtractor {
       switch (true) {
         case useChar === 0:
           const name = line.substr(0, 1).trim();
-          if (name === "") {
+          if (name === '') {
             return {
               name: name,
               searchName: name,
-              objName: "",
-              methodName: "",
+              objName: '',
+              methodName: '',
               isMethod: false,
               isFunction: false,
               equalBefore: equalBefore
@@ -375,12 +375,12 @@ export class IDLSymbolExtractor {
           // check if our expression contains our charater
           if (idx <= useChar && idx + m[i].length >= useChar) {
             symbolName = m[i];
-            functionFlag = line.substr(idx + m[i].length, 1) === "(";
+            functionFlag = line.substr(idx + m[i].length, 1) === '(';
             break;
           }
         }
       }
-      if (symbolName !== "") {
+      if (symbolName !== '') {
         break;
       }
     }
@@ -390,23 +390,23 @@ export class IDLSymbolExtractor {
     let isMethod = false;
     let searchName: string, objName: string, methodName: string;
     switch (true) {
-      case symbolName.includes("."):
+      case symbolName.includes('.'):
         // get to the end
-        let idxDot = symbolName.indexOf(".");
+        let idxDot = symbolName.indexOf('.');
         let idxPrev = idxDot;
         while (idxDot !== -1) {
           idxPrev = idxDot;
-          idxDot = symbolName.indexOf(".", idxDot + 1);
+          idxDot = symbolName.indexOf('.', idxDot + 1);
         }
         split = [symbolName.substr(0, idxPrev), symbolName.substr(idxPrev + 1)];
-        searchName = "::" + split[1];
+        searchName = '::' + split[1];
         objName = split[0];
         methodName = split[1];
         isMethod = true;
         break;
-      case symbolName.includes("->"):
-        split = symbolName.split("->");
-        searchName = "::" + split[1];
+      case symbolName.includes('->'):
+        split = symbolName.split('->');
+        searchName = '::' + split[1];
         objName = split[0];
         methodName = split[1];
         isMethod = true;
@@ -414,8 +414,8 @@ export class IDLSymbolExtractor {
       default:
         // do nothing
         searchName = symbolName;
-        objName = "";
-        methodName = "";
+        objName = '';
+        methodName = '';
         break;
     }
 
@@ -491,7 +491,7 @@ export class IDLSymbolExtractor {
         name: symbol.name,
         kind: symbol.kind,
         location: Location.create(uri, symbol.range),
-        containerName: ""
+        containerName: ''
       });
     });
 

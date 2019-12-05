@@ -1,6 +1,6 @@
-import { IDL } from "./idl";
-import { readFileSync } from "fs"; // read text file from disk
-import Uri from "vscode-uri"; // handle URI to file system and back
+import { IDL } from './idl';
+import { readFileSync } from 'fs'; // read text file from disk
+import Uri from 'vscode-uri'; // handle URI to file system and back
 
 export class IDLFileHelper {
   idl: IDL;
@@ -16,7 +16,7 @@ export class IDLFileHelper {
   // get strings for our document, it will be a single string
   private _getStrings(uri: string): string {
     // init return value
-    let strings = "";
+    let strings = '';
 
     // get the document we are processing
     const doc = this.idl.documents.get(uri);
@@ -24,7 +24,7 @@ export class IDLFileHelper {
       strings = doc.getText();
     } else {
       const parsed = Uri.parse(uri);
-      strings = readFileSync(parsed.fsPath, "utf8");
+      strings = readFileSync(parsed.fsPath, 'utf8');
     }
 
     // save lookup information
@@ -42,7 +42,7 @@ export class IDLFileHelper {
     // recurse
     while (flag) {
       // check for comment, single, and double quote
-      idxComment = line.indexOf(";", pos);
+      idxComment = line.indexOf(';', pos);
       idxSingle = line.indexOf("'", pos);
       idxDouble = line.indexOf('"', pos);
       min = Math.min(
@@ -105,7 +105,7 @@ export class IDLFileHelper {
     const noComments: string[] = [];
 
     //filter
-    const split = string.split("\n");
+    const split = string.split('\n');
     for (let idx = 0; idx < split.length; idx++) {
       // remove all formatting and comments
       const line = this._trimLine(split[idx].trimRight());
@@ -124,7 +124,7 @@ export class IDLFileHelper {
 
     // save processed strings
     this.regexStrings[uri] = noComments;
-    this.regexString[uri] = noComments.join("\n");
+    this.regexString[uri] = noComments.join('\n');
     this.cleanStrings[uri] = strings;
   }
 

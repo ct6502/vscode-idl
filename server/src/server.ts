@@ -18,10 +18,10 @@ import {
   DocumentSymbol,
   Definition,
   Hover
-} from "vscode-languageserver";
-import { IDL } from "./providers/idl";
+} from 'vscode-languageserver';
+import { IDL } from './providers/idl';
 
-const IDL_MODE: DocumentFilter = { language: "idl", scheme: "file" };
+const IDL_MODE: DocumentFilter = { language: 'idl', scheme: 'file' };
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -96,7 +96,7 @@ connection.onInitialized(async () => {
 
     // listen for new workspaces
     connection.workspace.connection.workspace.onDidChangeWorkspaceFolders(async _event => {
-      connection.console.log("Workspace folder change event received. " + JSON.stringify(_event));
+      connection.console.log('Workspace folder change event received. ' + JSON.stringify(_event));
 
       // index/change folders!
       await idl.indexWorkspace(_event.added, true);
@@ -138,7 +138,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
   if (!result) {
     result = connection.workspace.getConfiguration({
       scopeUri: resource,
-      section: "IDLLanguageServer"
+      section: 'IDLLanguageServer'
     });
     documentSettings.set(resource, result);
   }
@@ -147,7 +147,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 
 connection.onDidChangeWatchedFiles(_change => {
   // Monitored files have change in VSCode
-  connection.console.log("We received an file change event");
+  connection.console.log('We received an file change event');
 });
 
 // This handler provides the initial list of the completion items.

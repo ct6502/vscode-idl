@@ -1,6 +1,6 @@
-import { DiagnosticSeverity, SymbolKind } from "vscode-languageserver";
-import { IProblems } from "../core/problems.interface";
-import { IDL } from "./idl";
+import { DiagnosticSeverity, SymbolKind } from 'vscode-languageserver';
+import { IProblems } from '../core/problems.interface';
+import { IDL } from './idl';
 
 export class IDLProblemDetector {
   idl: IDL;
@@ -35,7 +35,7 @@ export class IDLProblemDetector {
           // check if we are a conflict for ENVI or IDL routines
           switch (true) {
             // validate class definitions
-            case ref.symbol.detail.includes("(class definition)"):
+            case ref.symbol.detail.includes('(class definition)'):
               if (this.idl.helper.procedures[ref.symbol.name.toLowerCase()]) {
                 if (!this.problems[ref.uri]) {
                   this.problems[ref.uri] = [];
@@ -45,13 +45,13 @@ export class IDLProblemDetector {
                   severity: DiagnosticSeverity.Error,
                   range: ref.symbol.range,
                   message:
-                    "Duplicate object definition conflicts with existing, core ENVI + IDL object",
-                  source: "Internal or core ENVI + IDL"
+                    'Duplicate object definition conflicts with existing, core ENVI + IDL object',
+                  source: 'Internal or core ENVI + IDL'
                 });
               }
               break;
             // validate function definitions
-            case ref.symbol.detail.includes("Function"):
+            case ref.symbol.detail.includes('Function'):
               if (this.idl.helper.functions[ref.symbol.name.toLowerCase()]) {
                 if (!this.problems[ref.uri]) {
                   this.problems[ref.uri] = [];
@@ -61,13 +61,13 @@ export class IDLProblemDetector {
                   severity: DiagnosticSeverity.Error,
                   range: ref.symbol.range,
                   message:
-                    "Duplicate function definition conflicts with existing, core ENVI + IDL function",
-                  source: "Internal or core ENVI + IDL"
+                    'Duplicate function definition conflicts with existing, core ENVI + IDL function',
+                  source: 'Internal or core ENVI + IDL'
                 });
               }
               break;
             // validate procedure definitions
-            case ref.symbol.detail.includes("Procedure"):
+            case ref.symbol.detail.includes('Procedure'):
               if (this.idl.helper.procedures[ref.symbol.name.toLowerCase()]) {
                 if (!this.problems[ref.uri]) {
                   this.problems[ref.uri] = [];
@@ -77,8 +77,8 @@ export class IDLProblemDetector {
                   severity: DiagnosticSeverity.Error,
                   range: ref.symbol.range,
                   message:
-                    "Duplicate procedure definition conflicts with existing, core ENVI + IDL procedure",
-                  source: "Internal or core ENVI + IDL"
+                    'Duplicate procedure definition conflicts with existing, core ENVI + IDL procedure',
+                  source: 'Internal or core ENVI + IDL'
                 });
               }
               break;
@@ -106,16 +106,16 @@ export class IDLProblemDetector {
                   this.problems[ref.uri].push({
                     severity: DiagnosticSeverity.Error,
                     range: ref.symbol.range,
-                    message: "Duplicate routine definition",
-                    source: ""
+                    message: 'Duplicate routine definition',
+                    source: ''
                   });
 
                   // save for compare
                   this.problems[compare.uri].push({
                     severity: DiagnosticSeverity.Error,
                     range: compare.symbol.range,
-                    message: "Duplicate routine definition",
-                    source: ""
+                    message: 'Duplicate routine definition',
+                    source: ''
                   });
                   break;
                 default:

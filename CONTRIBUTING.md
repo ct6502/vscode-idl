@@ -29,7 +29,7 @@ npm run watch
 
 This will watch for changes and recompile changes on teh fly. Once compiled, press `F5` in VSCodeto open a development session of VSCode that will have the extension up and running in. In the `Debug Console` you will be able to see console output from the server and any errors. 
 
-**Note:** In the session that is automatically launched, you may have to select the "IDL Language Server" fromt he dropdown on that tab.
+**Note:** In the session that is automatically launched, you may have to select the "IDL Language Server" from the dropdown on that tab.
 
 
 ## Testing

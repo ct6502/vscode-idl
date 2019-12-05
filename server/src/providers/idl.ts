@@ -11,12 +11,12 @@ import {
   TextDocumentChangeEvent,
   CompletionItem,
   Hover
-} from "vscode-languageserver";
-import { IDLSymbolExtractor } from "./idl-symbol-extractor";
-import { IDLRoutineHelper } from "./idl-routine-helper";
-import { IDLProblemDetector } from "./idl-problem-detector";
-import { IDLSymbolManager } from "./idl-symbol-manager";
-import { IDLFileHelper } from "./idl-file-helper";
+} from 'vscode-languageserver';
+import { IDLSymbolExtractor } from './idl-symbol-extractor';
+import { IDLRoutineHelper } from './idl-routine-helper';
+import { IDLProblemDetector } from './idl-problem-detector';
+import { IDLSymbolManager } from './idl-symbol-manager';
+import { IDLFileHelper } from './idl-file-helper';
 
 export class IDL {
   // connection specific properties for vscode lang server
@@ -65,8 +65,8 @@ export class IDL {
     const query = this.manager.getSelectedSymbol(position);
 
     // dont search if empty string
-    if (query.name === "") {
-      return { contents: "" };
+    if (query.name === '') {
+      return { contents: '' };
     }
     // this.consoleLog(query);
 
@@ -77,7 +77,7 @@ export class IDL {
     switch (true) {
       // no matches no dice
       case res.length === 0:
-        return { contents: "" };
+        return { contents: '' };
       // more than one, but first is an exact match, send
       case res.length > 1 && res[0].label.toLowerCase() === query.searchName.toLowerCase():
       // if only one, might as well just send the one
@@ -85,7 +85,7 @@ export class IDL {
         return { contents: res[0].documentation };
       // default, don't send anything
       default:
-        return { contents: "" };
+        return { contents: '' };
     }
   }
 

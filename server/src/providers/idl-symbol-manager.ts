@@ -7,21 +7,21 @@ import {
   TextDocumentPositionParams,
   Definition,
   CompletionItem
-} from "vscode-languageserver";
-import moize from "moize";
+} from 'vscode-languageserver';
+import moize from 'moize';
 import {
   IDLDocumentSymbol,
   resolveCompletionItemKind,
   ISelectedWord
-} from "./idl-symbol-extractor";
+} from './idl-symbol-extractor';
 
 // get our globby code
-const glob = require("glob-fs")({ gitignore: true }); // file searching
-import Uri from "vscode-uri"; // handle URI to file system and back
-import path = require("path"); // path separator
-import fuzzysort = require("fuzzysort"); // search through the symbols
-import { IDL } from "./idl";
-import { IQuickLookupObj, IQuickSearchLookupObj } from "../core/search.interface";
+const glob = require('glob-fs')({ gitignore: true }); // file searching
+import Uri from 'vscode-uri'; // handle URI to file system and back
+import path = require('path'); // path separator
+import fuzzysort = require('fuzzysort'); // search through the symbols
+import { IDL } from './idl';
+import { IQuickLookupObj, IQuickSearchLookupObj } from '../core/search.interface';
 
 // options for controlling search performance
 const searchOptions = {
@@ -108,7 +108,7 @@ export class IDLSymbolManager {
           name: lookup.symbol.name,
           kind: lookup.symbol.kind,
           location: Location.create(lookup.uri, lookup.symbol.range),
-          containerName: ""
+          containerName: ''
         });
       });
     });
@@ -124,7 +124,7 @@ export class IDLSymbolManager {
         case query.equalBefore || query.isFunction:
           return Object.values(this.quickLookup.functions);
         // nothing typed, so just return everything
-        case query.name === "":
+        case query.name === '':
           return Object.values(this.routineCompletionLookup);
         case query.isMethod && query.equalBefore:
           return Object.values(this.quickLookup.functionMethods);
@@ -240,11 +240,11 @@ export class IDLSymbolManager {
 
     // check if we need to clean up the name
     switch (true) {
-      case symbolName.includes("."):
-        symbolName = "::" + symbolName.split(".")[1];
+      case symbolName.includes('.'):
+        symbolName = '::' + symbolName.split('.')[1];
         break;
-      case symbolName.includes("->"):
-        symbolName = "::" + symbolName.split("->")[1];
+      case symbolName.includes('->'):
+        symbolName = '::' + symbolName.split('->')[1];
         break;
       default: // do nothing
     }
@@ -253,7 +253,7 @@ export class IDLSymbolManager {
     let placeholder: Definition = null;
 
     // make sure that we only have one match, no idea why we wouldn't have a match here
-    if (symbolName !== "") {
+    if (symbolName !== '') {
       const symbols = this.findSymbolsByName(symbolName);
 
       // make sure that we have only one match
@@ -262,17 +262,17 @@ export class IDLSymbolManager {
         if (limit) {
           switch (true) {
             // function method
-            case symbolName.includes("::") &&
-              symbols[0].name.toLowerCase().endsWith(symbolName + "()") &&
+            case symbolName.includes('::') &&
+              symbols[0].name.toLowerCase().endsWith(symbolName + '()') &&
               functionFlag:
               placeholder = symbols[0].location;
               break;
             // procedure method
-            case symbolName.includes("::") && symbols[0].name.toLowerCase().endsWith(symbolName):
+            case symbolName.includes('::') && symbols[0].name.toLowerCase().endsWith(symbolName):
               placeholder = symbols[0].location;
               break;
             // function
-            case symbols[0].name.toLowerCase() === symbolName + "()" && functionFlag:
+            case symbols[0].name.toLowerCase() === symbolName + '()' && functionFlag:
               placeholder = symbols[0].location;
               break;
             // procedure
@@ -398,8 +398,8 @@ export class IDLSymbolManager {
 
       process.chdir(folderPath);
       const files: string[] = glob
-        .readdirSync("**/*.pro")
-        .filter(files => !files.toLowerCase().endsWith(".spec.pro"));
+        .readdirSync('**/*.pro')
+        .filter(files => !files.toLowerCase().endsWith('.spec.pro'));
 
       // process each file
       files.forEach(file => {
@@ -463,9 +463,9 @@ export class IDLSymbolManager {
                 };
 
                 // check if our name has '::'  and just get the method name
-                const split = symbol.name.split("::");
+                const split = symbol.name.split('::');
                 let isMethod = false;
-                let replaceName = "";
+                let replaceName = '';
                 if (split.length == 1) {
                   replaceName = symbol.name;
                 } else {
@@ -475,25 +475,25 @@ export class IDLSymbolManager {
 
                 // update name with function, procedure, method
                 switch (true) {
-                  case symbol.detail.includes("Function") && isMethod:
+                  case symbol.detail.includes('Function') && isMethod:
                     this.quickLookup.functionMethods[key] = completionItem;
                     this.quickSearchLookup.functionMethods[key] = prepped;
                     completionItem.insertText = replaceName.substr(0, replaceName.length - 1); // replace with  open paren, not closed
                     break;
-                  case symbol.detail.includes("Function"):
+                  case symbol.detail.includes('Function'):
                     this.quickLookup.functions[key] = completionItem;
                     this.quickSearchLookup.functions[key] = prepped;
                     completionItem.insertText = replaceName.substr(0, replaceName.length - 1); // replace with  open paren, not closed
                     break;
-                  case symbol.detail.includes("Procedure") && isMethod:
+                  case symbol.detail.includes('Procedure') && isMethod:
                     this.quickLookup.procedureMethods[key] = completionItem;
                     this.quickSearchLookup.procedureMethods[key] = prepped;
-                    completionItem.insertText = replaceName + ",";
+                    completionItem.insertText = replaceName + ',';
                     break;
-                  case symbol.detail.includes("Procedure"):
+                  case symbol.detail.includes('Procedure'):
                     this.quickLookup.procedures[key] = completionItem;
                     this.quickSearchLookup.procedures[key] = prepped;
-                    completionItem.insertText = replaceName + ",";
+                    completionItem.insertText = replaceName + ',';
                     break;
                   default:
                     // do nothing

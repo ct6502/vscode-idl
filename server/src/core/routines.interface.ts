@@ -1,4 +1,4 @@
-import { CompletionItem } from "vscode-languageserver";
+import { CompletionItem } from 'vscode-languageserver';
 
 // all keys are strings of the index to access our item
 

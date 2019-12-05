@@ -1,28 +1,28 @@
-import * as vscode from "vscode";
-import * as fs from "fs";
-import * as os from "os";
-import * as cp from "child_process";
-import { IDLAction, commandChildren } from "./idl-tree-view";
+import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as cp from 'child_process';
+import { IDLAction, commandChildren } from './idl-tree-view';
 
 // store the IDL directory locatioons to check when auto-starting IDL
 const idlDirs: { [key: string]: string[] } = {
   darwin: [
-    "/Applications/harris/envi55/idl87/bin/bin.darwin.x86_64",
-    "/Applications/harris/idl87/bin/bin.darwin.x86_64",
-    "/Applications/harris/envi54/idl86/bin/bin.darwin.x86_64",
-    "/Applications/harris/idl86/bin/bin.darwin.x86_64"
+    '/Applications/harris/envi55/idl87/bin/bin.darwin.x86_64',
+    '/Applications/harris/idl87/bin/bin.darwin.x86_64',
+    '/Applications/harris/envi54/idl86/bin/bin.darwin.x86_64',
+    '/Applications/harris/idl86/bin/bin.darwin.x86_64'
   ],
   linux: [
-    "/usr/local/harris/envi55/idl87/bin/bin.linux.x86_64",
-    "/usr/local/harris/idl87/bin/bin.linux.x86_64",
-    "/usr/local/harris/envi54/idl86/bin/bin.linux.x86_64",
-    "/usr/local/harris/idl86/bin/bin.linux.x86_64"
+    '/usr/local/harris/envi55/idl87/bin/bin.linux.x86_64',
+    '/usr/local/harris/idl87/bin/bin.linux.x86_64',
+    '/usr/local/harris/envi54/idl86/bin/bin.linux.x86_64',
+    '/usr/local/harris/idl86/bin/bin.linux.x86_64'
   ],
   win32: [
-    "C:\\Program Files\\Harris\\ENVI55\\IDL87\\bin\\bin.x86_64",
-    "C:\\Program Files\\Harris\\IDL87\\bin\\bin.x86_64",
-    "C:\\Program Files\\Harris\\ENVI54\\IDL86\\bin\\bin.x86_64",
-    "C:\\Program Files\\Harris\\IDL86\\bin\\bin.x86_64"
+    'C:\\Program Files\\Harris\\ENVI55\\IDL87\\bin\\bin.x86_64',
+    'C:\\Program Files\\Harris\\IDL87\\bin\\bin.x86_64',
+    'C:\\Program Files\\Harris\\ENVI54\\IDL86\\bin\\bin.x86_64',
+    'C:\\Program Files\\Harris\\IDL86\\bin\\bin.x86_64'
   ],
 
   // other OS values, just in case we come across them
@@ -39,7 +39,7 @@ export class IDLTreeClickHandler {
   constructor() {}
 
   private _getIDLTerminal(): vscode.Terminal[] {
-    return vscode.window.terminals.filter(terminal => terminal.name.toLowerCase() === "idl");
+    return vscode.window.terminals.filter(terminal => terminal.name.toLowerCase() === 'idl');
   }
 
   private _getActivePROCode(): vscode.TextDocument | null {
@@ -47,7 +47,7 @@ export class IDLTreeClickHandler {
     if (!editor) {
       return null;
     } else {
-      if (editor.document.uri.fsPath.endsWith(".pro")) {
+      if (editor.document.uri.fsPath.endsWith('.pro')) {
         return editor.document;
       } else {
         return null;
@@ -60,7 +60,7 @@ export class IDLTreeClickHandler {
     const terminals = this._getIDLTerminal();
 
     // first, check if we are opening a terminal window or not
-    if (item.label === "Open") {
+    if (item.label === 'Open') {
       if (terminals.length > 0) {
         // make the IDL terminal appear
         terminals[0].show();
@@ -70,7 +70,7 @@ export class IDLTreeClickHandler {
         return;
       } else {
         // detect IDL's installation directory
-        let idlDir = "";
+        let idlDir = '';
         const testDirs = idlDirs[os.platform()];
         for (let i = 0; i < testDirs.length; i++) {
           const dir = testDirs[i];
@@ -81,10 +81,10 @@ export class IDLTreeClickHandler {
         }
 
         // make sure we found the directory
-        if (idlDir !== "") {
+        if (idlDir !== '') {
           // make a new terminal
           const newTerminal = vscode.window.createTerminal();
-          newTerminal.sendText("cd " + idlDir + " && idl");
+          newTerminal.sendText('cd ' + idlDir + ' && idl');
           newTerminal.show();
           // this.registerTerminalForCapture(newTerminal);
 
@@ -108,13 +108,13 @@ export class IDLTreeClickHandler {
           // renderer.write("\x1b[31mHello world\x1b[0m");
         } else {
           // try to spawn IDL
-          const output = cp.spawnSync("idl");
+          const output = cp.spawnSync('idl');
 
           // check if IDL is on the path
           let foundIDL = false;
           output.output.forEach(res => {
             if (res !== null && !foundIDL) {
-              if (res.toString().includes("IDL ")) {
+              if (res.toString().includes('IDL ')) {
                 foundIDL = true;
               }
             }
@@ -124,11 +124,11 @@ export class IDLTreeClickHandler {
           if (foundIDL) {
             // make a new terminal
             const newTerminal = vscode.window.createTerminal();
-            newTerminal.sendText("idl");
+            newTerminal.sendText('idl');
             newTerminal.show();
           } else {
             vscode.window.showWarningMessage(
-              "IDL not found on PATH or in standard installation locations"
+              'IDL not found on PATH or in standard installation locations'
             );
           }
         }
@@ -146,38 +146,38 @@ export class IDLTreeClickHandler {
         const code = this._getActivePROCode();
         if (code) {
           switch (item.label) {
-            case "Compile":
+            case 'Compile':
               await code.save();
               idl.sendText(".compile -v '" + code.uri.fsPath + "'");
               break;
-            case "Run":
+            case 'Run':
               await code.save();
               idl.sendText(".compile -v '" + code.uri.fsPath + "'");
-              idl.sendText(".go");
+              idl.sendText('.go');
               break;
-            case "Stop":
-              idl.sendText("\u0003", false);
+            case 'Stop':
+              idl.sendText('\u0003', false);
               break;
-            case "Continue":
-              idl.sendText(".continue");
+            case 'Continue':
+              idl.sendText('.continue');
               break;
-            case "In":
-              idl.sendText(".step");
+            case 'In':
+              idl.sendText('.step');
               break;
-            case "Over":
-              idl.sendText(".stepover");
+            case 'Over':
+              idl.sendText('.stepover');
               break;
-            case "Out":
-              idl.sendText(".out");
+            case 'Out':
+              idl.sendText('.out');
               break;
-            case "Reset":
-              idl.sendText(".reset");
+            case 'Reset':
+              idl.sendText('.reset');
               break;
             default:
             // do nothing
           }
         } else {
-          vscode.window.showInformationMessage("No active PRO file in VSCode");
+          vscode.window.showInformationMessage('No active PRO file in VSCode');
         }
       }
     }
@@ -186,7 +186,7 @@ export class IDLTreeClickHandler {
   clickedItem(item: IDLAction) {
     // determine what to do, ignore parent requests
     switch (true) {
-      case item.contextValue === "child":
+      case item.contextValue === 'child':
         // determine if we are a command or not
         if (this.commandIds.indexOf(item.label) !== -1) {
           this.sendIDLACommand(item);

@@ -1,14 +1,14 @@
-import test from "ava";
-import { TextDocuments, DocumentSymbol } from "vscode-languageserver";
-import { IDL } from "./idl";
-import { ReturnTestFile, FileToDocumentSymbolParams } from "../test/helper.spec";
+import test from 'ava';
+import { TextDocuments, DocumentSymbol } from 'vscode-languageserver';
+import { IDL } from './idl';
+import { ReturnTestFile, FileToDocumentSymbolParams } from '../test/helper.spec';
 
 const documents: TextDocuments = new TextDocuments();
 
 // placeholder for variable
 let idl: IDL;
 
-test("IDL object creation", t => {
+test('IDL object creation', t => {
   // get start time, to check how long it takes
   const start = process.hrtime();
 
@@ -22,17 +22,17 @@ test("IDL object creation", t => {
   t.assert(idl);
 
   // alert user how long it took
-  t.log("Creation time (ms):", finish[1] / 1000000);
+  t.log('Creation time (ms):', finish[1] / 1000000);
 });
 
-test("Simple document outline", async t => {
+test('Simple document outline', async t => {
   const res: any = await idl.getDocumentOutline(
-    FileToDocumentSymbolParams(ReturnTestFile("addition.pro"))
+    FileToDocumentSymbolParams(ReturnTestFile('addition.pro'))
   );
   const compare = [
     {
-      name: "addition",
-      detail: "Procedure",
+      name: 'addition',
+      detail: 'Procedure',
       kind: 12,
       children: undefined,
       range: {
