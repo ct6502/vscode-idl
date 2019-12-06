@@ -4,7 +4,11 @@ All notable changes to the "idl" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [1.6.1] - 2010-10-05
+## [1.7.0] - Unreleased
+
+Added commands for the buttons added to the sidebar
+
+## [1.6.1] - 2019-10-05
 
 Fixed a bug with problem detection that didn't properly clear
 
