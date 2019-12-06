@@ -44,7 +44,16 @@
   "activationEvents": [
     "onLanguage:idl",
     "workspaceContains:**/*.pro",
-    "onView:idlTree"
+    "onView:idl-tree",
+    "onCommand:idl.openIDL",
+    "onCommand:idl.compileFile",
+    "onCommand:idl.runFile",
+    "onCommand:idl.stopExecution",
+    "onCommand:idl.continueExecution",
+    "onCommand:idl.stepIn",
+    "onCommand:idl.stepOver",
+    "onCommand:idl.stepOut",
+    "onCommand:idl.resetIDL"
   ],
   "main": "./client/dist/extension",
   "categories": [
@@ -52,6 +61,44 @@
   ],
   "icon": "images/idlicon.png",
   "contributes": {
+    "commands": [
+      {
+        "command": "idl.openIDL",
+        "title": "IDL: Open a Terminal"
+      },
+      {
+        "command": "idl.compileFile",
+        "title": "IDL: Compile File"
+      },
+      {
+        "command": "idl.runFile",
+        "title": "IDL: Run"
+      },
+      {
+        "command": "idl.stopExecution",
+        "title": "IDL: Stop Execution"
+      },
+      {
+        "command": "idl.continueExecution",
+        "title": "IDL: Continue Execution"
+      },
+      {
+        "command": "idl.stepIn",
+        "title": "IDL: Step In"
+      },
+      {
+        "command": "idl.stepOver",
+        "title": "IDL: Step Over"
+      },
+      {
+        "command": "idl.stepOut",
+        "title": "IDL: Step Out"
+      },
+      {
+        "command": "idl.resetIDL",
+        "title": "IDL: Reset"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -64,7 +111,7 @@
     "views": {
       "idl-view": [
         {
-          "id": "idlTree",
+          "id": "idl-tree",
           "name": "Actions and Commands"
         }
       ]

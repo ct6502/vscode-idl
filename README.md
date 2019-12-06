@@ -34,6 +34,16 @@ If you are looking to contribute, see [CONTRIBUTING.md](./CONTRIBUTING.md) for n
 
 * Schema validation for all versions of ENVI and IDL tasks to simplify development.
 
+* Commands (Ctrl+shift+p) for:
+
+    - Opening an IDL session
+
+    - Compiling
+
+    - Running PRO files
+
+    - Execution controls (stop, in, over, out)
+
 ## Notes
 
 - Method auto complete has basic variable logic, if there are issues with items not coming up, please submit an issue with a reproduce case on github so that we can make this better.

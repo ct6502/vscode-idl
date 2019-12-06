@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { IDLActionType } from '../core/idl-command-action.interface';
 
 // get all directories for icons
 const thisDir = path.dirname(__filename);
@@ -9,7 +10,7 @@ const extensionDir = path.dirname(clientDir);
 
 // constants to store the names and information for child objects
 interface IChild {
-  name: string;
+  name: IDLActionType;
   descripion: string;
   icon: string;
 }
@@ -42,17 +43,17 @@ export const commandChildren: IChild[] = [
     icon: 'play.svg'
   },
   {
-    name: 'In',
+    name: 'Step In',
     descripion: 'When debugging, step into a routine call',
     icon: 'arrow-down.svg'
   },
   {
-    name: 'Over',
+    name: 'Step Over',
     descripion: 'When debugging, step over a routine call',
     icon: 'arrow-over.svg'
   },
   {
-    name: 'Out',
+    name: 'Step Out',
     descripion: 'When debugging, step out of a routine',
     icon: 'arrow-up.svg'
   },
@@ -138,7 +139,7 @@ export class IDLTreeViewProvider implements vscode.TreeDataProvider<IDLAction> {
 
 export class IDLAction extends vscode.TreeItem {
   constructor(
-    public readonly label: string,
+    public readonly label: IDLActionType,
     private version: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     private iconName: string

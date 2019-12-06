@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as cp from 'child_process';
 import { IDLAction, commandChildren } from './idl-tree-view';
+import { IDLCommandAction } from '../core/idl-command-action.interface';
 
 // store the IDL directory locatioons to check when auto-starting IDL
 const idlDirs: { [key: string]: string[] } = {
@@ -55,7 +56,7 @@ export class IDLTreeClickHandler {
     }
   }
 
-  private async sendIDLACommand(item: IDLAction) {
+  public async sendIDLACommand(item: IDLAction | IDLCommandAction) {
     // get an IDL terminal, use the first
     const terminals = this._getIDLTerminal();
 
@@ -161,13 +162,13 @@ export class IDLTreeClickHandler {
             case 'Continue':
               idl.sendText('.continue');
               break;
-            case 'In':
+            case 'Step In':
               idl.sendText('.step');
               break;
-            case 'Over':
+            case 'Step Over':
               idl.sendText('.stepover');
               break;
-            case 'Out':
+            case 'Step Out':
               idl.sendText('.out');
               break;
             case 'Reset':

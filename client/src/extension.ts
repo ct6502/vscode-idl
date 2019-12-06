@@ -15,6 +15,7 @@ import {
 } from 'vscode-languageclient';
 import { IDLTreeViewProvider } from './providers/idl-tree-view';
 import { IDLTreeClickHandler } from './providers/idl-tree-click-handler';
+import { IDLCommands } from './providers/idl-commands';
 
 let client: LanguageClient;
 
@@ -59,6 +60,8 @@ export function activate(ctx: ExtensionContext) {
 
   // create our click handler
   const clickHandler = new IDLTreeClickHandler();
+  const commands = new IDLCommands(clickHandler);
+  commands.registerCommands(ctx);
 
   // generate our tree provider and get the view for listening to events
   const idlTreeProvider = new IDLTreeViewProvider();
