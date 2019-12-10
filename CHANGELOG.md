@@ -8,6 +8,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 Added commands for the buttons added to the sidebar
 
+Enhanced the way that IDL is auto-detected on Mac + Linux by chekcing IDL_DIR (from idl_setup.sh in the install location)
+
 ## [1.6.1] - 2019-10-05
 
 Fixed a bug with problem detection that didn't properly clear

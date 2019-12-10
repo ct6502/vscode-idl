@@ -2,7 +2,7 @@
   "name": "idl-language-server",
   "description": "IDL Language Server.",
   "author": "Zachary Norman",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "publisher": "CT6502",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
