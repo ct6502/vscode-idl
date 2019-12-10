@@ -60,127 +60,74 @@ export class IDLTreeClickHandler {
     // get an IDL terminal, use the first
     const terminals = this._getIDLTerminal();
 
-    // first, check if we are opening a terminal window or not
-    if (item.label === 'Open') {
-      if (terminals.length > 0) {
-        // make the IDL terminal appear
-        terminals[0].show();
-        vscode.window.showInformationMessage(
-          `IDL has already been started from a terminal window.`
-        );
+    // validate that IDL is open already, or try depending on the action
+    switch (true) {
+      // try to start IDL if it isnt open and return
+      case item.label === 'Open' && terminals.length === 0:
+        const idl = this._startIDL();
         return;
-      } else {
-        // detect IDL's installation directory
-        let idlDir = '';
-        const testDirs = idlDirs[os.platform()];
-        for (let i = 0; i < testDirs.length; i++) {
-          const dir = testDirs[i];
-          if (fs.existsSync(dir)) {
-            idlDir = dir;
-            break;
-          }
-        }
 
-        // make sure we found the directory
-        if (idlDir !== '') {
-          // make a new terminal
-          const newTerminal = vscode.window.createTerminal();
-          newTerminal.sendText('cd ' + idlDir + ' && idl');
-          newTerminal.show();
-          // this.registerTerminalForCapture(newTerminal);
+      // check if we are already open
+      case item.label === 'Open' && terminals.length > 0:
+        vscode.window.showInformationMessage(`IDL has already been started.`);
+        return;
 
-          // newTerminal.sendText = (
-          //   text: string,
-          //   addNewLine: boolean = true
-          // ): void => {
-          //   (<any>newTerminal)._checkDisposed();
-          //   console.log([text]);
-          //   // (<any>newTerminal)._queueApiRequest((<any>newTerminal)._proxy.$sendText, [text, addNewLine]);
-          // };
-          // const renderer = (<any>vscode.window).createTerminalRenderer("idl");
-          // const newTerminal = renderer.terminal;
-          // renderer.terminal.sendText("cd " + idlDir + " && idl");
-          // renderer.terminal.show();
+      // no terminals, so alert user and return
+      case terminals.length === 0:
+        vscode.window.showInformationMessage(`IDL has not been started yet.`);
+        return;
 
-          // const uri = vscode.Uri.file('');
-          // vscode.workspace.openTextDocument(uri);
-          // // vscode.window.showTextDocument()
+      // bring IDL to the front
+      default:
+        terminals[0].show();
+        break;
+    }
 
-          // renderer.write("\x1b[31mHello world\x1b[0m");
-        } else {
-          // try to spawn IDL
-          const output = cp.spawnSync('idl');
+    // get our IDL terminal
+    const idl = terminals[0];
 
-          // check if IDL is on the path
-          let foundIDL = false;
-          output.output.forEach(res => {
-            if (res !== null && !foundIDL) {
-              if (res.toString().includes('IDL ')) {
-                foundIDL = true;
-              }
-            }
-          });
+    // determine what command we need to run
+    const code = this._getActivePROCode();
 
-          // check if we have the A-ok to start IDL
-          if (foundIDL) {
-            // make a new terminal
-            const newTerminal = vscode.window.createTerminal();
-            newTerminal.sendText('idl');
-            newTerminal.show();
-          } else {
-            vscode.window.showWarningMessage(
-              'IDL not found on PATH or in standard installation locations'
-            );
-          }
-        }
-      }
-    } else {
-      // make sure we have IDL open
-      if (terminals.length === 0) {
-        vscode.window.showInformationMessage(`IDL has not been started from a terminal window.`);
-      } else {
-        // get our IDL terminal and show
-        const idl = terminals[0];
-        idl.show();
-
-        // determine what command we need to run
-        const code = this._getActivePROCode();
-        if (code) {
-          switch (item.label) {
-            case 'Compile':
-              await code.save();
-              idl.sendText(".compile -v '" + code.uri.fsPath + "'");
-              break;
-            case 'Run':
-              await code.save();
-              idl.sendText(".compile -v '" + code.uri.fsPath + "'");
-              idl.sendText('.go');
-              break;
-            case 'Stop':
-              idl.sendText('\u0003', false);
-              break;
-            case 'Continue':
-              idl.sendText('.continue');
-              break;
-            case 'Step In':
-              idl.sendText('.step');
-              break;
-            case 'Step Over':
-              idl.sendText('.stepover');
-              break;
-            case 'Step Out':
-              idl.sendText('.out');
-              break;
-            case 'Reset':
-              idl.sendText('.reset');
-              break;
-            default:
-            // do nothing
-          }
-        } else {
+    // check what our action is
+    switch (item.label) {
+      case 'Compile':
+        if (!code) {
           vscode.window.showInformationMessage('No active PRO file in VSCode');
+          return;
         }
-      }
+        await code.save();
+        idl.sendText(".compile -v '" + code.uri.fsPath + "'");
+        break;
+      case 'Run':
+        if (!code) {
+          vscode.window.showInformationMessage('No active PRO file in VSCode');
+          return;
+        }
+        await code.save();
+        idl.sendText(".compile -v '" + code.uri.fsPath + "'");
+        idl.sendText('.go');
+        break;
+      case 'Stop':
+        idl.sendText('\u0003', false);
+        break;
+      case 'Continue':
+        idl.sendText('.continue');
+        break;
+      case 'Step In':
+        idl.sendText('.step');
+        break;
+      case 'Step Over':
+        idl.sendText('.stepover');
+        break;
+      case 'Step Out':
+        idl.sendText('.out');
+        break;
+      case 'Reset':
+        idl.sendText('.reset');
+        break;
+      default:
+      // do nothing
     }
   }
 
@@ -222,5 +169,77 @@ export class IDLTreeClickHandler {
       .then(undefined, rejected => {
         console.log(rejected);
       });
+  }
+
+  private _startIDL(): vscode.Terminal | null {
+    let newTerminal: vscode.Terminal;
+
+    // detect IDL's installation directory
+    let idlDir = '';
+
+    // check for IDL_DIR from sourcing idl_setup.bash
+    if ('IDL_DIR' in process.env) {
+      idlDir = process.env.IDL_DIR;
+    } else {
+      // check other folders if we didnt find anything
+      const testDirs = idlDirs[os.platform()];
+      for (let i = 0; i < testDirs.length; i++) {
+        const dir = testDirs[i];
+        if (fs.existsSync(dir)) {
+          idlDir = dir;
+          break;
+        }
+      }
+    }
+
+    // make sure we found the directory
+    if (idlDir !== '') {
+      // make a new terminal
+      newTerminal = vscode.window.createTerminal();
+      newTerminal.sendText('cd ' + idlDir + ' && idl');
+      newTerminal.show();
+
+      // const renderer = (<any>vscode.window).createTerminalRenderer("idl");
+      // const newTerminal = renderer.terminal;
+      // renderer.terminal.sendText("cd " + idlDir + " && idl");
+      // renderer.terminal.show();
+
+      // const uri = vscode.Uri.file('');
+      // vscode.workspace.openTextDocument(uri);
+      // // vscode.window.showTextDocument()
+
+      // renderer.write("\x1b[31mHello world\x1b[0m");
+    } else {
+      // check if error, try aliases
+      const output = cp.spawnSync('idl -e "print, 42"');
+
+      // check if IDL is on the path
+      let foundIDL = false;
+      try {
+        output.output.forEach(res => {
+          if (res !== null && !foundIDL) {
+            if (res.toString().includes('IDL ')) {
+              foundIDL = true;
+            }
+          }
+        });
+
+        // make a new terminal
+        newTerminal = vscode.window.createTerminal();
+        newTerminal.sendText('idl');
+        newTerminal.show();
+      } catch (err) {
+        // problem spawning IDL
+        vscode.window.showWarningMessage(
+          'IDL not found on PATH, IDL_DIR, or in standard installation locations'
+        );
+      }
+    }
+
+    if (newTerminal) {
+      return newTerminal;
+    } else {
+      return null;
+    }
   }
 }
