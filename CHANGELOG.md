@@ -2,13 +2,14 @@
 
 All notable changes to the "idl" extension will be documented in this file.
 
-## 2.0.1
+## 2.0.1 - 2020-01-22
 
 - Fixed a bug with hover help
 
 - Issues with debugging, so removing features associated (debugging, commands, and webview)
 
 ## 2.0.0 - 2020-01-14
+
 Lots of exciting changes!
 
 - Terminal Commands
@@ -51,7 +52,7 @@ Lots of exciting changes!
 
 - Logging
 
-    - Proper extension logging when not in debug mode.
+    - Proper extension logging when not launching extension in debug mode.
 
     - Error messages prompt the user by default to view logs.
 
