@@ -1,0 +1,43 @@
+{
+  "name": "idl-language-server",
+  "description": "IDL Language Server.",
+  "author": "Zachary Norman",
+  "version": "2.0.0",
+  "publisher": "CT6502",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chris-torrence/vscode-idl"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "test": "ava",
+    "test:watch": "ava --watch",
+    "webpack": "npm run clean && webpack --watch",
+    "webpack-deploy": "npm run clean && webpack --mode production"
+  },
+  "dependencies": {
+    "fast-glob": "^3.1.1",
+    "fuzzysort": "^1.1.4",
+    "moize": "^5.4.4",
+    "vscode-languageserver": "^5.2.1",
+    "vscode-uri": "^2.1.1"
+  },
+  "devDependencies": {},
+  "ava": {
+    "files": [
+      "!src/test"
+    ],
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "verbose": true
+  }
+}

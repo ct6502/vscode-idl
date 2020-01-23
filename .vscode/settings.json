@@ -1,0 +1,33 @@
+{
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false
+  },
+  "[markdown]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false
+  },
+  "[html]": {
+    "editor.formatOnSave": false
+  },
+  "prettier.printWidth": 100,
+  "prettier.singleQuote": true,
+  "tslint.configFile": "tslint.json",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  },
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": false
+}

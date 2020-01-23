@@ -1,0 +1,23 @@
+{
+  "name": "make-i18n",
+  "description": "Code to make internationalization easier with typescript and vscode extensions",
+  "author": "Zachary Norman",
+  "version": "2.0.0",
+  "publisher": "CT6502",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chris-torrence/vscode-idl"
+  },
+  "scripts": {
+    "clean": "rimraf dist && rimraf ../i18n",
+    "build": "npm run clean && tsc -b && cd dist && node build.js && cd ..",
+    "watch:build": "tsc -b --watch",
+    "watch:make": "nodemon ./dist/build.js --config nodemon.json",
+    "start": "npm-run-all build --parallel watch:build watch:make --print-label"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "restartable": "rs",
+  "ignore": ["node_modules/**/node_modules"],
+  "verbose": false,
+  "watch": ["dist/"],
+  "ext": "js,json"
+}

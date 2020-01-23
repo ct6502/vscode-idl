@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "idltask-1.2-task": {
+      "type": "object",
+      "allOf": [
+        {
+          "properties": {
+            "tags": {
+              "type": "array",
+              "description": "An array of strings that help categorize the task.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/idltask-1.1-task"
+        }
+      ]
+    },
+    "idltask-1.1-task": {
+      "type": "object",
+      "allOf": [
+        {
+          "properties": {
+            "revision": {
+              "type": "string",
+              "title": "Revision",
+              "description": "A string with the semantic revision number of the task. Semantic versioning provides a quick way to extract information about a new task release using a convention of X.Y.Z, where:\n\n- X represents the major version. An incremented value indicates that task additions and updates are not backward-compatible.\n- Y represents the minor version. An incremented value indicates that task additions and updates are backward-compatible.\n- Z represents the patch number. An incremented value indicates bug fixes that do not affect the task.\n\nThe revision key is for development purposes only. The revision number does not affect which task file is loaded. Whichever task file is found first will be used. If revision is not set, it will default to a value of 1.0.0.",
+              "default": "1.0.0"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/idltask-1.0-task"
+        }
+      ]
+    },
+    "idltask-1.0-task": {
+      "type": "object",
+      "allOf": [
+        {
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "A string with the name of the task. This name is used when calling the IDLTask function to create an instance of the task. The name of the task file must match the value of this key and must be a valid IDL variable name."
+            }
+          }
+        },
+        {
+          "$ref": "envi-schema-tasks.json#/definitions/envitask-3.0-task"
+        }
+      ]
+    },
+    "idltask-1.2-parameter": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/idltask-1.1-parameter"
+        }
+      ]
+    },
+    "idltask-1.1-parameter": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/idltask-1.0-parameter"
+        }
+      ]
+    },
+    "idltask-1.0-parameter": {
+      "type": "object",
+      "allOf": [
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Type",
+              "description": "A scalar string indicating the parameter type to use on creating an instance of the task.\n\nBasic scalar data type string values are:\n\n- BYTE, INT, UINT, LONG, ULONG, LONG64,ULONG64, FLOAT, DOUBLE, COMPLEX, DCOMPLEX, STRING, BOOLEAN, LIST, HASH, DICTIONARY, ORDEREDHASH\n\nBasic array data types must include the dimensions key and type string values are:\n\n- BYTEARRAY, INTARRAY, UINTARRAY, LONGARRAY, ULONGARRAY, LONG64ARRAY,ULONG64ARRAY, FLOATARRAY, DOUBLEARRAY, COMPLEXARRAY, DCOMPLEXARRAY, STRINGARRAY, BOOLEANARRAY\n\nThe type key value can be set to a class name to indicate that the user must provide an object of the given class name."
+            }
+          }
+        },
+        {
+          "$ref": "envi-schema-tasks.json#/definitions/envitask-3.0-parameter"
+        }
+      ]
+    }
+  }
+}

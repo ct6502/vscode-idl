@@ -1,0 +1,11 @@
+.nyc_output
+coverage
+client/dist
+i18n
+make-i18n/dist
+node_modules
+server/dist
+.vscode-test
+*.vsix
+*package.nls*.json
+idl.extension.host.log

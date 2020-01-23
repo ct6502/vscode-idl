@@ -1,0 +1,318 @@
+{
+  "name": "idl",
+  "displayName": "IDL: Interactive Data Language",
+  "description": "IDL syntax highlighting, code snippets, and much more!",
+  "version": "2.0.1",
+  "publisher": "CT6502",
+  "license": "BSD Type - SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chris-torrence/vscode-idl"
+  },
+  "scripts": {
+    "build-client": "cd client && npm run webpack-deploy && cd ..",
+    "build-server": "cd server && npm run webpack-deploy && cd ..",
+    "contributors:init": "all-contributors init",
+    "contributors:add": "all-contributors add",
+    "contributors:generate": "all-contributors generate",
+    "code-prep": "npm-run-all --parallel prettier-check lint",
+    "deploy": "npm run make-i18n && npm-run-all --parallel build-client build-server",
+    "install-client": "cd client && npm install && cd ..",
+    "install-server": "cd server && npm install && cd ..",
+    "install-i18n": "cd make-i18n && npm install && cd ..",
+    "lint": "tslint --project tsconfig-lint.json --fix",
+    "make-i18n": "cd make-i18n && npm run build && cd ..",
+    "prettier": "prettier --config ./.prettierrc.json --write client/**/*.ts make-i18n/**/*.ts server/**/*.ts client/**/*.json server/**/*.json !client/.vscode-test/** !client/.nyc_output/** !client/coverage/**  !**/dist/** !server/routines/**",
+    "prettier-check": "prettier --config ./.prettierrc.json --check client/**/*.ts make-i18n/**/*.ts server/**/*.ts client/**/*.json server/**/*.json !client/.vscode-test/** !client/.nyc_output/** !client/coverage/** !**/dist/** !server/routines/**",
+    "postinstall": "npm-run-all install-client install-server install-i18n",
+    "test": "npm run test-i18n && npm-run-all --parallel test-client test-server",
+    "test-i18n": "npm run make-i18n",
+    "test-client": "cd client && npm test",
+    "test-server": "cd server && npm test",
+    "vscode:prepublish": "npm-run-all code-prep test deploy",
+    "watch": "npm run make-i18n && npm-run-all --parallel watch-client watch-server",
+    "watch-client": "cd client && npm run webpack",
+    "watch-server": "cd server && npm run webpack",
+    "watch-i18n": "cd make-i18n && npm start",
+    "watch-vscode-test": "npm run make-i18n && cd client && npm run watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^13.1.1",
+    "all-contributors-cli": "^4.11.1",
+    "angular-tslint-rules": "^1.20.3",
+    "ava": "^2.4.0",
+    "merge-options": "^1.0.1",
+    "node-emoji": "^1.10.0",
+    "npm-run-all": "^4.1.5",
+    "nyc": "^15.0.0",
+    "prettier": "^1.19.1",
+    "relative": "^3.0.2",
+    "rimraf": "^3.0.0",
+    "stacktracey": "^1.2.122",
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4",
+    "vscode-test": "^1.3.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "engines": {
+    "vscode": "^1.41.0"
+  },
+  "activationEvents": [
+    "onLanguage:idl",
+    "workspaceContains:**/*.pro",
+    "onView:idl-tree",
+    "onCommand:idl.openIDLTerminal",
+    "onCommand:idl.compileFileTerminal",
+    "onCommand:idl.runFileTerminal",
+    "onCommand:idl.executeBatchFileTerminal",
+    "onCommand:idl.resetIDLTerminal",
+    "onCommand:idl.stopExecutionTerminal",
+    "onCommand:idl.continueExecutionTerminal",
+    "onCommand:idl.stepInTerminal",
+    "onCommand:idl.stepOverTerminal",
+    "onCommand:idl.stepOutTerminal"
+  ],
+  "main": "./client/dist/extension",
+  "categories": [
+    "Programming Languages",
+    "Themes",
+    "Snippets"
+  ],
+  "icon": "images/idlicon.png",
+  "contributes": {
+    "themes": [
+      {
+        "label": "%themes.new%",
+        "uiTheme": "vs-dark",
+        "path": "./language/themes/dark.json"
+      },
+      {
+        "label": "%themes.retro%",
+        "uiTheme": "vs",
+        "path": "./language/themes/light.json"
+      }
+    ],
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "idl.idlDir": {
+          "type": "string",
+          "format": "uri",
+          "description": "%configuration.idlDir.description%",
+          "scope": "machine-overridable"
+        },
+        "idl.dontAskForIdlDir": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.dontAskForIDLDir%",
+          "scope": "user"
+        },
+        "idl.idlPath": {
+          "type": "array",
+          "default": [],
+          "description": "%configuration.idlPath%",
+          "scope": "window",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "idl.addWorkspaceFoldersToPath": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.addWorkspaceFoldersToPath%",
+          "scope": "window"
+        },
+        "idl.appendOrPrependWorkspaceFolders": {
+          "enum": [
+            "prepend",
+            "append"
+          ],
+          "default": "prepend",
+          "description": "%configuration.appendOrPrependWorkspaceFolders%",
+          "scope": "window"
+        },
+        "idl.verboseExtensionClient": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.verboseExtensionClient%",
+          "scope": "user"
+        },
+        "idl.verboseServerClient": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.verboseServerClient%",
+          "scope": "user"
+        },
+        "idl.debugMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.debugMode%",
+          "scope": "user"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "idl.specifyIDLDirectory",
+        "title": "%commands.idl.specifyIDLDirectory%"
+      },
+      {
+        "command": "idl.specifyIDLDirectoryWorkspace",
+        "title": "%commands.idl.specifyIDLDirectoryWorkspace%"
+      },
+      {
+        "command": "idl.fileABug",
+        "title": "%commands.idl.fileABug%"
+      },
+      {
+        "command": "idl.openIDLTerminal",
+        "title": "%commands.idl.openIDLTerminal%"
+      },
+      {
+        "command": "idl.compileFileTerminal",
+        "title": "%commands.idl.compileFileTerminal%"
+      },
+      {
+        "command": "idl.runFileTerminal",
+        "title": "%commands.idl.runFileTerminal%"
+      },
+      {
+        "command": "idl.executeBatchFileTerminal",
+        "title": "%commands.idl.executeBatchFileTerminal%"
+      },
+      {
+        "command": "idl.resetIDLTerminal",
+        "title": "%commands.idl.resetIDLTerminal%"
+      },
+      {
+        "command": "idl.stopExecutionTerminal",
+        "title": "%commands.idl.stopExecutionTerminal%"
+      },
+      {
+        "command": "idl.continueExecutionTerminal",
+        "title": "%commands.idl.continueExecutionTerminal%"
+      },
+      {
+        "command": "idl.stepInTerminal",
+        "title": "%commands.idl.stepInTerminal%"
+      },
+      {
+        "command": "idl.stepOverTerminal",
+        "title": "%commands.idl.stepOverTerminal%"
+      },
+      {
+        "command": "idl.stepOutTerminal",
+        "title": "%commands.idl.stepOutTerminal%"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "idl-view",
+          "title": "IDL",
+          "icon": "images/idlicon.svg"
+        }
+      ]
+    },
+    "views": {
+      "idl-view": [
+        {
+          "id": "idl-tree",
+          "name": "%idl.tree.name%"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "idl",
+        "aliases": [
+          "IDL",
+          "idl"
+        ],
+        "extensions": [
+          ".pro"
+        ],
+        "configuration": "./language/syntaxes/language-configuration.json"
+      },
+      {
+        "id": "json",
+        "aliases": [
+          "Task",
+          "task"
+        ],
+        "extensions": [
+          ".task"
+        ]
+      },
+      {
+        "id": "json",
+        "aliases": [
+          "Style",
+          "style"
+        ],
+        "extensions": [
+          ".style"
+        ]
+      },
+      {
+        "id": "json",
+        "aliases": [
+          "Model",
+          "model"
+        ],
+        "extensions": [
+          ".model"
+        ]
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": "*.task",
+        "url": "./language/schemas/tasks.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "idl",
+        "scopeName": "source.idl",
+        "path": "./language/syntaxes/idl.tmLanguage"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "idl",
+        "path": "./language/snippets/idl.json"
+      },
+      {
+        "language": "idl",
+        "path": "./language/snippets/loops.json"
+      },
+      {
+        "language": "idl",
+        "path": "./language/snippets/conditionals.json"
+      },
+      {
+        "language": "idl",
+        "path": "./language/snippets/envi.json"
+      },
+      {
+        "language": "idl",
+        "path": "./language/snippets/objects.json"
+      },
+      {
+        "language": "idl",
+        "path": "./language/snippets/tests.json"
+      }
+    ]
+  },
+  "__metadata": {
+    "id": "6d16eefa-72a8-4d42-8b60-923da419ad11",
+    "publisherId": "57c04141-2024-405c-9c48-49d3db0f7402",
+    "publisherDisplayName": "CT6502"
+  }
+}
