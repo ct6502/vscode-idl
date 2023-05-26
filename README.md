@@ -1,5 +1,10 @@
 # VS Code IDL (Interactive Data Language) Extension
 
+> This extension has been deprecated and migrated to a new location!
+> By installing this extension, you will automatically get the new extension.
+>
+> See here as well:
+
 **2.0.1 is here!** This release offers many exciting and new features. With all these new features, there also may be some undocumented software enhancements (i.e. bugs). For these please use [GitHub](https://github.com/chris-torrence/vscode-idl) to file bug/feature requests. There is also a quick link for submitting bugs for the extension in the IDL View.
 
 **Note that, due to issues with debugging, the feature has been temporarily removed**
