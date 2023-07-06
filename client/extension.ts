@@ -3,7 +3,7 @@ import { ExtensionContext } from 'vscode';
 
 // function to activate our extension
 export async function activate(ctx: ExtensionContext) {
-  const idlName = 'idl.idl';
+  const idlName = 'idl.idl-for-vscode';
 
   // alert user
   vscode.window.showInformationMessage(
@@ -14,10 +14,7 @@ export async function activate(ctx: ExtensionContext) {
   const newIdl = vscode.extensions.getExtension(idlName);
   if (!newIdl) {
     // install the extension.
-    await vscode.commands.executeCommand(
-      'workbench.extensions.installExtension',
-      'idl.idl-for-vscode'
-    );
+    await vscode.commands.executeCommand('workbench.extensions.installExtension', idlName);
   }
 }
 
