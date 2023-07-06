@@ -1,6 +1,6 @@
 .nyc_output
 coverage
-client/dist
+dist/
 i18n
 make-i18n/dist
 node_modules
