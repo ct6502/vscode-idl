@@ -7,7 +7,7 @@ export async function activate(ctx: ExtensionContext) {
 
   // alert user
   vscode.window.showInformationMessage(
-    'This extension has migrated to a new place! Automatically installing the latest version, with many features and updates. You should uninstall this extension.'
+    'This extension has migrated to a new place! Automatically installing the new extension. You should uninstall this deprecated extension.'
   );
 
   // guide the users to install Microsoft Python extension.

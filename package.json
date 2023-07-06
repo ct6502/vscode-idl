@@ -1,7 +1,7 @@
 {
   "name": "idl",
-  "displayName": "IDL: Interactive Data Language",
-  "description": "IDL syntax highlighting, code snippets, and much more!",
+  "displayName": "IDL (DEPRECATED)",
+  "description": "(DEPRECATED) IDL syntax highlighting, code snippets, and much more!",
   "version": "2.1.0",
   "publisher": "CT6502",
   "license": "BSD Type - SEE LICENSE IN LICENSE",
