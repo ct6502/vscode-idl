@@ -2,6 +2,10 @@
 
 All notable changes to the "idl" extension will be documented in this file.
 
+## 2.1.0
+
+Removed all functionality and auto-installs new extension.
+
 ## 2.0.1 - 2020-01-22
 
 - Fixed a bug with hover help
