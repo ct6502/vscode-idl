@@ -1,3 +1,10 @@
+# Deprecated and Migrated to [IDL for VSCode](https://marketplace.visualstudio.com/items?itemName=IDL.idl-for-vscode)
+
+This extension is now managed and published by the creators of IDL and ENVI. You can view the new GitHub repository here: https://github.com/interactive-data-language/vscode-idl
+
+
+If you are looking for earlier versions of this source code, see the git history for this repo.
+
 # VS Code IDL (Interactive Data Language) Extension
 
 > This extension has been deprecated and migrated to a new location!

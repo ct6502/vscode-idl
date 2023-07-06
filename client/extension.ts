@@ -6,14 +6,19 @@ export async function activate(ctx: ExtensionContext) {
   const idlName = 'idl.idl';
 
   // alert user
-  vscode.window.showInformationMessage('This extension has migrated to a new place! Automatically installing the latest version, with many features and updates. You should uninstall this extension.')
+  vscode.window.showInformationMessage(
+    'This extension has migrated to a new place! Automatically installing the latest version, with many features and updates. You should uninstall this extension.'
+  );
 
   // guide the users to install Microsoft Python extension.
   const newIdl = vscode.extensions.getExtension(idlName);
   if (!newIdl) {
-    await vscode.commands.executeCommand('workbench.extensions.installExtension', 'idl.idl'); // install the extension.
+    // install the extension.
+    await vscode.commands.executeCommand(
+      'workbench.extensions.installExtension',
+      'idl.idl-for-vscode'
+    );
   }
-
 }
 
 export function deactivate() {

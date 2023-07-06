@@ -2,7 +2,7 @@
   "name": "idl",
   "displayName": "IDL: Interactive Data Language",
   "description": "IDL syntax highlighting, code snippets, and much more!",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "publisher": "CT6502",
   "license": "BSD Type - SEE LICENSE IN LICENSE",
   "repository": {
@@ -14,15 +14,15 @@
   },
   "dependencies": {},
   "devDependencies": {
-		"@types/node": "^16.11.7",
-		"@types/vscode": "^1.73.0",
-		"@typescript-eslint/eslint-plugin": "^5.42.0",
-		"@typescript-eslint/parser": "^5.42.0",
-		"eslint": "^8.26.0",
-		"typescript": "^5.0.2"
+    "@types/node": "^16.11.7",
+    "@types/vscode": "^1.73.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "eslint": "^8.26.0",
+    "typescript": "^5.0.2"
   },
   "engines": {
-		"vscode": "^1.74.0"
+    "vscode": "^1.74.0"
   },
   "activationEvents": [
     "workspaceContains:**/*.pro"
